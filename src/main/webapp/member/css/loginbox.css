@@ -1,0 +1,11 @@
+.mn-login-box {
+    max-width: 500px;
+    width: 100%;
+    margin: 0 auto;
+}
+/* 同時確保輸入框是 100% 寬度 */
+.mn-login-wrap input {
+    width: 100%;
+    box-sizing: border-box;
+}
+

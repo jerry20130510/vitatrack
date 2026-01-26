@@ -3,9 +3,9 @@
 
 	<Resource name="jdbc/vitatrack" type="javax.sql.DataSource"
 		driverClassName="com.mysql.cj.jdbc.Driver"
-		jdbcUrl="jdbc:mysql://localhost:3306/vitatrack"
-		username="root"
-		password="123456" 
+		jdbcUrl="jdbc:mysql://tibame.c8gprzfylp8c.us-east-1.rds.amazonaws.com:3306/vitatrack"
+		username="admin"
+		password="tibame24708053" 
 		factory="com.zaxxer.hikari.HikariJNDIFactory"
 		dataSource.cachePrepStmts="true" 
 		dataSource.prepStmtCacheSize="250"
