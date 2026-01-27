@@ -10351,6 +10351,7 @@ button.btn-close.qty_close {
   -webkit-box-direction: normal;
       -ms-flex-direction: row;
           flex-direction: row;
+  justify-content: center;
 }
 .mn-login-content .mn-login-box {
   width: 50%;

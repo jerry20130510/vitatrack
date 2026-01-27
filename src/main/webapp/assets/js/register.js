@@ -1,0 +1,1 @@
+// 移動自 member/js/register.js
