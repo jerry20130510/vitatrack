@@ -25,7 +25,7 @@
 /* 讓輸入框寬度適中 */
 .mn-login-form input[type="email"],
 .mn-login-form input[type="password"] {
-	width: 300px;
+	width: 350px;
 	max-width: 80vw;
 	margin: 0.5em 0;
 }
