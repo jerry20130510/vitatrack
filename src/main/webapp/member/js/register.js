@@ -141,4 +141,29 @@ document.addEventListener("DOMContentLoaded", function () {
         window.location.href = "login.html";
     });
 
+	fetch("vitatrack/member/register",{
+		method:"post",
+		headers:{"content-type":"application/json"},
+		body:JSON.stringify({
+				"name":"member.name",	
+				"address":"member.address",
+				"phone":"member.phone",
+				"email":"member.email",
+				"password":"member.password",	 
+				"verify_code":"member.verify_code"
+				})
+				
+	.then(res=> res.json())
+	.then()
+		
+		
+		
+		
+		
+		
+		
+		
+	})
+	
+	
 });
