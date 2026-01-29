@@ -1,169 +1,93 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    const form = document.getElementById("registerForm"); // 注意抓 form 的 id
-    //STEP 1
-    // 取得所有需要驗證的輸入欄位
-    // 這裡用 querySelectorAll 一次抓取，方便統一管理
-    const inputs = document.querySelectorAll("input[required], input[pattern]");
-    const nameInput = document.getElementById("name");
+    const name = document.getElementById("name");
     const email = document.getElementById("email");
-    const phonenumber = document.getElementById("phonenumber");
-    const addressInput = document.getElementById("address");
+    const phone = document.getElementById("phone");
+    const address = document.getElementById("address");
     const password = document.getElementById("password");
-    const repassword = document.getElementById("re-password");
-    const customAlert = document.getElementById("customAlert"); // 註冊成功視窗
-    const goLoginBtn = document.getElementById("goLoginBtn"); // 登入按鈕
+    const confirmPassword = document.getElementById("confirmPassword");
+    const registerForm = document.getElementById("registerForm");
+	const registerBtn = document.getElementById("registerBtn");
+
+    registerBtn.addEventListener("click", function (event) {
+        // event.preventDefault();
 
 
-    // STEP2. 通用邏輯：監聽所有欄位的 Blur 事件
-    // ==========================================
-    // 這裡我們只做一件事：給欄位加上 "touched" 標籤
-    // 這樣 CSS 就會知道「可以顯示紅框了」
-    [phonenumber, email, password, repassword].forEach(input => {
-        input.addEventListener("blur", function() {
-            this.classList.add("touched"); 
-            
-            // ★ 關鍵：這裡絕對不要寫 reportValidity()，這樣就不會卡住游標
-        });
-    });
-
-
-    // ===== Email 即時驗證 =====
-    email.addEventListener("input", function () {
-        email.setCustomValidity("");
-        if (email.value && !email.validity.valid) {
-            email.setCustomValidity("Email格式輸入不符，請重新輸入!\n" + email.title);
-        }
-    });
-    
-
-    //手機號碼輸入即時檢查
-    phonenumber.addEventListener("input", function () {
-        // 步驟 1: 先清除之前的自定義錯誤訊息
-        // 這一步非常重要！這會讓 validity.valid 變回「僅根據 HTML pattern 判斷」的狀態
-        // 若格式錯誤 → 自訂錯誤訊息
-        phonenumber.setCustomValidity("");
-
-        // 步驟 2: 檢查 HTML 原生的驗證結果 (pattern 是否符合)
-        if (!phonenumber.validity.valid) {
-            // 自己的錯誤訊息
-            let customMsg = "手機格式輸入不符，請重新輸入!";
-            // 取出 HTML title 的內容
-            let titleMsg = phonenumber.title;
-
-            phonenumber.setCustomValidity(customMsg + "\n" + titleMsg);
-        }
-        // 步驟 3: 顯示驗證結果
-        // 注意：在 input 事件一直呼叫 reportValidity 會導致打字時一直跳視窗，建議斟酌使用
-        // 當滑鼠離開欄位時才跳出提示框
-        //  phonenumber.reportValidity();
-
-    });
-  
-
-
-    // ===== 密碼即時驗證 =====
-    password.addEventListener("input", function () {
-        password.setCustomValidity("");
-        if (password.value && !password.validity.valid) {
-            password.setCustomValidity("密碼格式不符，請重新輸入!");
-        }
-    });
-
-    // 確認密碼即時驗證
-
-    repassword.addEventListener("input", function () {
-        repassword.setCustomValidity("");
-        if (repassword.value !== password.value) {
-            repassword.setCustomValidity("與設定密碼不一致，請重新輸入!");
-        }
-        // repassword.reportValidity();
-    });
-
-
-    // 表單送出
-    form.addEventListener("submit", function (event) {
-        event.preventDefault();
-
-        // 為了讓所有錯誤欄位都顯示紅框，我們在送出時把所有欄位都標記為 touched
-        inputs.forEach(input => input.classList.add("touched"));
-        // 檢查 A: 瀏覽器原生檢查 (包含 required, pattern, 以及上面 input 設定的 setCustomValidity)
-        if (!form.checkValidity()) {
-            form.reportValidity(); // 這時候才跳出第一個錯誤提示框
-            return; // 停止送出
-        }
-        // 檢查 B: 雙重確認密碼 (雖然 input 寫了，但在 submit 再擋一次比較保險)
-        if (repassword.value !== password.value) {
-            repassword.setCustomValidity("兩次密碼輸入不一致!");
-            repassword.reportValidity();
+        // 驗證註冊功能中各個必填欄位是否為空，若空return 此欄為必填欄位;前端有驗證的後端程式也要驗證
+       
+        // trim() 方法會回傳一個去除了空格的字串，它永遠不會回傳 null（如果原字串不是 null）。
+        // 如果使用者只輸入空白，trim() 會回傳 ""（空字串）。
+        // 1 姓名不能空白
+        if (!name.value || name.value.trim() === "") {
+            alert("此欄為必填欄位");
             return;
         }
 
-        // ===== 模擬向後端發送資料 =====
-        // const formData = {
-        //     name: document.getElementById("name").value,
-        //     email: email.value,
-        //     phone: phonenumber.value,
-        //     address: document.getElementById("address").value,
-        //     password: password.value
-        // };
-        // // 使用 Fetch API 發送 POST 請求
-        //  fetch("/register", {
-        //     method: "POST",
-        //     headers: { "Content-Type": "application/json" },
-        //     body: JSON.stringify(formData)
-        // })
-        //     .then(res => res.json())
-        //     .then(data => {
-        //         if (data.success) {
-        //             // 顯示成功提示視窗
-        //             customAlert.style.display = "flex";
-        //             setTimeout(() => window.location.href = "/login.html", 2000);
-        //         } else {
-        //             alert(data.message || "註冊失敗，請重試！");
-        //         }
-        //     })
-        //     .catch(err => {
-        //         console.error(err);
-        //         alert("網路錯誤，請稍後再試！");
-        //     });
+        // 2 電子郵件 必須為^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$
+        if (!email.value || !email.value.match(/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/)) {
+            alert("email格式錯誤或未填寫!");
+            return;
+        }
 
-        // 全部通過顯示自訂彈窗
-        customAlert.style.display = "flex";
-        
+        // 3 手機 必須是09開頭且共10位數字("^09[0-9]{8}$") 手機號碼格式錯誤或未填寫!
+        if (!phone.value || !phone.value.match(/^09[0-9]{8}$/)) {
+            alert("手機號碼格式錯誤或未填寫!");
+            return;
+        }
+
+        // 4 密碼 密碼至少為 8 個字元，且至少包含 1 個英文字母(大小寫皆可)與 1 個數字 密碼格式錯誤或未填寫!
+        if (!password.value || !password.value.match(/^(?=.*[A-Za-z])(?=.*\d).{8,}$/)) {
+            alert("密碼格式錯誤或未填寫!");
+            return;
+        }
+        // 5 重新輸入密碼 和密碼 必須一致  與設定密碼不一致，請重新輸入!
+        if (confirmPassword.value !== password.value) {
+            alert("與設定密碼不一致，請重新輸入!");
+            return;
+        }
+
+        // 6 判斷帳號是否有重複，資料庫的email不能等於新註冊的email
+        //但前端無法真正「驗證」Email 是否重複（因為前端拿不到資料庫完整清單）。
+
+        // 7 利用ajax 發出請求，接回應
+        fetch('register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                name: registerForm.name.value,
+                email: registerForm.email.value,
+                phone: registerForm.phone.value,
+                address: registerForm.address ? registerForm.address.value.trim() : "",
+                password: registerForm.password.value,
+                confirmPassword: registerForm.confirmPassword.value
+            })
+        })
+            .then(response => response.json()) //接收ap server 回傳的json格式，反序列化為js物件
+            .then(result => {
+                console.log("這是後端回傳的所有資料：", result); //  將後端回傳的 JSON 字串轉換後的 JS 物件。
+                if (result.success) {
+                    //如果後端顯示true，要顯示註冊成功 
+                    // 顯示自訂彈窗
+                    // 使用 flex 才能觸發 CSS 裡的置中效果
+                    customAlert.style.display = "flex"; //彈窗顯示
+                    // 清空表單
+                    registerForm.reset();
+                } else {
+                    //如果後端顯示false，要顯示註冊失敗
+                    // result.message 就是在 Service 層調用String register(Member member) 回傳的 errMsg 內容
+                    alert("註冊失敗: " + result.errMsg);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("註冊過程中發生錯誤，請稍後再試。");
+            })
     });
-
-
-
-
-    // 登入會員按鈕 → 跳轉登入頁
-    goLoginBtn.addEventListener("click", function () {
-        window.location.href = "login.html";
+    // 彈窗按鈕 → 前往登入頁面 
+    const customAlert = document.getElementById("customAlert");
+    const loginBtn = document.getElementById("loginBtn");
+    loginBtn.addEventListener("click", function () {
+        console.log("前往登入頁按鈕被按！");
+        window.location.href = "login.html"; // 跳轉到我的登入頁面
     });
-
-	fetch("vitatrack/member/register",{
-		method:"post",
-		headers:{"content-type":"application/json"},
-		body:JSON.stringify({
-				"name":"member.name",	
-				"address":"member.address",
-				"phone":"member.phone",
-				"email":"member.email",
-				"password":"member.password",	 
-				"verify_code":"member.verify_code"
-				})
-				
-	.then(res=> res.json())
-	.then()
-		
-		
-		
-		
-		
-		
-		
-		
-	})
-	
-	
 });

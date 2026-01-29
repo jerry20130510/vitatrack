@@ -3,39 +3,43 @@ package web.member.vo;
 import java.sql.Timestamp;
 
 public class Member {
-	
-	private Integer member_id;
+
+	private Integer memberId;
 	private String name;
-	private String address;
 	private String email;
+	private String phone;
+	private String address;
 	private String password;
-	private String verify_code;
-	private Integer member_status;
-	private Timestamp registration_time;
-	
+	private String confirmPassword;
+	private String verifyCode;
+	private Integer memberStatus;
+	private Timestamp registrationTime;
+
 	public Member() {
-		
+
 	}
 
-	public Member(Integer member_id, String name, String address, String email, String password, String verify_code,
-			Integer member_status, Timestamp registration_time) {
+	public Member(Integer memberId, String name, String email, String phone, String address, String password,
+			String confirmPassword, String verifyCode, Integer memberStatus, Timestamp registrationTime) {
 		super();
-		this.member_id = member_id;
+		this.memberId = memberId;
 		this.name = name;
-		this.address = address;
 		this.email = email;
+		this.phone = phone;
+		this.address = address;
 		this.password = password;
-		this.verify_code = verify_code;
-		this.member_status = member_status;
-		this.registration_time = registration_time;
+		this.confirmPassword = confirmPassword;
+		this.verifyCode = verifyCode;
+		this.memberStatus = memberStatus;
+		this.registrationTime = registrationTime;
 	}
 
-	public Integer getMember_id() {
-		return member_id;
+	public Integer getMemberId() {
+		return memberId;
 	}
 
-	public void setMember_id(Integer member_id) {
-		this.member_id = member_id;
+	public void setMemberId(Integer memberId) {
+		this.memberId = memberId;
 	}
 
 	public String getName() {
@@ -46,20 +50,28 @@ public class Member {
 		this.name = name;
 	}
 
-	public String getAddress() {
-		return address;
-	}
-
-	public void setAddress(String address) {
-		this.address = address;
-	}
-
 	public String getEmail() {
 		return email;
 	}
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public String getPhone() {
+		return phone;
+	}
+
+	public void setPhone(String phone) {
+		this.phone = phone;
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
 	public String getPassword() {
@@ -70,35 +82,38 @@ public class Member {
 		this.password = password;
 	}
 
-	public String getVerify_code() {
-		return verify_code;
+	public String getConfirmPassword() {
+		return confirmPassword;
 	}
 
-	public void setVerify_code(String verify_code) {
-		this.verify_code = verify_code;
+	public void setConfirmPassword(String confirmPassword) {
+		this.confirmPassword = confirmPassword;
 	}
 
-	public Integer getMember_status() {
-		return member_status;
+	public String getVerifyCode() {
+		return verifyCode;
 	}
 
-	public void setMember_status(Integer member_status) {
-		this.member_status = member_status;
+	public void setVerifyCode(String verifyCode) {
+		this.verifyCode = verifyCode;
 	}
 
-	public Timestamp getRegistration_time() {
-		return registration_time;
+	public Integer getMemberStatus() {
+		return memberStatus;
 	}
 
-	public void setRegistration_time(Timestamp registration_time) {
-		this.registration_time = registration_time;
+	public void setMemberStatus(Integer memberStatus) {
+		this.memberStatus = memberStatus;
 	}
+
+	public Timestamp getRegistrationTime() {
+		return registrationTime;
+	}
+
+	public void setRegistrationTime(Timestamp registrationTime) {
+		this.registrationTime = registrationTime;
+	}
+
 	
-	
-	
-	
-	
-	
-	
-	
+
 }

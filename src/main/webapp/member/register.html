@@ -29,7 +29,8 @@
 
 	<!-- Main CSS -->
 	<link id="mainCss" href="../assets/css/style.css" rel="stylesheet">
-	<link href="../assets/css/register.css" rel="stylesheet">
+	<link rel="stylesheet" href="./css/customAlert.css">
+	
 </head>
 
 <body data-mn-mode="light">
@@ -44,7 +45,7 @@
 			</div>
 		</div>
 
-		
+
 
 		<header class="sb-hide">
 			<div class="mn-header">
@@ -77,7 +78,7 @@
 															<ul class="d-block mega-block">
 																<li class="menu_title"><a
 																		href="javascript:void(0)">商品分類</a></li>
-																		
+
 																<li><a href="shop-list-left-sidebar.html">腸胃</a></li>
 																<li><a href="shop-list-left-sidebar.html">眼睛</a></li>
 																<li><a href="shop-list-left-sidebar.html">膝蓋</a></li>
@@ -92,24 +93,29 @@
 												</li>
 												<li class="dropdown drop-list">
 													<a href="javascript:void(0)" class="dropdown-arrow">文章<i
-															 class="ri-arrow-down-s-line"></i></a>
+															class="ri-arrow-down-s-line"></i></a>
 													<ul class="mega-menu d-block">
 														<li class="d-flex">
 															<span class="bg"></span>
 															<ul class="d-block mega-block">
 																<li class="menu_title"><a
 																		href="javascript:void(0)">文章分類</a></li>
-																		
-																<li><a href="blog-detail-right-sidebar.html">有機蔬菜栽種</a></li>
-																<li><a href="blog-detail-right-sidebar.html">全穀物的營養價值</a></li>
-																<li><a href="blog-detail-right-sidebar.html">有機生活</a></li>
-																<li><a href="blog-detail-right-sidebar.html">冥想入門</a></li>
-																
+
+																<li><a href="blog-detail-right-sidebar.html">有機蔬菜栽種</a>
 																</li>
-															</ul>
+																<li><a
+																		href="blog-detail-right-sidebar.html">全穀物的營養價值</a>
+																</li>
+																<li><a href="blog-detail-right-sidebar.html">有機生活</a>
+																</li>
+																<li><a href="blog-detail-right-sidebar.html">冥想入門</a>
+																</li>
+
 														</li>
 													</ul>
 												</li>
+											</ul>
+											</li>
 											</ul>
 										</div>
 									</div>
@@ -281,41 +287,44 @@
 					<div class="mn-register-wrapper">
 						<div class="mn-register-container">
 							<div class="mn-register-form">
-								<form id="registerForm" action="#" method="post">
+								<form id="registerForm"  method="post">
 									<span class="mn-register-wrap mn-register-half">
 										<label for="name">姓名*</label>
-										<input type="text" id="name" name="name" placeholder="Enter your name" required>
+										<input type="text" id="name" name="name" placeholder="Enter your name" title="請輸入姓名" required>
 									</span>
 									<span class="mn-register-wrap mn-register-half">
 										<label for="email">電子郵件*</label>
 										<input type="email" id="email" name="email" placeholder="Enter your email ..."
-											pattern="^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$"
+											pattern="^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"
 											title="請輸入有效的 Email，例如：example@mail.com" required>
 									</span>
 
 									<span class="mn-register-wrap mn-register-half">
-										<label for="phonenumber">手機號碼*</label>
-										<input type="tel" id="phonenumber" name="phonenumber"
-											placeholder="Enter your phone number" pattern="^09[0-9]{8}$"
-											title="必須是09開頭且共10位數字" maxlength="10" inputmode="numeric" required>
+										<label for="phone">手機號碼*</label>
+										<input type="tel" id="phone" name="phone" placeholder="Enter your phone number"
+											pattern="^09[0-9]{8}$" title="必須是09開頭且共10位數字" maxlength="10"
+											inputmode="numeric" required>
 									</span>
 									<span class="mn-register-wrap">
 										<label for="address">地址</label>
-										<input type="text" id="address" name="address" placeholder="Address Line">
+
+										<input type="text" id="address" name="address" placeholder="Address Line"
+											maxlength="100">
 									</span>
 									<span class="mn-register-wrap mn-register-half">
 										<label for="password">設定密碼*</label>
 										<input type="password" id="password" name="password"
 											placeholder="Enter your password" pattern="^(?=.*[A-Za-z])(?=.*\d).{8,}$"
+											
 											title="密碼至少為 8 個字元，且至少包含 1 個英文字母(大小寫皆可)與 1 個數字" required>
 										<!-- 至少 8 位 + 必須包含字母和數字（常見規範） -->
 										<!-- A. 至少 8 位 + 必須包含字母和數字（常見規範）
                                                  pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$" -->
 									</span>
 									<span class="mn-register-wrap mn-register-half">
-										<label for="re-password">重新輸入密碼*</label>
-										<input type="password" id="re-password" name="re-password"
-											placeholder="Re-Enter your password" required>
+										<label for="confirmPassword">重新輸入密碼*</label>
+										<input type="password" id="confirmPassword" name="confirmPassword"
+											title="重新輸入密碼" placeholder="Re-Enter your password" required>
 									</span>
 									<!-- 驗證 -->
 									<span class="mn-register-wrap mn-recaptcha">
@@ -329,14 +338,14 @@
 									</span>
 									<span class="mn-register-wrap mn-register-btn">
 										<span>已經有帳號了?<a href="login.html">登入</a></span>
-										<button class="mn-btn-1" type="submit"><span>註冊</span></button>
+										<button class="mn-btn-1" id="registerBtn" type="button"><span>註冊</span></button>
 									</span>
 								</form>
 								<!-- 自訂註冊成功視窗 -->
-								<div id="customAlert" class="alert-overlay" style="display:none;">
+								<div id="customAlert" class="alert-cover" style="display:none;">
 									<div class="alert-box">
 										<p class="alert-title">感謝您加入我們的會員</p>
-										<button id="goLoginBtn" class="alert-btn">前往登入頁面</button>
+										<button id="loginBtn" class="alert-btn">前往登入頁面</button>
 									</div>
 								</div>
 
@@ -349,7 +358,7 @@
 			</section>
 		</div>
 
-	<!-- Footer -->
+		<!-- Footer -->
 		<footer class="m-t-15 sb-hide">
 			<div class="mn-footer">
 				<div class="footer-container">
@@ -866,7 +875,7 @@
 						</li>
 						<li class="wishlist-sidebar-list">
 							<a href="product-detail.html" class="mn-pro-img"><img src="../assets/img/product/5.jpg"
-									alt="product"></a>                                   
+									alt="product"></a>
 							<div class="mn-pro-content">
 								<a href="product-detail.html" class="wishlist-pro-title">T-Shirt for men</a>
 								<span class="wishlist-price"><span>$65.00</span><span class="stock">- 54 in
@@ -900,7 +909,7 @@
 
 	<!-- Main Custom -->
 	<script src="../assets/js/main.js"></script>
-	<script src="../assets/js/register.js"></script>
+	<script src="./js/register.js"></script>
 </body>
 
 </html>
