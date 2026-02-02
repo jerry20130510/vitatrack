@@ -1,5 +1,6 @@
 package web.blog.controller;
 
+import com.google.gson.Gson;
 import web.blog.service.ArticleService;
 import web.blog.service.impl.ArticleServiceImpl;
 
@@ -9,14 +10,17 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 @WebServlet("/api/articles/like")
 public class ArticleLikeController extends HttpServlet {
     private ArticleService articleService;
+    private Gson gson;
 
     @Override
     public void init() throws ServletException {
         articleService = new ArticleServiceImpl();
+        gson = new Gson();
     }
 
     @Override
@@ -25,17 +29,23 @@ public class ArticleLikeController extends HttpServlet {
         String slug = req.getParameter("slug");
         
         if (slug == null || slug.trim().isEmpty()) {
-            resp.getWriter().write("{\"success\":false,\"errMsg\":\"缺少slug參數\"}");
+            Map<String, Object> response = Map.of("success", false, "errMsg", "缺少slug參數");
+            resp.getWriter().write(gson.toJson(response));
             return;
         }
         
         String errMsg = articleService.incrementLikes(slug);
         if (errMsg != null) {
-            resp.getWriter().write("{\"success\":false,\"errMsg\":\"" + errMsg + "\"}");
+            Map<String, Object> response = Map.of("success", false, "errMsg", errMsg);
+            resp.getWriter().write(gson.toJson(response));
             return;
         }
         
         int likes = articleService.getLikes(slug);
-        resp.getWriter().write("{\"success\":true,\"data\":{\"totalLikes\":" + likes + "}}");
+        Map<String, Object> response = Map.of(
+            "success", true,
+            "data", Map.of("totalLikes", likes)
+        );
+        resp.getWriter().write(gson.toJson(response));
     }
 }
