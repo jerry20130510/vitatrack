@@ -1,6 +1,7 @@
 package web.blog.controller;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import web.blog.bean.ArticleListResponse;
 import web.blog.service.ArticleService;
 import web.blog.service.impl.ArticleServiceImpl;
@@ -11,21 +12,24 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Map;
 
 @WebServlet("/api/articles")
 public class ArticleListController extends HttpServlet {
     private ArticleService articleService;
+    private Gson gson;
 
     @Override
     public void init() throws ServletException {
         articleService = new ArticleServiceImpl();
+        gson = new GsonBuilder()
+            .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
+            .create();
     }
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Gson gson = new GsonBuilder()
-            .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
-            .create();
+        resp.setContentType("application/json; charset=UTF-8");
         
         int page = req.getParameter("page") != null ? Integer.parseInt(req.getParameter("page")) : 0;
         int size = req.getParameter("size") != null ? Integer.parseInt(req.getParameter("size")) : 6;
@@ -34,13 +38,7 @@ public class ArticleListController extends HttpServlet {
         
         ArticleListResponse data = articleService.listArticles(page, size, category, authorSlug);
         
-        JsonObject response = new JsonObject();
-        response.addProperty("success", true);
-        
-        JsonElement dataJson = gson.toJsonTree(data);
-        response.add("data", dataJson);
-        
-        resp.setContentType("application/json; charset=UTF-8");
+        Map<String, Object> response = Map.of("success", true, "data", data);
         resp.getWriter().write(gson.toJson(response));
     }
 }
