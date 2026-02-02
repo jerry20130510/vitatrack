@@ -30,7 +30,7 @@
 	<!-- Main CSS -->
 	<link id="mainCss" href="../assets/css/style.css" rel="stylesheet">
 	<!-- Login box 去除多餘留白部分 -->
-	<link id="mainCss" href="../assets/css/loginbox.css" rel="stylesheet">
+	<link id="mainCss" href="../member/css/loginbox.css" rel="stylesheet">
 </head>
 
 <body data-mn-mode="light">
@@ -45,9 +45,9 @@
 			</div>
 		</div>
 
-		
 
-	<!-- Header -->
+
+		<!-- Header -->
 		<header class="sb-hide">
 			<div class="mn-header">
 				<div class="mn-header-items">
@@ -68,7 +68,7 @@
 										<div class="mn-main-menu">
 											<ul>
 												<li class="non-drop">
-													<a href="index.html">首頁</a>
+													<a href="../index.html">首頁</a>
 												</li>
 												<li class="dropdown drop-list">
 													<a href="javascript:void(0)" class="dropdown-arrow">商品<i
@@ -79,7 +79,7 @@
 															<ul class="d-block mega-block">
 																<li class="menu_title"><a
 																		href="javascript:void(0)">商品分類</a></li>
-																		
+
 																<li><a href="shop-list-left-sidebar.html">腸胃</a></li>
 																<li><a href="shop-list-left-sidebar.html">眼睛</a></li>
 																<li><a href="shop-list-left-sidebar.html">膝蓋</a></li>
@@ -101,17 +101,22 @@
 															<ul class="d-block mega-block">
 																<li class="menu_title"><a
 																		href="javascript:void(0)">文章分類</a></li>
-																		
-																<li><a href="blog-detail-right-sidebar.html">有機蔬菜栽種</a></li>
-																<li><a href="blog-detail-right-sidebar.html">全穀物的營養價值</a></li>
-																<li><a href="blog-detail-right-sidebar.html">有機生活</a></li>
-																<li><a href="blog-detail-right-sidebar.html">冥想入門</a></li>
-																
+
+																<li><a href="blog-detail-right-sidebar.html">有機蔬菜栽種</a>
 																</li>
-															</ul>
+																<li><a
+																		href="blog-detail-right-sidebar.html">全穀物的營養價值</a>
+																</li>
+																<li><a href="blog-detail-right-sidebar.html">有機生活</a>
+																</li>
+																<li><a href="blog-detail-right-sidebar.html">冥想入門</a>
+																</li>
+
 														</li>
 													</ul>
 												</li>
+											</ul>
+											</li>
 											</ul>
 										</div>
 									</div>
@@ -128,7 +133,7 @@
 								<div class="mn-menu-content">
 									<ul>
 										<li>
-											<a href="index.html">首頁</a>
+											<a href="../index.html">首頁</a>
 										</li>
 										<li>
 											<a href="javascript:void(0)">商品</a>
@@ -213,7 +218,7 @@
 								</a>
 								<ul class="sub-menu">
 									<li>
-										<a href="login.html">登入</a>
+										<a href="../member/login.html">登入</a>
 									</li>
 									<li>
 										<a href="register.html">註冊</a>
@@ -284,35 +289,39 @@
 						<div class="mn-login-wrapper">
 							<div class="mn-login-container">
 								<div class="mn-login-form">
-									<form action="#" method="post" id="loginForm">
+									<form method="post" id="loginForm">
 										<span class="mn-login-wrap">
-											<label for="email">電子信箱*</label>
-											<input type="email" id="email" name="email" placeholder="Enter your email add..."
-												required>
+											<label for="email">帳號*</label>
+											<input type="email" id="email" name="email"
+												placeholder="Enter your email address" required>
 										</span>
 										<span class="mn-login-wrap">
 											<label for="password">密碼*</label>
-											<input type="password" id="password" name="password" placeholder="Enter your password"
-												required>
+											<input type="password" id="password" name="password"
+												placeholder="Enter your password" required>
 										</span>
 										<span class="mn-login-wrap mn-login-fp">
 											<span class="mn-remember">
 												<input type="checkbox" id="rememberMe" name="rememberMe">
-												記得帳號
+												<label for="rememberMe">記住帳號</label>
 												<span class="checked"></span>
 											</span>
-											<label><a href="#">忘記密碼?</a></label>
+											<label><a href="#" id="forgotPasswordLink">忘記密碼?</a></label>
 										</span>
 										<span class="mn-login-wrap mn-login-btn">
-											<span><a href="register.html" class="">創建帳號?</a></span>
-											<button class="mn-btn-1 btn" type="submit"><span>登入</span></button>
+											<span><a href="../member/register.html" class="">創建帳號?</a></span>
+											<button class="mn-btn-1 btn" id="loginBtn"
+												type="button"><span>登入</span></button>
 										</span>
 									</form>
 									<!-- 自訂彈窗 Alert -->
 									<div id="customAlert" class="alert-overlay" style="display:none;">
 										<div class="alert-box">
-											<p class="alert-title">會員登入成功<br>歡迎回來！</p>
-											<button id="goMemberBtn" class="alert-btn">前往會員頁面</button>
+											<!-- <p class="alert-title">會員登入成功<br>歡迎回來！</p>
+											<button id="goMemberBtn" class="alert-btn">前往會員頁面</button> -->
+											<p class="alert-title" id="alertMessage"></p>
+											<button id="alertBtn" class="alert-btn">確定</button>
+
 										</div>
 									</div>
 									<!-- 忘記密碼彈窗 -->
@@ -320,8 +329,8 @@
 										<div class="alert-box">
 											<p class="alert-title">忘記密碼</p>
 											<p>請輸入您註冊的電子信箱</p>
-											<input type="text" id="fpEmail" name="fpEmail" placeholder="your-email@example.com"
-												class="alert-input">
+											<input type="text" id="fpEmail" name="fpEmail"
+												placeholder="your-email@example.com" class="alert-input">
 											<button id="fpSendBtn" class="alert-btn">送出</button>
 											<button id="fpCloseBtn" class="alert-btn cancel-btn">取消</button>
 										</div>
@@ -892,34 +901,11 @@
 	<!-- Main Custom -->
 	<script src="../assets/js/main.js"></script>
 	<!-- 登入跳轉 -->
-	<script src="../assets/js/login.js"></script>
+	<script src="../member/js/login.js"></script>
 
 	<script>
 		console.log("Login JS 已成功載入！");
 	</script>
-	<!-- <script>
-		document.addEventListener("DOMContentLoaded", function () {
-
-			const form = document.querySelector("form");
-			const customAlert = document.getElementById("customAlert");
-			const goMemberBtn = document.getElementById("goMemberBtn");
-
-			console.log("JS 有執行到這裡！");
-
-			form.addEventListener("submit", function (event) {
-				event.preventDefault(); // 防止 405
-
-				console.log("submit 被觸發！");
-				customAlert.style.display = "flex";
-			});
-
-			goMemberBtn.addEventListener("click", function () {
-				console.log("前往會員頁按鈕被按！");
-				window.location.href = "product-accordion-full-width.html";
-			});
-
-		});
-	</script> -->
 
 
 </body>

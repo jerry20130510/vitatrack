@@ -69,6 +69,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     //如果後端顯示true，要顯示註冊成功 
                     // 顯示自訂彈窗
                     // 使用 flex 才能觸發 CSS 裡的置中效果
+                    const customAlert = document.getElementById("customAlert");
                     customAlert.style.display = "flex"; //彈窗顯示
                     // 清空表單
                     registerForm.reset();
@@ -84,7 +85,7 @@ document.addEventListener("DOMContentLoaded", function () {
             })
     });
     // 彈窗按鈕 → 前往登入頁面 
-    const customAlert = document.getElementById("customAlert");
+  
     const loginBtn = document.getElementById("loginBtn");
     loginBtn.addEventListener("click", function () {
         console.log("前往登入頁按鈕被按！");

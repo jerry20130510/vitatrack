@@ -1058,7 +1058,7 @@ p {
   padding: 7px 12px;
   background-color: #ffd783;
   color: #313b50;
-  border-radius: 10px;
+  border-radius: 15px;
   border: 0;
   position: relative;
   display: -webkit-inline-box;
@@ -10354,7 +10354,7 @@ button.btn-close.qty_close {
   justify-content: center;
 }
 .mn-login-content .mn-login-box {
-  width: 50%;
+  width: 40%;
   padding: 0 15px;
 }
 
