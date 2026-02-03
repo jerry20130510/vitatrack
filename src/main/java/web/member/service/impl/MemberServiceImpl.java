@@ -42,7 +42,7 @@ public class MemberServiceImpl implements MemberService {
 	    if (address != null) {
 	        address = address.trim(); // 去除前後空白
 	        
-	        // 限制最大長度，例如資料庫 VARCHAR(255)，這裡就設 200
+	        // 限制最大長度，資料庫 VARCHAR(255)，這裡就設 200
 	        if (address.length() > 200) {
 	            return "地址長度過長"; 
 	        }
@@ -82,6 +82,21 @@ public class MemberServiceImpl implements MemberService {
 
 		// 9全部成功，回傳 null 代表沒有錯誤訊息或 代表的是 「錯誤訊息為空」。
 		return null;
+	}
+
+	@Override
+	public Member login(Member member) {
+		
+		//驗證帳號和密碼
+		String email =member.getEmail();
+		String password =member.getPassword();
+		if (email==null||email.isEmpty()) {
+			return null ;
+		}
+		if (password==null||password.isEmpty()) {
+			return null;
+		}
+		return memberDao.SelectByEmailandPassword(email, password);
 	}
 
 }

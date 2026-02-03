@@ -3,6 +3,8 @@ package web.member.dao.impl;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
+
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
@@ -73,5 +75,46 @@ public class MemberDaoImpl implements MemberDao {
 
 		return null;
 	}
+
+	@Override
+	public Member SelectByEmailandPassword(String email, String password) {
+		String sql = "select * from member where email =? and password=?";
+		try (
+			Connection conn = ds.getConnection(); 
+			PreparedStatement pstmt = conn.prepareStatement(sql);
+		) {
+			pstmt.setString(1, email);
+			pstmt.setString(2, password);
+			try (ResultSet rs = pstmt.executeQuery();) {
+//				// --- 偵錯用程式碼：印出所有欄位名稱 ---
+//			    ResultSetMetaData metaData = rs.getMetaData();
+//			    int count = metaData.getColumnCount();
+//			    for (int i = 1; i <= count; i++) {
+//			        System.out.println("資料庫欄位第 " + i + " 個名稱是: [" + metaData.getColumnName(i) + "]");
+//			    }
+//			    // ----------------------------------
+				if (rs.next()) {
+					Member member = new Member();
+					member.setMemberId(rs.getInt("member_id"));
+					member.setName(rs.getString("name"));
+					member.setEmail(rs.getString("email"));
+					member.setPhone(rs.getString("phone"));
+					member.setAddress(rs.getString("address"));
+					member.setPassword(rs.getString("password"));
+					member.setVerifyCode(rs.getString("verify_code"));
+					member.setMemberStatus(rs.getInt("member_status"));
+					member.setRegistrationTime(rs.getTimestamp("registration_Time"));
+					return member;
+				}
+				
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return null;
+	}
+		
+	
 
 }

@@ -7,14 +7,78 @@ document.addEventListener("DOMContentLoaded", function () {
     const password = document.getElementById("password");
     const confirmPassword = document.getElementById("confirmPassword");
     const registerForm = document.getElementById("registerForm");
-	const registerBtn = document.getElementById("registerBtn");
+    const registerBtn = document.getElementById("registerBtn");
 
+    name.addEventListener("blur", function () {
+        const hint = document.getElementById("nameHint");
+        console.log(hint);
+
+        if (name.value.trim() === "") {
+            hint.textContent = "此欄為必填欄位";
+            hint.style.color = "red";
+        } else {
+            hint.textContent = "格式正確";
+            hint.style.color = "green";
+        }
+    });
+
+    email.addEventListener("blur", function () {
+        const hint = document.getElementById("emailHint");
+        console.log(hint);
+        const rule = /^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/;
+        if (!email.value.match(rule)) {
+            hint.textContent = "請輸入有效的Email，例如：example@mail.com";
+            hint.style.color = "red";
+        } else {
+            hint.textContent = "格式正確";
+            hint.style.color = "green";
+        }
+    });
+
+    phone.addEventListener("blur", function () {
+        const hint = document.getElementById("phoneHint");
+        console.log(hint);
+        const rule = /^09[0-9]{8}$/;
+        if (!phone.value.match(rule)) {
+            hint.textContent = "必須是09開頭且共10位數字";
+            hint.style.color = "red";
+        } else {
+            hint.textContent = "格式正確";
+            hint.style.color = "green";
+        }
+    });
+
+    password.addEventListener("blur", function () {
+        const hint = document.getElementById("passwordHint");
+        console.log(hint);
+        const rule = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+        if (!password.value.match(rule)) {
+            hint.textContent = "密碼至少為8個字元，且至少包含1個英文字母(大小寫皆可)與1個數字";
+            hint.style.color = "red";
+        } else {
+            hint.textContent = "格式正確";
+            hint.style.color = "green";
+        }
+    });
+
+    confirmPassword.addEventListener("blur", function () {
+        const hint = document.getElementById("confirmPasswordHint");
+        console.log(hint);
+
+        if (confirmPassword.value !== password.value || confirmPassword.value === "") {
+            hint.textContent = "與設定密碼不一致";
+            hint.style.color = "red";
+        } else {
+            hint.textContent = "與設定密碼一致";
+            hint.style.color = "green";
+        }
+    });
     registerBtn.addEventListener("click", function (event) {
         // event.preventDefault();
 
 
         // 驗證註冊功能中各個必填欄位是否為空，若空return 此欄為必填欄位;前端有驗證的後端程式也要驗證
-       
+
         // trim() 方法會回傳一個去除了空格的字串，它永遠不會回傳 null（如果原字串不是 null）。
         // 如果使用者只輸入空白，trim() 會回傳 ""（空字串）。
         // 1 姓名不能空白
@@ -41,7 +105,7 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
         // 5 重新輸入密碼 和密碼 必須一致  與設定密碼不一致，請重新輸入!
-        if (confirmPassword.value !== password.value) {
+        if (confirmPassword.value !== password.value || confirmPassword.value === "") {
             alert("與設定密碼不一致，請重新輸入!");
             return;
         }
@@ -69,6 +133,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     //如果後端顯示true，要顯示註冊成功 
                     // 顯示自訂彈窗
                     // 使用 flex 才能觸發 CSS 裡的置中效果
+                    const customAlert = document.getElementById("customAlert");
                     customAlert.style.display = "flex"; //彈窗顯示
                     // 清空表單
                     registerForm.reset();
@@ -84,7 +149,7 @@ document.addEventListener("DOMContentLoaded", function () {
             })
     });
     // 彈窗按鈕 → 前往登入頁面 
-    const customAlert = document.getElementById("customAlert");
+
     const loginBtn = document.getElementById("loginBtn");
     loginBtn.addEventListener("click", function () {
         console.log("前往登入頁按鈕被按！");
