@@ -1,6 +1,7 @@
 // blog-reader-util.js - Shared utilities for public blog pages
 
-const API_BASE = 'http://localhost:8080/api';
+const contextPath = window.location.pathname.substring(0, window.location.pathname.indexOf('/', 1)) || '';
+const API_BASE = `${window.location.origin}${contextPath}/api`;
 
 // DOM helpers
 const el = id => document.getElementById(id);
