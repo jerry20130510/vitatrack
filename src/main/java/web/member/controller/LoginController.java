@@ -1,6 +1,5 @@
 package web.member.controller;
 
-
 import java.io.IOException;
 import javax.naming.NamingException;
 import javax.servlet.ServletException;
@@ -21,24 +20,18 @@ public class LoginController extends HttpServlet {
 	private MemberService memberService;
 
 	public LoginController() throws NamingException {
-
 		memberService = new MemberServiceImpl();
 	}
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("application/json");
-
-
-
 		Gson gson = new Gson();
-		
-
 		// 再轉 Member 物件
 		Member member = gson.fromJson(req.getReader(), Member.class);
 
 		JsonObject result = new JsonObject();
-		Member loginMember =memberService.login(member);
+		Member loginMember = memberService.login(member);
 
 		if (loginMember == null) {
 			result.addProperty("success", false);

@@ -10,7 +10,6 @@ public class MemberServiceImpl implements MemberService {
 	private MemberDao memberDao;
 
 	public MemberServiceImpl() throws NamingException {
-
 		memberDao = new MemberDaoImpl();
 	}
 
@@ -38,24 +37,24 @@ public class MemberServiceImpl implements MemberService {
 			return "手機號碼格式錯誤或未填寫!";
 		}
 		// 4處理地址 (因為是非必填，先處理空值)
-	    String address = member.getAddress();
-	    if (address != null) {
-	        address = address.trim(); // 去除前後空白
-	        
-	        // 限制最大長度，資料庫 VARCHAR(255)，這裡就設 200
-	        if (address.length() > 200) {
-	            return "地址長度過長"; 
-	        }
-	        // 如果是空字串，可以統一設為 null 存入資料庫
-	        if (address.isEmpty()) {
-	            member.setAddress(null);
-	        } else {
-	            // 2. 安全性過濾：過濾掉 HTML 標籤防止 XSS
-	            // 建議使用外部 Library 如 Jsoup，或簡單用 String 取代
-	            String safeAddress = address.replaceAll("<[^>]*>", "");  //防止XSS注入攻擊
-	            member.setAddress(safeAddress);
-	        }
-	    }
+		String address = member.getAddress();
+		if (address != null) {
+			address = address.trim(); // 去除前後空白
+
+			// 限制最大長度，資料庫 VARCHAR(255)，這裡就設 200
+			if (address.length() > 200) {
+				return "地址長度過長";
+			}
+			// 如果是空字串，可以統一設為 null 存入資料庫
+			if (address.isEmpty()) {
+				member.setAddress(null);
+			} else {
+				// 2. 安全性過濾：過濾掉 HTML 標籤防止 XSS
+				// 建議使用外部 Library 如 Jsoup，或簡單用 String 取代
+				String safeAddress = address.replaceAll("<[^>]*>", ""); // 防止XSS注入攻擊
+				member.setAddress(safeAddress);
+			}
+		}
 
 		// 5 密碼 密碼至少為 8 個字元，且至少包含 1 個英文字母(大小寫皆可)與 1 個數字
 		String password = member.getPassword();
@@ -86,14 +85,13 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public Member login(Member member) {
-		
-		//驗證帳號和密碼
-		String email =member.getEmail();
-		String password =member.getPassword();
-		if (email==null||email.isEmpty()) {
-			return null ;
+		// 驗證帳號和密碼
+		String email = member.getEmail();
+		String password = member.getPassword();
+		if (email == null || email.isEmpty()) {
+			return null;
 		}
-		if (password==null||password.isEmpty()) {
+		if (password == null || password.isEmpty()) {
 			return null;
 		}
 		return memberDao.SelectByEmailandPassword(email, password);
