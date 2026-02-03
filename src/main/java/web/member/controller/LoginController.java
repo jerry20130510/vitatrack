@@ -15,7 +15,7 @@ import web.member.vo.Member;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-@WebServlet("/member/login")
+@WebServlet("/login")
 public class LoginController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private MemberService memberService;
