@@ -13,23 +13,23 @@
 	<title>Mantu - eCommerce HTML Template.</title>
 
 	<!-- App favicon -->
-	<link rel="shortcut icon" href="../assets/img/favicon/favicon.png">
+	<link rel="shortcut icon" href="assets/img/favicon/favicon.png">
 
 	<!-- Icon CSS -->
-	<link href="../assets/css/vendor/materialdesignicons.min.css" rel="stylesheet">
-	<link href="../assets/css/vendor/remixicon.css" rel="stylesheet">
+	<link href="assets/css/vendor/materialdesignicons.min.css" rel="stylesheet">
+	<link href="assets/css/vendor/remixicon.css" rel="stylesheet">
 
 	<!-- Vendor -->
-	<link href="../assets/css/vendor/bootstrap.min.css" rel="stylesheet">
-	<link href="../assets/css/vendor/animate.min.css" rel="stylesheet">
-	<link href="../assets/css/vendor/owl.carousel.min.css" rel="stylesheet">
-	<link href="../assets/css/vendor/slick.min.css" rel="stylesheet">
-	<link href="../assets/css/vendor/swiper-bundle.min.css" rel="stylesheet">
-	<link href="../assets/css/vendor/nouislider.css" rel="stylesheet">
+	<link href="assets/css/vendor/bootstrap.min.css" rel="stylesheet">
+	<link href="assets/css/vendor/animate.min.css" rel="stylesheet">
+	<link href="assets/css/vendor/owl.carousel.min.css" rel="stylesheet">
+	<link href="assets/css/vendor/slick.min.css" rel="stylesheet">
+	<link href="assets/css/vendor/swiper-bundle.min.css" rel="stylesheet">
+	<link href="assets/css/vendor/nouislider.css" rel="stylesheet">
 
 	<!-- Main CSS -->
-	<link id="mainCss" href="../assets/css/style.css" rel="stylesheet">
-	<link rel="stylesheet" href="./css/customAlert.css">
+	<link id="mainCss" href="assets/css/style.css" rel="stylesheet">
+	<link rel="stylesheet" href="member/css/register.css">
 	
 </head>
 
@@ -40,7 +40,7 @@
 		<!-- Loader -->
 		<div id="mn-overlay">
 			<div class="loader">
-				<img src="../assets/img/logo/loader.png" alt="loader">
+				<img src="assets/img/logo/loader.png" alt="loader">
 				<span class="shape"></span>
 			</div>
 		</div>
@@ -51,7 +51,7 @@
 			<div class="mn-header">
 				<div class="mn-header-items">
 					<div class="left-header">
-						<a href="../index.html" class="logo"><img src="../assets/img/logo/logo.png" alt="logo"></a>
+						<a href="index.html" class="logo"><img src="assets/img/logo/logo.png" alt="logo"></a>
 						<a href="javascript:void(0)" class="mn-toggle-menu">
 							<div class="header-icon">
 								<i class="ri-menu-3-fill"></i>
@@ -67,7 +67,7 @@
 										<div class="mn-main-menu">
 											<ul>
 												<li class="non-drop">
-													<a href="../index.html">首頁</a>
+													<a href="index.html">首頁</a>
 												</li>
 												<li class="dropdown drop-list">
 													<a href="javascript:void(0)" class="dropdown-arrow">商品<i
@@ -217,10 +217,10 @@
 								</a>
 								<ul class="sub-menu">
 									<li>
-										<a href="../member/login.html">登入</a>
+										<a href="login.html">登入</a>
 									</li>
 									<li>
-										<a href="../member/register.html">註冊</a>
+										<a href="register.html">註冊</a>
 									</li>
 								</ul>
 							</div>
@@ -289,42 +289,40 @@
 							<div class="mn-register-form">
 								<form id="registerForm"  method="post">
 									<span class="mn-register-wrap mn-register-half">
-										<label for="name">姓名*</label>
+										<label for="name">姓名*</label><span id="nameHint" class="hint-text"></span>
 										<input type="text" id="name" name="name" placeholder="Enter your name" title="請輸入姓名" required>
+										
 									</span>
 									<span class="mn-register-wrap mn-register-half">
-										<label for="email">電子郵件*</label>
+										<label for="email">電子郵件*</label><span id="emailHint" class="hint-text"></span>
 										<input type="email" id="email" name="email" placeholder="Enter your email ..."
-											pattern="^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$"
-											title="請輸入有效的 Email，例如：example@mail.com" required>
+											pattern="^[A-Za-z0-9._%+\-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$" title="請輸入有效的 Email，例如：example@mail.com" required>
 									</span>
 
 									<span class="mn-register-wrap mn-register-half">
-										<label for="phone">手機號碼*</label>
+										<label for="phone">手機號碼*</label><span id="phoneHint" class="hint-text"></span>	
 										<input type="tel" id="phone" name="phone" placeholder="Enter your phone number"
 											pattern="^09[0-9]{8}$" title="必須是09開頭且共10位數字" maxlength="10"
 											inputmode="numeric" required>
 									</span>
 									<span class="mn-register-wrap">
-										<label for="address">地址</label>
-
-										<input type="text" id="address" name="address" placeholder="Address Line"
+										<label for="address">地址</label> 
+										<input type="text" id="address" name="address" placeholder="Enter your address"
 											maxlength="100">
 									</span>
 									<span class="mn-register-wrap mn-register-half">
-										<label for="password">設定密碼*</label>
+										<label for="password">設定密碼*</label><span id="passwordHint" class="hint-text"></span>
 										<input type="password" id="password" name="password"
-											placeholder="Enter your password" pattern="^(?=.*[A-Za-z])(?=.*\d).{8,}$"
-											
-											title="密碼至少為 8 個字元，且至少包含 1 個英文字母(大小寫皆可)與 1 個數字" required>
+											placeholder="Enter your password" pattern="^(?=.*[A-Za-z])(?=.*\d).{8,}$" title="密碼至少為 8 個字元，且至少包含 1 個英文字母(大小寫皆可)與 1 個數字" required>
 										<!-- 至少 8 位 + 必須包含字母和數字（常見規範） -->
 										<!-- A. 至少 8 位 + 必須包含字母和數字（常見規範）
                                                  pattern="^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$" -->
+										
 									</span>
 									<span class="mn-register-wrap mn-register-half">
-										<label for="confirmPassword">重新輸入密碼*</label>
-										<input type="password" id="confirmPassword" name="confirmPassword"
-											title="重新輸入密碼" placeholder="Re-Enter your password" required>
+										<label for="confirmPassword">重新輸入密碼*</label><span id="confirmPasswordHint" class="hint-text"></span>
+										<input type="password" id="confirmPassword" name="confirmPassword" title="重新輸入密碼" placeholder="Re-Enter your password" required>
+										
 									</span>
 									<!-- 驗證 -->
 									<span class="mn-register-wrap mn-recaptcha">
@@ -366,8 +364,8 @@
 						<div class="row m-minus-991">
 							<div class="col-sm-12 col-lg-3 mn-footer-cat">
 								<div class="mn-footer-widget mn-footer-company">
-									<img src="../assets/img/logo/logo.png" class="mn-footer-logo" alt="footer logo">
-									<img src="../assets/img/logo/logo-dark.png" class="mn-footer-dark-logo"
+									<img src="assets/img/logo/logo.png" class="mn-footer-logo" alt="footer logo">
+									<img src="assets/img/logo/logo-dark.png" class="mn-footer-dark-logo"
 										alt="footer logo">
 									<p class="mn-footer-detail">我們是一家多元的保健品網站，能快速查詢你需要的商品</p>
 								</div>
@@ -422,7 +420,7 @@
 									<div class="mn-footer-links mn-footer-dropdown">
 										<ul class="align-items-center">
 											<li class="mn-footer-link">
-												<a href="../member/login.html">登入</a>
+												<a href="login.html">登入</a>
 											</li>
 											<li class="mn-footer-link">
 												<a href="cart.html">查看購物車</a>
@@ -495,7 +493,7 @@
 								<div class="footer-copy">
 									<div class="footer-bottom-copy ">
 										<div class="mn-copy">Copyright © <span id="copyright_year"></span>
-											<a class="site-name" href="../index.html">VitaTrack</a> all rights
+											<a class="site-name" href="index.html">VitaTrack</a> all rights
 											reserved.
 										</div>
 									</div>
@@ -503,7 +501,7 @@
 								<div class="footer-bottom-right">
 									<div class="footer-bottom-payment d-flex justify-content-center">
 										<div class="payment-link">
-											<img src="../assets/img/footer/payment.png" alt="payment">
+											<img src="assets/img/footer/payment.png" alt="payment">
 										</div>
 									</div>
 								</div>
@@ -594,11 +592,11 @@
 								<div class="single-pro-img single-pro-img-no-sidebar">
 									<div class="single-product-scroll">
 										<div class="single-slide-quickview owl-carousel">
-											<img class="img-responsive" src="../assets/img/product/1.jpg"
+											<img class="img-responsive" src="assets/img/product/1.jpg"
 												alt="product-img-1">
-											<img class="img-responsive" src="../assets/img/product/2.jpg"
+											<img class="img-responsive" src="assets/img/product/2.jpg"
 												alt="product-img-1">
-											<img class="img-responsive" src="../assets/img/product/3.jpg"
+											<img class="img-responsive" src="assets/img/product/3.jpg"
 												alt="product-img-1">
 										</div>
 									</div>
@@ -682,7 +680,7 @@
 				<div class="mn-search-list">
 					<ul class="mn-search-pro-items">
 						<li class="search-sidebar-list">
-							<a href="product-detail.html" class="mn-pro-img"><img src="../assets/img/product/9.jpg"
+							<a href="product-detail.html" class="mn-pro-img"><img src="assets/img/product/9.jpg"
 									alt="product"></a>
 							<div class="mn-pro-content">
 								<a href="product-detail.html" class="search-pro-title">Sport Shoes</a>
@@ -700,7 +698,7 @@
 							</div>
 						</li>
 						<li class="search-sidebar-list">
-							<a href="product-detail.html" class="mn-pro-img"><img src="../assets/img/product/15.jpg"
+							<a href="product-detail.html" class="mn-pro-img"><img src="assets/img/product/15.jpg"
 									alt="product"></a>
 							<div class="mn-pro-content">
 								<a href="product-detail.html" class="search-pro-title">Leather bag</a>
@@ -718,7 +716,7 @@
 							</div>
 						</li>
 						<li class="search-sidebar-list">
-							<a href="product-detail.html" class="mn-pro-img"><img src="../assets/img/product/1.jpg"
+							<a href="product-detail.html" class="mn-pro-img"><img src="assets/img/product/1.jpg"
 									alt="product"></a>
 							<div class="mn-pro-content">
 								<a href="product-detail.html" class="search-pro-title">T-shirt for girls</a>
@@ -854,7 +852,7 @@
 					</div>
 					<ul class="mn-wishlist-pro-items">
 						<li class="wishlist-sidebar-list">
-							<a href="product-detail.html" class="mn-pro-img"><img src="../assets/img/product/15.jpg"
+							<a href="product-detail.html" class="mn-pro-img"><img src="assets/img/product/15.jpg"
 									alt="product"></a>
 							<div class="mn-pro-content">
 								<a href="product-detail.html" class="wishlist-pro-title">Leather bag</a>
@@ -864,7 +862,7 @@
 							</div>
 						</li>
 						<li class="wishlist-sidebar-list">
-							<a href="product-detail.html" class="mn-pro-img"><img src="../assets/img/product/13.jpg"
+							<a href="product-detail.html" class="mn-pro-img"><img src="assets/img/product/13.jpg"
 									alt="product"></a>
 							<div class="mn-pro-content">
 								<a href="product-detail.html" class="wishlist-pro-title">Leather Belt</a>
@@ -874,7 +872,7 @@
 							</div>
 						</li>
 						<li class="wishlist-sidebar-list">
-							<a href="product-detail.html" class="mn-pro-img"><img src="../assets/img/product/5.jpg"
+							<a href="product-detail.html" class="mn-pro-img"><img src="assets/img/product/5.jpg"
 									alt="product"></a>
 							<div class="mn-pro-content">
 								<a href="product-detail.html" class="wishlist-pro-title">T-Shirt for men</a>
@@ -896,20 +894,20 @@
 	</main>
 
 	<!-- Vendor Custom -->
-	<script src="../assets/js/vendor/jquery-3.7.1.min.js"></script>
-	<script src="../assets/js/vendor/bootstrap.bundle.min.js"></script>
-	<script src="../assets/js/vendor/owl.carousel.min.js"></script>
-	<script src="../assets/js/vendor/slick.min.js"></script>
-	<script src="../assets/js/vendor/swiper-bundle.min.js"></script>
-	<script src="../assets/js/vendor/countdownTimer.js"></script>
-	<script src="../assets/js/vendor/infiniteslidev2.js"></script>
-	<script src="../assets/js/vendor/nouislider.js"></script>
-	<script src="../assets/js/vendor/smoothscroll.min.js"></script>
-	<script src="../assets/js/vendor/jquery.zoom.min.js"></script>
+	<script src="assets/js/vendor/jquery-3.7.1.min.js"></script>
+	<script src="assets/js/vendor/bootstrap.bundle.min.js"></script>
+	<script src="assets/js/vendor/owl.carousel.min.js"></script>
+	<script src="assets/js/vendor/slick.min.js"></script>
+	<script src="assets/js/vendor/swiper-bundle.min.js"></script>
+	<script src="assets/js/vendor/countdownTimer.js"></script>
+	<script src="assets/js/vendor/infiniteslidev2.js"></script>
+	<script src="assets/js/vendor/nouislider.js"></script>
+	<script src="assets/js/vendor/smoothscroll.min.js"></script>
+	<script src="assets/js/vendor/jquery.zoom.min.js"></script>
 
 	<!-- Main Custom -->
-	<script src="../assets/js/main.js"></script>
-	<script src="./js/register.js"></script>
+	<script src="assets/js/main.js"></script>
+	<script src="member/js/register.js"></script>
 </body>
 
 </html>

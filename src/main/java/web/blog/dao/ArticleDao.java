@@ -1,0 +1,20 @@
+package web.blog.dao;
+
+import web.blog.bean.Article;
+import java.util.List;
+
+public interface ArticleDao {
+    List<Article> findAll(int offset, int limit);
+    List<Article> findByCategory(String category, int offset, int limit);
+    List<Article> findByAuthorSlug(String authorSlug, int offset, int limit);
+    int countAll();
+    int countByCategory(String category);
+    int countByAuthorSlug(String authorSlug);
+    Article findByTitleSlugWithAuthor(String titleSlug);
+    int incrementViews(String titleSlug);
+    int incrementLikes(String titleSlug);
+    int incrementShares(String titleSlug);
+    Integer getTotalViews(String titleSlug);
+    Integer getTotalLikes(String titleSlug);
+    Integer getTotalShares(String titleSlug);
+}

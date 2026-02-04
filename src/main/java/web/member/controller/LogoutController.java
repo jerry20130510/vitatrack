@@ -1,5 +1,6 @@
 package web.member.controller;
 
+
 import java.io.IOException;
 import javax.naming.NamingException;
 import javax.servlet.ServletException;
@@ -14,24 +15,30 @@ import web.member.vo.Member;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-@WebServlet("/login")
-public class LoginController extends HttpServlet {
+@WebServlet("/member/logout")
+public class LogoutController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private MemberService memberService;
 
-	public LoginController() throws NamingException {
+	public LogoutController() throws NamingException {
+
 		memberService = new MemberServiceImpl();
 	}
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("application/json");
+
+
+
 		Gson gson = new Gson();
+		
+
 		// 再轉 Member 物件
 		Member member = gson.fromJson(req.getReader(), Member.class);
 
 		JsonObject result = new JsonObject();
-		Member loginMember = memberService.login(member);
+		Member loginMember =memberService.login(member);
 
 		if (loginMember == null) {
 			result.addProperty("success", false);

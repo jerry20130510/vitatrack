@@ -28,12 +28,23 @@
 }
 .alert-box .alert-btn {
     padding: 10px 20px;
-    background-color: #4CAF50; /* 綠色按鈕 */
+    background-color: #4e7dffdc; /* 綠色按鈕 */
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
 }
 .alert-box .alert-btn:hover {
-    background-color: #45a049;
+    background-color: #4e88ff;
+}
+/* 欄為格式提醒 */
+.hint-text {
+    display: block;
+    font-size: 13px;
+    margin-bottom: 10px;
+    height: 18px; /* 固定高度防止頁面跳動 */
+}
+
+input {
+    margin-bottom: 2px; /* 縮小 input 底部間距，讓提示文字靠近一點 */
 }
