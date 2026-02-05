@@ -1,6 +1,4 @@
-/* =============================================
-   Blog List Page Styles
-   ============================================= */
+/*   Blog List Page Styles   */
 
 /* Chinese font family */
 body {
@@ -65,9 +63,7 @@ a.btn.btn-primary:hover {
   padding-top: 30px;
 }
 
-/* =============================================
-   Error Display Styles
-   ============================================= */
+/*   Error Display Styles  */
 
 .error-display {
   text-align: center;
@@ -99,9 +95,7 @@ a.btn.btn-primary:hover {
   text-decoration: none;
 }
 
-/* =============================================
-   Blog Card Styles
-   ============================================= */
+/*   Blog Card Styles   */
 
 .blog-card-clickable {
   cursor: pointer;
