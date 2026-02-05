@@ -1,6 +1,6 @@
 package web.blog.dao;
 
-import web.blog.bean.Article;
+import web.blog.vo.Article;
 import java.util.List;
 
 public interface ArticleDao {

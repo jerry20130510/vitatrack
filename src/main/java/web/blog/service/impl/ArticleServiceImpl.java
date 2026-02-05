@@ -1,7 +1,7 @@
 package web.blog.service.impl;
 
-import web.blog.bean.Article;
-import web.blog.bean.ArticleListResponse;
+import web.blog.vo.Article;
+import web.blog.vo.ArticleListResponse;
 import web.blog.dao.ArticleDao;
 import web.blog.dao.impl.ArticleDaoImpl;
 import web.blog.service.ArticleService;

@@ -1,6 +1,6 @@
 package web.blog.dao.impl;
 
-import web.blog.bean.Article;
+import web.blog.vo.Article;
 import web.blog.dao.ArticleDao;
 
 import javax.naming.Context;

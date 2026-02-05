@@ -2,7 +2,7 @@ package web.blog.controller;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import web.blog.bean.ArticleListResponse;
+import web.blog.vo.ArticleListResponse;
 import web.blog.service.ArticleService;
 import web.blog.service.impl.ArticleServiceImpl;
 
