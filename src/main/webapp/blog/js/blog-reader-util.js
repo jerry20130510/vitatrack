@@ -1,5 +1,4 @@
 // blog-reader-util.js - Shared utilities for public blog pages
-
 const contextPath = window.location.pathname.substring(0, window.location.pathname.indexOf('/', 1)) || '';
 const API_BASE = `${window.location.origin}${contextPath}/api`;
 
@@ -7,7 +6,7 @@ const API_BASE = `${window.location.origin}${contextPath}/api`;
 const el = id => document.getElementById(id);
 const toggle = (elem, show) => elem && (elem.style.display = show ? 'block' : 'none');
 
-// Formatting
+// Date formatting
 const formatDate = date => new Date(date).toLocaleDateString('zh-TW', { 
     year: 'numeric', month: 'long', day: 'numeric' 
 });
@@ -20,7 +19,7 @@ const escapeHtml = str => (str || '').replace(/[&<>"']/g, m => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
 })[m]);
 
-// Unified toast notification
+// Unified toast
 const showToast = (message, options = {}) => {
     const {
         type = 'info',        // 'success', 'error', 'info'

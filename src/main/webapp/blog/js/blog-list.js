@@ -4,7 +4,6 @@ let currentPage = 0;
 let currentCategory = '';
 let currentAuthor = '';
 
-
 document.querySelectorAll('.nav-link').forEach(link => {
     link.addEventListener('click', (e) => {
         e.preventDefault();
