@@ -73,7 +73,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                     showAlert("會員登入成功<br>歡迎回來！"); //視窗彈出(.style.display = "flex"),會員登入成功<br>歡迎回來！ (.innerHTML)
                     alertBtn.onclick = function () {
-                        window.location.href = "../index.html";
+                        window.location.href = "index.html";
                     };
                     loginForm.reset();
 
