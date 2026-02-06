@@ -36,23 +36,34 @@ const addSharedArticle = slug => {
 };
 
 
-const showError = (msg, isNotFound = false) => {
-    const container = el('article-content') || document.querySelector('.mn-main-content');
+const showNotFoundError = () => {
+    const container = el('article-content');
     if (!container) return;
-    
-    const icon = isNotFound ? 'ri-file-unknow-line' : 'ri-wifi-off-line';
-    const title = isNotFound ? '找不到文章' : '無法載入文章';
-    const desc = isNotFound ? '此文章可能被移除或不存在' : '請檢查網路連線再試一次';
-    const btnText = isNotFound ? '返回文章列表' : '重新載入';
-    const btnAction = isNotFound ? 'href="blog-list.html"' : 'href="javascript:location.reload()"';
     
     container.innerHTML = `
         <div class="col-12">
             <div class="error-display">
-                <i class="${icon} error-icon"></i>
-                <h3 class="mn-title error-title">${title}</h3>
-                <p class="error-message">${desc}</p>
-                <a ${btnAction} class="mn-btn-2 error-button"><span>${btnText}</span></a>
+                <i class="ri-file-unknow-line error-icon"></i>
+                <h3 class="mn-title error-title">找不到文章</h3>
+                <p class="error-message">此文章可能被移除或不存在</p>
+                <a href="blog-list.html" class="mn-btn-2 error-button"><span>返回文章列表</span></a>
+            </div>
+        </div>
+    `;
+    container.style.display = 'block';
+};
+
+const showNetworkError = () => {
+    const container = el('article-content');
+    if (!container) return;
+    
+    container.innerHTML = `
+        <div class="col-12">
+            <div class="error-display">
+                <i class="ri-wifi-off-line error-icon"></i>
+                <h3 class="mn-title error-title">無法載入文章</h3>
+                <p class="error-message">請檢查網路連線再試一次</p>
+                <a href="javascript:location.reload()" class="mn-btn-2 error-button"><span>重新載入</span></a>
             </div>
         </div>
     `;
@@ -63,7 +74,7 @@ function loadArticleDetail() {
     const slug = new URLSearchParams(location.search).get('slug');
     
     if (!slug) {
-        showError('文章不存在', true);
+        showNotFoundError();
         return;
     }
 
@@ -83,7 +94,7 @@ function loadArticleDetail() {
         .then(result => {
             // Check success wrapper
             if (!result.success) {
-                throw new Error(result.errMsg || 'LOAD_ERROR');
+                throw new Error(result.errMsg);
             }
             
             const a = result.data;  // Extract data from wrapper
@@ -105,7 +116,7 @@ function loadArticleDetail() {
             el('article-title').textContent = a.titleDisplay;
             
             // Author avatar with fallback
-            const authorName = a.authorDisplayName || '作者';
+            const authorName = a.authorDisplayName;
             const avatarImg = el('author-avatar');
             const fallback = el('author-avatar-fallback');
             
@@ -166,9 +177,9 @@ function loadArticleDetail() {
         .catch(error => {
             console.error('[Load] error:', error);
             if (error.message === 'NOT_FOUND') {
-                showError('文章不存在', true);
+                showNotFoundError();
             } else {
-                showError('載入文章失敗，請稍後再試');
+                showNetworkError();
             }
         });
 }

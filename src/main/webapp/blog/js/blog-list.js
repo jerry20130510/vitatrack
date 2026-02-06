@@ -31,7 +31,7 @@ function loadArticles() {
         })
         .then(result => {
             if (!result.success) {
-                throw new Error(result.errMsg || '載入文章列表失敗');
+                throw new Error(result.errMsg);
             }
             const data = result.data;
             renderArticles(data.articles);
