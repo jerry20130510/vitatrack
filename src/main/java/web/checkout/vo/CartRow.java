@@ -39,25 +39,4 @@ public class CartRow {
     public int getQuantity() {
         return quantity;
     }
-
-    // ===== setters（需要時可用）=====
-    public void setCartItemId(int cartItemId) {
-        this.cartItemId = cartItemId;
-    }
-
-    public void setSku(String sku) {
-        this.sku = sku;
-    }
-
-    public void setProductName(String productName) {
-        this.productName = productName;
-    }
-
-    public void setUnitPrice(BigDecimal unitPrice) {
-        this.unitPrice = unitPrice;
-    }
-
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
 }

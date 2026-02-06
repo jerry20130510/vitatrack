@@ -5,12 +5,12 @@ import java.sql.SQLException;
 
 public interface OrderDao {
 
-    int insertOrder(Connection conn,
-                    int memberId,
-                    int totalAmount,
-                    String status,
-                    String paymentMethod,
-                    String paymentStatus,
-                    int amount,
-                    String transactionId) throws SQLException;
+	int insertOrder(Connection conn, 
+			int memberId, 
+			int totalAmount, 
+			String status, 
+			String paymentMethod,
+			String paymentStatus, 
+			int amount, 
+			String transactionId) throws SQLException;
 }

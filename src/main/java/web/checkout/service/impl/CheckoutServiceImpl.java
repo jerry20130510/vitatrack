@@ -4,7 +4,9 @@ import java.math.BigDecimal;
 import java.sql.Connection;
 import java.util.List;
 
-import core.util.DbUtil;
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
+
 import web.checkout.dao.CartDao;
 import web.checkout.dao.OrderDao;
 import web.checkout.dao.OrderItemDao;
@@ -21,17 +23,23 @@ public class CheckoutServiceImpl implements CheckoutService {
     private final OrderDao orderDao = new OrderDaoImpl();
     private final OrderItemDao orderItemDao = new OrderItemDaoImpl();
 
+    private final DataSource ds;
+
+    public CheckoutServiceImpl() {
+        try {
+            ds = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/vitatrack");
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
     @Override
     public CheckoutResult checkout(int memberId) {
-
-        Connection conn = null;
-
-        try {
-            conn = DbUtil.getConnection();
+        try (Connection conn = ds.getConnection()) {  
             conn.setAutoCommit(false);
-
+        	
             // 1) 查 open cart
-            List<CartRow> cartRows = cartDao.findOpenCartByMemberId(conn, memberId);
+            List<CartRow> cartRows = cartDao.findOpenCartByMemberId(memberId);
             if (cartRows == null || cartRows.isEmpty()) {
                 throw new RuntimeException("Cart is empty.");
             }
@@ -55,8 +63,8 @@ public class CheckoutServiceImpl implements CheckoutService {
             String transactionId = "NA";        // 金流完成再更新真實值
 
             int orderId = orderDao.insertOrder(
-                    conn,
-                    memberId,
+            		conn,
+            		memberId,
                     totalAmountInt,
                     status,
                     paymentMethod,
@@ -66,25 +74,14 @@ public class CheckoutServiceImpl implements CheckoutService {
             );
 
             // 4) insert order_item（batch）
-            orderItemDao.batchInsertFromCart(conn, orderId, cartRows);
+            orderItemDao.batchInsertFromCart(conn,orderId, cartRows);
 
             // 5) 更新 cart_item 綁 order_id
-            cartDao.attachCartItemsToOrder(conn, orderId, cartRows);
-
-            conn.commit();
+            cartDao.attachCartItemsToOrder(orderId, cartRows);
             return new CheckoutResult(orderId, totalAmountInt, status);
-
         } catch (Exception ex) {
-            try {
-                if (conn != null) conn.rollback();
-            } catch (Exception ignore) {}
-
-            throw new RuntimeException("Checkout failed: " + ex.getMessage(), ex);
-
-        } finally {
-            try {
-                if (conn != null) conn.close();
-            } catch (Exception ignore) {}
+            ex.printStackTrace();
         }
+        return null;
     }
 }

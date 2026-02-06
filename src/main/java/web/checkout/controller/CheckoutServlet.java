@@ -20,7 +20,7 @@ public class CheckoutServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-
+    	
         // 統一回 JSON，避免 DevTools Response 看到空白
         resp.setContentType("application/json; charset=UTF-8");
 

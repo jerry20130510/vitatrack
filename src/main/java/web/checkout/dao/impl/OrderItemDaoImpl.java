@@ -6,11 +6,23 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+import javax.sql.DataSource;
+
 import web.checkout.dao.OrderItemDao;
 import web.checkout.vo.CartRow;
 
 public class OrderItemDaoImpl implements OrderItemDao {
+	private DataSource ds;
 
+	public OrderItemDaoImpl() {
+		try {
+			ds = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/vitatrack");
+		} catch (NamingException e) {
+			e.printStackTrace();
+		}
+	}
     @Override
     public int[] batchInsertFromCart(Connection conn, int orderId, List<CartRow> cartRows)
             throws SQLException {
