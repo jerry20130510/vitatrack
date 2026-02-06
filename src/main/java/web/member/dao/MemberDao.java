@@ -7,6 +7,8 @@ public interface MemberDao {
 	
 	int insert(Member member);
 	
+	int deleteById(Integer id);
+	
 	Member selectByEmail(String email);
 	
 	Member SelectByEmailandPassword(String email, String password);

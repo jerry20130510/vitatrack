@@ -41,6 +41,21 @@ public class MemberDaoImpl implements MemberDao {
 		}
 		return -1;
 	}
+	@Override
+	public int deleteById(Integer id) {
+		String sql = "delete from member where id = ? ";
+
+		try (Connection conn = ds.getConnection(); 
+			PreparedStatement pstmt = conn.prepareStatement(sql);) {
+			pstmt.setInt(1, id);
+			int count = pstmt.executeUpdate();
+			return count;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return -1;
+	}
 
 	@Override
 	public Member selectByEmail(String email) {
@@ -53,15 +68,15 @@ public class MemberDaoImpl implements MemberDao {
 			try (ResultSet rs = pstmt.executeQuery();) {
 				if (rs.next()) {
 					Member member = new Member();
-					member.setMemberId(rs.getInt("memberId"));
+					member.setMemberId(rs.getInt("member_id"));
 					member.setName(rs.getString("name"));
 					member.setEmail(rs.getString("email"));
 					member.setPhone(rs.getString("phone"));
 					member.setAddress(rs.getString("address"));
 					member.setPassword(rs.getString("password"));
-					member.setVerifyCode(rs.getString("verifyCode"));
-					member.setMemberStatus(rs.getInt("memberStatus"));
-					member.setRegistrationTime(rs.getTimestamp("registrationTime"));
+					member.setVerifyCode(rs.getString("verify_code"));
+					member.setMemberStatus(rs.getInt("member_status"));
+					member.setRegistrationTime(rs.getTimestamp("registration_time"));
 					return member;
 				}
 			}

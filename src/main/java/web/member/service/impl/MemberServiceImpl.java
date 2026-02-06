@@ -97,4 +97,11 @@ public class MemberServiceImpl implements MemberService {
 		return memberDao.SelectByEmailandPassword(email, password);
 	}
 
+	@Override
+	public Member profile(Member member) {
+		String email = member.getEmail();
+		return memberDao.selectByEmail(email);
+	}
+
+
 }

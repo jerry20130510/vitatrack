@@ -1,0 +1,35 @@
+.member-layout {
+  display: flex;
+  align-items: flex-start;
+}
+
+.member-sidebar {
+  width: 160px;
+  flex-shrink: 0;
+}
+
+.member-main {
+  flex: 1;
+  padding-left: 40px;
+}
+
+.member-user {
+   
+/* ✔ 元素仍佔空間 ✘ 內容不可見 */
+    visibility: hidden; /* 看不到，但高度還在 */
+}
+
+.form-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  font-size: 14px;
+}
+
+.form-row label {
+  width: 120px;     
+  height: 38px;
+  flex-shrink: 0;
+  color: #555;
+}
+

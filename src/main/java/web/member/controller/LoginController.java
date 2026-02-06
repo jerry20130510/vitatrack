@@ -7,6 +7,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import web.member.service.MemberService;
 import web.member.service.impl.MemberServiceImpl;
@@ -37,6 +38,9 @@ public class LoginController extends HttpServlet {
 			result.addProperty("success", false);
 			result.addProperty("message", "帳號或密碼錯誤，請重新登入!");
 		} else {
+			HttpSession session = req.getSession();
+			session.setAttribute("member", loginMember);
+
 			result.addProperty("success", true);
 			result.addProperty("message", "登入成功!");
 		}
