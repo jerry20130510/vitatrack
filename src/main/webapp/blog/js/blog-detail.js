@@ -1,10 +1,39 @@
 // blog-detail.js - Article detail page logic
 
 // localStorage helpers
-const getLikedArticles = () => JSON.parse(localStorage.getItem('likedArticles') || '[]');
-const getSharedArticles = () => JSON.parse(localStorage.getItem('sharedArticles') || '[]');
-const addLikedArticle = slug => localStorage.setItem('likedArticles', JSON.stringify([...getLikedArticles(), slug]));
-const addSharedArticle = slug => localStorage.setItem('sharedArticles', JSON.stringify([...getSharedArticles(), slug]));
+const getLikedArticles = () => {
+    try {
+        return JSON.parse(localStorage.getItem('likedArticles') || '[]');
+    } catch (e) {
+        console.error('[Storage] error:', e);
+        return [];
+    }
+};
+
+const getSharedArticles = () => {
+    try {
+        return JSON.parse(localStorage.getItem('sharedArticles') || '[]');
+    } catch (e) {
+        console.error('[Storage] error:', e);
+        return [];
+    }
+};
+
+const addLikedArticle = slug => {
+    try {
+        localStorage.setItem('likedArticles', JSON.stringify([...getLikedArticles(), slug]));
+    } catch (e) {
+        console.error('[Storage] error:', e);
+    }
+};
+
+const addSharedArticle = slug => {
+    try {
+        localStorage.setItem('sharedArticles', JSON.stringify([...getSharedArticles(), slug]));
+    } catch (e) {
+        console.error('[Storage] error:', e);
+    }
+};
 
 
 const showError = (msg, isNotFound = false) => {
