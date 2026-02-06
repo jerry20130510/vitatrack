@@ -5,6 +5,7 @@ import web.blog.dao.ArticleDao;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,13 +14,9 @@ import java.util.List;
 public class ArticleDaoImpl implements ArticleDao {
     private DataSource ds;
 
-    public ArticleDaoImpl() {
-        try {
-            Context ctx = new InitialContext();
-            ds = (DataSource) ctx.lookup("java:comp/env/jdbc/vitatrack");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public ArticleDaoImpl() throws NamingException {
+        Context ctx = new InitialContext();
+        ds = (DataSource) ctx.lookup("java:comp/env/jdbc/vitatrack");
     }
 
     @Override
