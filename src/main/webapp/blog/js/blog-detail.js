@@ -157,7 +157,7 @@ function toggleLike() {
     
     API.incrementLikes(slug)
         .then(data => {
-            updateButtonState('like-btn', 'like-text', CONSTANTS.MESSAGES.ALREADY_LIKED, true);
+            updateButtonState(btn, 'like-text', CONSTANTS.MESSAGES.ALREADY_LIKED, true);
             el('like-count').textContent = data.totalLikes;
             addLikedArticle(slug);
         })
@@ -182,9 +182,11 @@ function shareArticle() {
         return;
     }
     
+    const btn = el('share-btn');
+    
     API.incrementShares(slug)
         .then(data => {
-            updateButtonState('share-btn', 'share-text', CONSTANTS.MESSAGES.ALREADY_SHARED, false);
+            updateButtonState(btn, 'share-text', CONSTANTS.MESSAGES.ALREADY_SHARED, false);
             el('share-count').textContent = data.totalShares;
             addSharedArticle(slug);
             copyAndNotify();
@@ -269,20 +271,21 @@ function updateArticleContent(article) {
 
 function updateSocialButtons(slug) {
     if (getLikedArticles().includes(slug)) {
-        updateButtonState('like-btn', 'like-text', CONSTANTS.MESSAGES.ALREADY_LIKED, true);
+        const btn = el('like-btn');
+        updateButtonState(btn, 'like-text', CONSTANTS.MESSAGES.ALREADY_LIKED, true);
     }
     
     if (getSharedArticles().includes(slug)) {
-        updateButtonState('share-btn', 'share-text', CONSTANTS.MESSAGES.ALREADY_SHARED, false);
+        const btn = el('share-btn');
+        updateButtonState(btn, 'share-text', CONSTANTS.MESSAGES.ALREADY_SHARED, false);
     }
 }
 
-function updateButtonState(btnId, textId, text, isLike) {
-    const btn = el(btnId);
+function updateButtonState(btnElement, textId, text, isLike) {
     const classes = isLike ? CONSTANTS.CSS_CLASSES.LIKE : CONSTANTS.CSS_CLASSES.SHARE;
     
-    btn.classList.replace(classes.BTN_INACTIVE, classes.BTN_ACTIVE);
-    if (isLike) btn.classList.add('liked');
-    btn.querySelector('i').classList.replace(classes.ICON_INACTIVE, classes.ICON_ACTIVE);
+    btnElement.classList.replace(classes.BTN_INACTIVE, classes.BTN_ACTIVE);
+    if (isLike) btnElement.classList.add('liked');
+    btnElement.querySelector('i').classList.replace(classes.ICON_INACTIVE, classes.ICON_ACTIVE);
     el(textId).textContent = text;
 }
