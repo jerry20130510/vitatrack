@@ -11,9 +11,9 @@ public class Article {
     private String imageUrl;
     private String category;
     private String authorSlug;
-    private Integer totalLikes;
-    private Integer totalViews;
-    private Integer totalShares;
+    private int totalLikes;
+    private int totalViews;
+    private int totalShares;
     private Timestamp createdAt;
     private Timestamp updatedAt;
     
@@ -87,27 +87,27 @@ public class Article {
         this.authorSlug = authorSlug;
     }
 
-    public Integer getTotalLikes() {
+    public int getTotalLikes() {
         return totalLikes;
     }
 
-    public void setTotalLikes(Integer totalLikes) {
+    public void setTotalLikes(int totalLikes) {
         this.totalLikes = totalLikes;
     }
 
-    public Integer getTotalViews() {
+    public int getTotalViews() {
         return totalViews;
     }
 
-    public void setTotalViews(Integer totalViews) {
+    public void setTotalViews(int totalViews) {
         this.totalViews = totalViews;
     }
 
-    public Integer getTotalShares() {
+    public int getTotalShares() {
         return totalShares;
     }
 
-    public void setTotalShares(Integer totalShares) {
+    public void setTotalShares(int totalShares) {
         this.totalShares = totalShares;
     }
 

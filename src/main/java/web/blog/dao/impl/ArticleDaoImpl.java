@@ -400,7 +400,7 @@ public class ArticleDaoImpl implements ArticleDao {
     }
 
     @Override
-    public Integer getTotalViews(String titleSlug) {
+    public int getTotalViews(String titleSlug) {
         String sql = "SELECT total_views FROM articles WHERE title_slug = ?";
         
         try (Connection conn = ds.getConnection();
@@ -417,11 +417,11 @@ public class ArticleDaoImpl implements ArticleDao {
             e.printStackTrace();
         }
         
-        return null;
+        return 0;
     }
 
     @Override
-    public Integer getTotalLikes(String titleSlug) {
+    public int getTotalLikes(String titleSlug) {
         String sql = "SELECT total_likes FROM articles WHERE title_slug = ?";
         
         try (Connection conn = ds.getConnection();
@@ -438,11 +438,11 @@ public class ArticleDaoImpl implements ArticleDao {
             e.printStackTrace();
         }
         
-        return null;
+        return 0;
     }
 
     @Override
-    public Integer getTotalShares(String titleSlug) {
+    public int getTotalShares(String titleSlug) {
         String sql = "SELECT total_shares FROM articles WHERE title_slug = ?";
         
         try (Connection conn = ds.getConnection();
@@ -459,6 +459,6 @@ public class ArticleDaoImpl implements ArticleDao {
             e.printStackTrace();
         }
         
-        return null;
+        return 0;
     }
 }
