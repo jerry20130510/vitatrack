@@ -14,7 +14,7 @@ public interface ArticleDao {
     int incrementViews(String titleSlug);
     int incrementLikes(String titleSlug);
     int incrementShares(String titleSlug);
-    Integer getTotalViews(String titleSlug);
-    Integer getTotalLikes(String titleSlug);
-    Integer getTotalShares(String titleSlug);
+    int getTotalViews(String titleSlug);
+    int getTotalLikes(String titleSlug);
+    int getTotalShares(String titleSlug);
 }

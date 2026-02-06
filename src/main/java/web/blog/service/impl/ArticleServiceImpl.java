@@ -61,19 +61,16 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public int getViews(String titleSlug) {
-        Integer views = articleDao.getTotalViews(titleSlug);
-        return views != null ? views : 0;
+        return articleDao.getTotalViews(titleSlug);
     }
 
     @Override
     public int getLikes(String titleSlug) {
-        Integer likes = articleDao.getTotalLikes(titleSlug);
-        return likes != null ? likes : 0;
+        return articleDao.getTotalLikes(titleSlug);
     }
 
     @Override
     public int getShares(String titleSlug) {
-        Integer shares = articleDao.getTotalShares(titleSlug);
-        return shares != null ? shares : 0;
+        return articleDao.getTotalShares(titleSlug);
     }
 }
