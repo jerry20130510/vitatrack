@@ -6,6 +6,34 @@ const API_BASE = `${window.location.origin}${contextPath}/api`;
 const el = id => document.getElementById(id);
 const toggle = (elem, show) => elem && (elem.style.display = show ? 'block' : 'none');
 
+// Generic Storage Helper
+const Storage = {
+    getArray: (key) => {
+        try {
+            return JSON.parse(localStorage.getItem(key) || '[]');
+        } catch (e) {
+            console.error('[Storage] error:', e);
+            return [];
+        }
+    },
+    
+    addToArray: (key, item) => {
+        try {
+            const arr = Storage.getArray(key);
+            if (!arr.includes(item)) {
+                arr.push(item);
+                localStorage.setItem(key, JSON.stringify(arr));
+            }
+        } catch (e) {
+            console.error('[Storage] error:', e);
+        }
+    },
+    
+    hasInArray: (key, item) => {
+        return Storage.getArray(key).includes(item);
+    }
+};
+
 // Date formatting
 const formatDate = date => new Date(date).toLocaleDateString('zh-TW', { 
     year: 'numeric', month: 'long', day: 'numeric' 
@@ -72,3 +100,4 @@ const showToast = (message, options = {}) => {
     toast.show();
     toastEl.addEventListener('hidden.bs.toast', () => toastEl.remove());
 };
+

@@ -6,12 +6,13 @@ import web.blog.dao.ArticleDao;
 import web.blog.dao.impl.ArticleDaoImpl;
 import web.blog.service.ArticleService;
 
+import javax.naming.NamingException;
 import java.util.List;
 
 public class ArticleServiceImpl implements ArticleService {
     private ArticleDao articleDao;
 
-    public ArticleServiceImpl() {
+    public ArticleServiceImpl() throws NamingException {
         this.articleDao = new ArticleDaoImpl();
     }
 
