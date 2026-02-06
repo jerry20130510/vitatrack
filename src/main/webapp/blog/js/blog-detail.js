@@ -23,6 +23,12 @@ const CONSTANTS = {
         LIKED_ARTICLES: 'likedArticles',
         SHARED_ARTICLES: 'sharedArticles'
     },
+    AVATAR: {
+        HUE_MULTIPLIER: 5,
+        HUE_MAX: 360,
+        SATURATION: '50%',
+        LIGHTNESS: '45%'
+    },
     MESSAGES: {
         NOT_FOUND: '文章不存在',
         NOT_FOUND_DESC: '此文章可能被移除或不存在',
@@ -231,7 +237,7 @@ function setupAuthorAvatar(profileImage, authorName) {
         avatarImg.style.display = 'none';
         fallback.style.display = 'flex';
         fallback.textContent = authorName.charAt(0).toUpperCase();
-        fallback.style.background = `hsl(${authorName.charCodeAt(0) * 5 % 360}, 50%, 45%)`;
+        fallback.style.background = `hsl(${authorName.charCodeAt(0) * CONSTANTS.AVATAR.HUE_MULTIPLIER % CONSTANTS.AVATAR.HUE_MAX}, ${CONSTANTS.AVATAR.SATURATION}, ${CONSTANTS.AVATAR.LIGHTNESS})`;
     };
     
     if (profileImage) {

@@ -15,6 +15,11 @@ const CONSTANTS = {
         '>': '&gt;',
         '"': '&quot;',
         "'": '&#39;'
+    },
+    TOAST: {
+        DURATION: 3000,
+        ICON_SIZE: '20px',
+        BOTTOM_MARGIN: '30px'
     }
 };
 
@@ -63,7 +68,7 @@ const escapeHtml = str => (str || '').replace(/[&<>"']/g, m => CONSTANTS.HTML_EN
 const showToast = (message, options = {}) => {
     const {
         type = 'info',        // 'success', 'error', 'info'
-        duration = 3000,
+        duration = CONSTANTS.TOAST.DURATION,
         position = 'bottom'   // 'bottom' or 'top'
     } = options;
     
@@ -76,8 +81,8 @@ const showToast = (message, options = {}) => {
     
     // Icon mapping
     const icons = {
-        success: '<i class="ri-check-line" style="font-size: 20px;"></i>',
-        error: '<i class="ri-error-warning-line" style="font-size: 20px;"></i>',
+        success: `<i class="ri-check-line" style="font-size: ${CONSTANTS.TOAST.ICON_SIZE};"></i>`,
+        error: `<i class="ri-error-warning-line" style="font-size: ${CONSTANTS.TOAST.ICON_SIZE};"></i>`,
         info: ''
     };
     
@@ -101,7 +106,7 @@ const showToast = (message, options = {}) => {
             : 'bottom-0 start-50 translate-middle-x';
         container.className = `toast-container position-fixed ${positionClass}`;
         if (position === 'bottom') {
-            container.style.marginBottom = '30px';
+            container.style.marginBottom = CONSTANTS.TOAST.BOTTOM_MARGIN;
         }
         document.body.appendChild(container);
     }
