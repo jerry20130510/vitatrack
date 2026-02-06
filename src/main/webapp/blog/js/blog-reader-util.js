@@ -1,4 +1,23 @@
 // blog-reader-util.js - Shared utilities for public blog pages
+
+// Constants
+const CONSTANTS = {
+    LOCALE: 'zh-TW',
+    DATE_FORMAT: {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+    },
+    PLACEHOLDER_IMAGE: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwMCIgaGVpZ2h0PSI4MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEyMDAiIGhlaWdodD0iODAwIiBmaWxsPSIjZjVmNWY1Ii8+PHRleHQgeD0iNTAlIiB5PSI0NSUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0OCIgZmlsbD0iIzk5OTk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+PGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI2NCI+8J+TtzwvZm9udC1mYW1pbHk+PC90ZXh0Pjx0ZXh0IHg9IjUwJSIgeT0iNTUlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiNiYmJiYmIiIHRleHQtYW5jaG9yPSJtaWRkbGUiPuWclueJh+i8ieWFpeWksei0pTwvdGV4dD48L3N2Zz4=',
+    HTML_ENTITIES: {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;'
+    }
+};
+
 const contextPath = window.location.pathname.substring(0, window.location.pathname.indexOf('/', 1)) || '';
 const API_BASE = `${window.location.origin}${contextPath}/api`;
 
@@ -35,17 +54,10 @@ const Storage = {
 };
 
 // Date formatting
-const formatDate = date => new Date(date).toLocaleDateString('zh-TW', { 
-    year: 'numeric', month: 'long', day: 'numeric' 
-});
-
-// Image placeholder
-const PLACEHOLDER_IMAGE = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTIwMCIgaGVpZ2h0PSI4MDAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PHJlY3Qgd2lkdGg9IjEyMDAiIGhlaWdodD0iODAwIiBmaWxsPSIjZjVmNWY1Ii8+PHRleHQgeD0iNTAlIiB5PSI0NSUiIGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI0OCIgZmlsbD0iIzk5OTk5OSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+PGZvbnQtZmFtaWx5PSJBcmlhbCwgc2Fucy1zZXJpZiIgZm9udC1zaXplPSI2NCI+8J+TtzwvZm9udC1mYW1pbHk+PC90ZXh0Pjx0ZXh0IHg9IjUwJSIgeT0iNTUlIiBmb250LWZhbWlseT0iQXJpYWwsIHNhbnMtc2VyaWYiIGZvbnQtc2l6ZT0iMjQiIGZpbGw9IiNiYmJiYmIiIHRleHQtYW5jaG9yPSJtaWRkbGUiPuWclueJh+i8ieWFpeWksei0pTwvdGV4dD48L3N2Zz4=';
+const formatDate = date => new Date(date).toLocaleDateString(CONSTANTS.LOCALE, CONSTANTS.DATE_FORMAT);
 
 // Security
-const escapeHtml = str => (str || '').replace(/[&<>"']/g, m => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
-})[m]);
+const escapeHtml = str => (str || '').replace(/[&<>"']/g, m => CONSTANTS.HTML_ENTITIES[m]);
 
 // Unified toast
 const showToast = (message, options = {}) => {

@@ -212,7 +212,7 @@ function updateFeaturedImage(article) {
     img.alt = article.titleDisplay;
     img.onerror = function() {
         this.onerror = null;
-        this.src = PLACEHOLDER_IMAGE;
+        this.src = CONSTANTS.PLACEHOLDER_IMAGE;
     };
 }
 
