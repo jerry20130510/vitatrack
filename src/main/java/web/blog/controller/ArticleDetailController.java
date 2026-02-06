@@ -1,30 +1,19 @@
 package web.blog.controller;
 
 import com.google.gson.Gson;
-import javax.naming.NamingException;
 import com.google.gson.GsonBuilder;
-import javax.naming.NamingException;
 import web.blog.vo.Article;
-import javax.naming.NamingException;
 import web.blog.service.ArticleService;
-import javax.naming.NamingException;
 import web.blog.service.impl.ArticleServiceImpl;
-import javax.naming.NamingException;
 
 import javax.servlet.ServletException;
-import javax.naming.NamingException;
 import javax.servlet.annotation.WebServlet;
-import javax.naming.NamingException;
 import javax.servlet.http.HttpServlet;
-import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
-import javax.naming.NamingException;
 import javax.servlet.http.HttpServletResponse;
 import javax.naming.NamingException;
 import java.io.IOException;
-import javax.naming.NamingException;
 import java.util.Map;
-import javax.naming.NamingException;
 
 @WebServlet("/api/articles/*")
 public class ArticleDetailController extends HttpServlet {
