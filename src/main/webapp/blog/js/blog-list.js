@@ -15,17 +15,15 @@ function loadArticles() {
 
     fetch(`${API_BASE}/articles?${params}`)
         .then(response => {
-            if (!response.ok) {
-                if (response.status === 404) {
-                    throw new Error('NOT_FOUND');
-                }
-                throw new Error('LOAD_ERROR');
-            }
+            if (response.status === 400) throw new Error('Bad Request');
+            if (response.status === 404) throw new Error('Article not found'); 
+            if (response.status === 500) throw new Error('Server Error');
+            if (!response.ok) throw new Error('Network Error');
             return response.json();
         })
         .then(result => {
             if (!result.success) {
-                throw new Error(result.errMsg);
+                throw new Error(result.errMsg || 'Server Error');
             }
             const data = result.data;
             renderArticles(data.articles);
@@ -34,10 +32,14 @@ function loadArticles() {
         })
         .catch(error => {
             console.error('[Load] error:', error);
-            if (error.message === 'NOT_FOUND') {
-                showNotFoundError('articles-container', '此分類或篩選條件沒有文章', '返回文章列表', 'blog-list.html');
+            if (error.message === 'Bad Request') {
+                showLoadError('articles-container', '請求錯誤', '重新載入', 'location.reload()');
+            } else if (error.message === 'Article not found') {
+                showNotFoundError('articles-container', '找不到內容', '返回列表', 'blog-list.html');
+            } else if (error.message === 'Server Error') {
+                showLoadError('articles-container', '伺服器錯誤', '重試', 'loadArticles()');
             } else {
-                showLoadError('articles-container');
+                showLoadError('articles-container', '網路錯誤', '重試', 'loadArticles()');
             }
         })
         .finally(() => {

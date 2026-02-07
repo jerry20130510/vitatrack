@@ -83,7 +83,7 @@ const showNotFoundError = (containerId, message, buttonText, buttonHref) => {
     `;
 };
 
-const showLoadError = (containerId) => {
+const showLoadError = (containerId, message = '請檢查網路再試一次', buttonText = '重新載入', retryAction = 'location.reload()') => {
     const container = el(containerId);
     container.style.display = 'block';
     container.innerHTML = `
@@ -91,8 +91,8 @@ const showLoadError = (containerId) => {
             <div class="error-display">
                 <i class="ri-wifi-off-line error-icon"></i>
                 <h3 class="mn-title error-title">無法載入文章</h3>
-                <p class="error-message">請檢查網路再試一次</p>
-                <a href="javascript:location.reload()" class="mn-btn-2 error-button"><span>重新載入</span></a>
+                <p class="error-message">${message}</p>
+                <a href="javascript:${retryAction}" class="mn-btn-2 error-button"><span>${buttonText}</span></a>
             </div>
         </div>
     `;
