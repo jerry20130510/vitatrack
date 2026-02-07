@@ -30,7 +30,19 @@ function loadArticleDetail() {
             
             fetch(`${API_BASE}/articles/view?slug=${slug}`, { 
                 method: 'POST'
-            }).catch(() => {});
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    if (!result.success) {
+                        console.warn('[View] Failed:', result.errMsg);
+                    }
+                })
+                .catch(error => console.warn('[View] error:', error));
             
             el('page-title').textContent = a.titleDisplay;
             el('breadcrumb-title').textContent = a.titleDisplay;
@@ -119,11 +131,17 @@ function toggleLike() {
     }
     
     const btn = el('like-btn');
+    btn.disabled = true;
     
     fetch(`${API_BASE}/articles/like?slug=${slug}`, { 
         method: 'POST'
     })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            return response.json();
+        })
         .then(result => {
             if (!result.success) {
                 throw new Error(result.errMsg);
@@ -136,7 +154,10 @@ function toggleLike() {
             
             addLikedArticle(slug);
         })
-        .catch(error => console.error('[Like] error:', error));
+        .catch(error => console.error('[Like] error:', error))
+        .finally(() => {
+            btn.disabled = false;
+        });
 }
 
 function shareArticle() {
@@ -155,10 +176,17 @@ function shareArticle() {
         return;
     }
     
+    btn.disabled = true;
+    
     fetch(`${API_BASE}/articles/share?slug=${slug}`, { 
         method: 'POST'
     })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            return response.json();
+        })
         .then(result => {
             if (!result.success) {
                 throw new Error(result.errMsg);
@@ -171,7 +199,10 @@ function shareArticle() {
             addSharedArticle(slug);
             copyAndNotify();
         })
-        .catch(error => console.error('[Share] error:', error));
+        .catch(error => console.error('[Share] error:', error))
+        .finally(() => {
+            btn.disabled = false;
+        });
 }
 
 const getLikedArticles = () => {
