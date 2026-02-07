@@ -7,5 +7,9 @@ public interface MemberService {
 	String register(Member member);
 	
 	Member login(Member member);
+	
+	Member profile(Member member);
+
+	
 
 }

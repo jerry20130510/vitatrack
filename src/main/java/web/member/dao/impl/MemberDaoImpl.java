@@ -3,14 +3,13 @@ package web.member.dao.impl;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 import web.member.dao.MemberDao;
 import web.member.vo.Member;
-import java.sql.Timestamp;
+
 
 public class MemberDaoImpl implements MemberDao {
 	private DataSource ds;
@@ -19,14 +18,12 @@ public class MemberDaoImpl implements MemberDao {
 		try {
 			ds = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/vitatrack");
 		} catch (NamingException e) {
-
 			e.printStackTrace();
 		}
 	}
 
 	@Override
 	public int insert(Member member) {
-
 		String sql = "Insert into member (name, email, phone, address, password)  values(?,?,?,?,?)";
 		try (
 			 Connection conn = ds.getConnection(); 
@@ -44,6 +41,21 @@ public class MemberDaoImpl implements MemberDao {
 		}
 		return -1;
 	}
+	@Override
+	public int deleteById(Integer id) {
+		String sql = "delete from member where id = ? ";
+
+		try (Connection conn = ds.getConnection(); 
+			PreparedStatement pstmt = conn.prepareStatement(sql);) {
+			pstmt.setInt(1, id);
+			int count = pstmt.executeUpdate();
+			return count;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return -1;
+	}
 
 	@Override
 	public Member selectByEmail(String email) {
@@ -56,23 +68,21 @@ public class MemberDaoImpl implements MemberDao {
 			try (ResultSet rs = pstmt.executeQuery();) {
 				if (rs.next()) {
 					Member member = new Member();
-					member.setMemberId(rs.getInt("memberId"));
+					member.setMemberId(rs.getInt("member_id"));
 					member.setName(rs.getString("name"));
 					member.setEmail(rs.getString("email"));
 					member.setPhone(rs.getString("phone"));
 					member.setAddress(rs.getString("address"));
 					member.setPassword(rs.getString("password"));
-					member.setVerifyCode(rs.getString("verifyCode"));
-					member.setMemberStatus(rs.getInt("memberStatus"));
-					member.setRegistrationTime(rs.getTimestamp("registrationTime"));
+					member.setVerifyCode(rs.getString("verify_code"));
+					member.setMemberStatus(rs.getInt("member_status"));
+					member.setRegistrationTime(rs.getTimestamp("registration_time"));
 					return member;
 				}
-				
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		return null;
 	}
 
@@ -86,13 +96,6 @@ public class MemberDaoImpl implements MemberDao {
 			pstmt.setString(1, email);
 			pstmt.setString(2, password);
 			try (ResultSet rs = pstmt.executeQuery();) {
-//				// --- 偵錯用程式碼：印出所有欄位名稱 ---
-//			    ResultSetMetaData metaData = rs.getMetaData();
-//			    int count = metaData.getColumnCount();
-//			    for (int i = 1; i <= count; i++) {
-//			        System.out.println("資料庫欄位第 " + i + " 個名稱是: [" + metaData.getColumnName(i) + "]");
-//			    }
-//			    // ----------------------------------
 				if (rs.next()) {
 					Member member = new Member();
 					member.setMemberId(rs.getInt("member_id"));
@@ -103,7 +106,7 @@ public class MemberDaoImpl implements MemberDao {
 					member.setPassword(rs.getString("password"));
 					member.setVerifyCode(rs.getString("verify_code"));
 					member.setMemberStatus(rs.getInt("member_status"));
-					member.setRegistrationTime(rs.getTimestamp("registration_Time"));
+					member.setRegistrationTime(rs.getTimestamp("registration_time"));
 					return member;
 				}
 				
@@ -111,10 +114,6 @@ public class MemberDaoImpl implements MemberDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		return null;
 	}
-		
-	
-
 }

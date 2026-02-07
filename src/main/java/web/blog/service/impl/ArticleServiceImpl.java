@@ -1,17 +1,18 @@
 package web.blog.service.impl;
 
-import web.blog.bean.Article;
-import web.blog.bean.ArticleListResponse;
+import web.blog.vo.Article;
+import web.blog.vo.ArticleListResponse;
 import web.blog.dao.ArticleDao;
 import web.blog.dao.impl.ArticleDaoImpl;
 import web.blog.service.ArticleService;
 
+import javax.naming.NamingException;
 import java.util.List;
 
 public class ArticleServiceImpl implements ArticleService {
     private ArticleDao articleDao;
 
-    public ArticleServiceImpl() {
+    public ArticleServiceImpl() throws NamingException {
         this.articleDao = new ArticleDaoImpl();
     }
 
@@ -61,19 +62,16 @@ public class ArticleServiceImpl implements ArticleService {
 
     @Override
     public int getViews(String titleSlug) {
-        Integer views = articleDao.getTotalViews(titleSlug);
-        return views != null ? views : 0;
+        return articleDao.getTotalViews(titleSlug);
     }
 
     @Override
     public int getLikes(String titleSlug) {
-        Integer likes = articleDao.getTotalLikes(titleSlug);
-        return likes != null ? likes : 0;
+        return articleDao.getTotalLikes(titleSlug);
     }
 
     @Override
     public int getShares(String titleSlug) {
-        Integer shares = articleDao.getTotalShares(titleSlug);
-        return shares != null ? shares : 0;
+        return articleDao.getTotalShares(titleSlug);
     }
 }

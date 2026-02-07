@@ -1,6 +1,4 @@
-/* =============================================
-   Blog Detail Page Styles
-   ============================================= */
+/*   Blog Detail Page Styles   */
 
 /* Chinese font family */
 body {
@@ -247,9 +245,7 @@ body {
   --border-dark: #555;
 }
 
-/* =============================================
-   Error Display Styles
-   ============================================= */
+/*   Error Display Styles。 */
 
 .error-display {
   text-align: center;
@@ -281,9 +277,7 @@ body {
   text-decoration: none;
 }
 
-/* =============================================
-   Author and Category Link Styles
-   ============================================= */
+/*   Author and Category Link Styles */
 
 .author-link,
 .category-link {

@@ -1,6 +1,6 @@
 package web.blog.dao;
 
-import web.blog.bean.Article;
+import web.blog.vo.Article;
 import java.util.List;
 
 public interface ArticleDao {
@@ -14,7 +14,7 @@ public interface ArticleDao {
     int incrementViews(String titleSlug);
     int incrementLikes(String titleSlug);
     int incrementShares(String titleSlug);
-    Integer getTotalViews(String titleSlug);
-    Integer getTotalLikes(String titleSlug);
-    Integer getTotalShares(String titleSlug);
+    int getTotalViews(String titleSlug);
+    int getTotalLikes(String titleSlug);
+    int getTotalShares(String titleSlug);
 }

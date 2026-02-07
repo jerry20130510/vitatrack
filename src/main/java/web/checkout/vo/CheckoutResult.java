@@ -22,13 +22,4 @@ public class CheckoutResult {
     public String getStatus() {
         return status;
     }
-
-    @Override
-    public String toString() {
-        return "CheckoutResult{" +
-                "orderId=" + orderId +
-                ", totalAmount=" + totalAmount +
-                ", status='" + status + '\'' +
-                '}';
-    }
 }
