@@ -51,7 +51,6 @@ public class ProductController extends HttpServlet{
 	        resp.setContentType("application/json; charset=UTF-8");
 
 	        try {
-	            // 從路徑取 sku：/admin/products/{sku}
 	            String sku = extractSkuFromPath(req);
 	            if (sku == null || sku.trim().isEmpty()) {
 	                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -59,12 +58,9 @@ public class ProductController extends HttpServlet{
 	                return;
 	            }
 
-	            // 讀 JSON body
 	            String body = readBody(req);
-	            System.out.println("RAW BODY = [" + body + "]");
 	            Product product = gson.fromJson(body, Product.class);
 
-	            // 交給 service 更新（你需要在 ProductService / Impl 補上 update(sku, product)）
 	            boolean ok = productService.update(sku, product);
 
 	            if (ok) {
@@ -82,16 +78,16 @@ public class ProductController extends HttpServlet{
 	        }
 	    }
 
-	    // ====== helper：讀 body（給 doPut 用）======
+	    // ====== 讀 body（給 doPut 用）======
 	    private String readBody(HttpServletRequest req) throws IOException {
 	        try (BufferedReader reader = req.getReader()) {
 	            return reader.lines().collect(Collectors.joining());
 	        }
 	    }
 
-	    // ====== helper：從 /admin/products/{sku} 取出 sku ======
+	    // ====== 從 /admin/products/{sku} 取出 sku ======
 	    private String extractSkuFromPath(HttpServletRequest req) {
-	        String pathInfo = req.getPathInfo(); // 例如：/NUTRI-001
+	        String pathInfo = req.getPathInfo();
 	        if (pathInfo == null) return null;
 
 	        pathInfo = pathInfo.trim();
