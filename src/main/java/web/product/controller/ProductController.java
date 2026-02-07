@@ -16,7 +16,7 @@ import web.product.service.ProductService;
 import web.product.service.impl.ProductServiceImpl;
 import web.product.vo.Product;
 
-@WebServlet ("/admin/products")
+@WebServlet ("/admin/product/*")
 public class ProductController extends HttpServlet{
 	private static final long serialVersionUID = 1L;
 	 private final Gson gson = new Gson();
@@ -44,6 +44,66 @@ public class ProductController extends HttpServlet{
 	            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
 	            resp.getWriter().write("{\"success\":失敗}");
 	        }
+	    }
+	    
+	    @Override
+	    protected void doPut(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	        resp.setContentType("application/json; charset=UTF-8");
+
+	        try {
+	            // 從路徑取 sku：/admin/products/{sku}
+	            String sku = extractSkuFromPath(req);
+	            if (sku == null || sku.trim().isEmpty()) {
+	                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+	                resp.getWriter().write("{\"success\":false}");
+	                return;
+	            }
+
+	            // 讀 JSON body
+	            String body = readBody(req);
+	            System.out.println("RAW BODY = [" + body + "]");
+	            Product product = gson.fromJson(body, Product.class);
+
+	            // 交給 service 更新（你需要在 ProductService / Impl 補上 update(sku, product)）
+	            boolean ok = productService.update(sku, product);
+
+	            if (ok) {
+	                resp.setStatus(HttpServletResponse.SC_OK);
+	                resp.getWriter().write("{\"success\":true}");
+	            } else {
+	                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+	                resp.getWriter().write("{\"success\":false}");
+	            }
+
+	        } catch (Exception e) {
+	            e.printStackTrace();
+	            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+	            resp.getWriter().write("{\"success\":false}");
+	        }
+	    }
+
+	    // ====== helper：讀 body（給 doPut 用）======
+	    private String readBody(HttpServletRequest req) throws IOException {
+	        try (BufferedReader reader = req.getReader()) {
+	            return reader.lines().collect(Collectors.joining());
+	        }
+	    }
+
+	    // ====== helper：從 /admin/products/{sku} 取出 sku ======
+	    private String extractSkuFromPath(HttpServletRequest req) {
+	        String pathInfo = req.getPathInfo(); // 例如：/NUTRI-001
+	        if (pathInfo == null) return null;
+
+	        pathInfo = pathInfo.trim();
+	        if (pathInfo.isEmpty() || "/".equals(pathInfo)) return null;
+
+	        if (pathInfo.startsWith("/")) pathInfo = pathInfo.substring(1);
+
+	        int slashIdx = pathInfo.indexOf('/');
+	        if (slashIdx >= 0) {
+	            pathInfo = pathInfo.substring(0, slashIdx);
+	        }
+	        return pathInfo;
 	    }
 		
 	};

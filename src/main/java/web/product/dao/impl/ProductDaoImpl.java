@@ -54,4 +54,38 @@ public class ProductDaoImpl implements ProductDao {
 		return false;
 	}
 
+	@Override
+	public boolean updateBySku(String sku, Product product) {
+	    String sql = "UPDATE product SET "
+	            + "category_id = ?, "
+	            + "product_name = ?, "
+	            + "size = ?, "
+	            + "price = ?, "
+	            + "stock_quantity = ?, "
+	            + "status = ?, "
+	            + "short_description = ?, "
+	            + "description = ?, "
+	            + "updated_by_admin_id = ? "
+	            + "WHERE sku = ?";		
+	    
+	    try (Connection conn = ds.getConnection();
+	            PreparedStatement ps = conn.prepareStatement(sql)) {
+		           ps.setInt(1, product.getCategoryId());
+		           ps.setString(2, product.getProductName());
+		           ps.setString(3, product.getSize());
+		           ps.setInt(4, product.getPrice());
+		           ps.setInt(5, product.getStockQuantity());
+		           ps.setLong(6, product.getStatus());
+		           ps.setString(7, product.getShortDescription());
+		           ps.setString(8, product.getDescription());
+		           ps.setInt(9, product.getUpdatedByAdminId());
+		           ps.setString(10, sku);
+		           
+		           return ps.executeUpdate() == 1;
+		           
+	    }catch (SQLException e) {
+			e.printStackTrace();
+		}
+	    return false;
+	}
 }
