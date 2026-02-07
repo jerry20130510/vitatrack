@@ -30,14 +30,13 @@ public class ArticleDaoImpl implements ArticleDao {
                     "ORDER BY a.created_at DESC " +
                     "LIMIT ? OFFSET ?";
         
-        List<Article> articles = new ArrayList<>();
-        
         try (Connection conn = ds.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
             pstmt.setInt(1, limit);
             pstmt.setInt(2, offset);
             
+            List<Article> articles = new ArrayList<>();
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     Article article = new Article();
@@ -78,11 +77,12 @@ public class ArticleDaoImpl implements ArticleDao {
                     articles.add(article);
                 }
             }
+            return articles;
+            
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Failed to find articles", e);
         }
-        
-        return articles;
     }
 
     @Override
@@ -97,8 +97,6 @@ public class ArticleDaoImpl implements ArticleDao {
                     "ORDER BY a.created_at DESC " +
                     "LIMIT ? OFFSET ?";
         
-        List<Article> articles = new ArrayList<>();
-        
         try (Connection conn = ds.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
@@ -106,6 +104,7 @@ public class ArticleDaoImpl implements ArticleDao {
             pstmt.setInt(2, limit);
             pstmt.setInt(3, offset);
             
+            List<Article> articles = new ArrayList<>();
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     Article article = new Article();
@@ -146,11 +145,12 @@ public class ArticleDaoImpl implements ArticleDao {
                     articles.add(article);
                 }
             }
+            return articles;
+            
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Failed to find articles by category", e);
         }
-        
-        return articles;
     }
 
     @Override
@@ -165,8 +165,6 @@ public class ArticleDaoImpl implements ArticleDao {
                     "ORDER BY a.created_at DESC " +
                     "LIMIT ? OFFSET ?";
         
-        List<Article> articles = new ArrayList<>();
-        
         try (Connection conn = ds.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             
@@ -174,6 +172,7 @@ public class ArticleDaoImpl implements ArticleDao {
             pstmt.setInt(2, limit);
             pstmt.setInt(3, offset);
             
+            List<Article> articles = new ArrayList<>();
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     Article article = new Article();
@@ -214,11 +213,12 @@ public class ArticleDaoImpl implements ArticleDao {
                     articles.add(article);
                 }
             }
+            return articles;
+            
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Failed to find articles by author", e);
         }
-        
-        return articles;
     }
 
     @Override
@@ -232,11 +232,12 @@ public class ArticleDaoImpl implements ArticleDao {
             if (rs.next()) {
                 return rs.getInt(1);
             }
+            return 0;
+            
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Failed to count articles", e);
         }
-        
-        return 0;
     }
 
     @Override
@@ -252,12 +253,13 @@ public class ArticleDaoImpl implements ArticleDao {
                 if (rs.next()) {
                     return rs.getInt(1);
                 }
+                return 0;
             }
+            
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Failed to count articles by category", e);
         }
-        
-        return 0;
     }
 
     @Override
@@ -273,12 +275,13 @@ public class ArticleDaoImpl implements ArticleDao {
                 if (rs.next()) {
                     return rs.getInt(1);
                 }
+                return 0;
             }
+            
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Failed to count articles by author", e);
         }
-        
-        return 0;
     }
 
     @Override
@@ -340,12 +343,13 @@ public class ArticleDaoImpl implements ArticleDao {
                     
                     return article;
                 }
+                return null;
             }
+            
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Failed to find article by slug", e);
         }
-        
-        return null;
     }
 
     @Override
@@ -360,9 +364,8 @@ public class ArticleDaoImpl implements ArticleDao {
             
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Failed to increment views", e);
         }
-        
-        return 0;
     }
 
     @Override
@@ -377,9 +380,8 @@ public class ArticleDaoImpl implements ArticleDao {
             
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Failed to increment likes", e);
         }
-        
-        return 0;
     }
 
     @Override
@@ -394,9 +396,8 @@ public class ArticleDaoImpl implements ArticleDao {
             
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Failed to increment shares", e);
         }
-        
-        return 0;
     }
 
     @Override
@@ -412,12 +413,13 @@ public class ArticleDaoImpl implements ArticleDao {
                 if (rs.next()) {
                     return rs.getInt(1);
                 }
+                return 0;
             }
+            
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Failed to get total views", e);
         }
-        
-        return 0;
     }
 
     @Override
@@ -433,12 +435,13 @@ public class ArticleDaoImpl implements ArticleDao {
                 if (rs.next()) {
                     return rs.getInt(1);
                 }
+                return 0;
             }
+            
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Failed to get total likes", e);
         }
-        
-        return 0;
     }
 
     @Override
@@ -454,11 +457,12 @@ public class ArticleDaoImpl implements ArticleDao {
                 if (rs.next()) {
                     return rs.getInt(1);
                 }
+                return 0;
             }
+            
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException("Failed to get total shares", e);
         }
-        
-        return 0;
     }
 }
