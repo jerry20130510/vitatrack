@@ -4,7 +4,6 @@ import web.member.vo.Member;
 
 public interface MemberDao {
 	
-	
 	int insert(Member member);
 	
 	int deleteById(Integer id);

@@ -53,7 +53,6 @@ public class RegisterController extends HttpServlet {
 		}
 		//輸出純文字的json格式
 		resp.getWriter().write(result.toString());
-
 	}
 
 }

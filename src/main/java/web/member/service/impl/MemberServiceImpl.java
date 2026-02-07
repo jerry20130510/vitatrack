@@ -30,7 +30,6 @@ public class MemberServiceImpl implements MemberService {
 		if (email == null || !email.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
 			return "email格式錯誤或未填寫!";
 		}
-
 		// 3 手機 必須是09開頭且共10位數字("^09[0-9]{8}$")
 		String phone = member.getPhone();
 		if (phone == null || !phone.matches("^09[0-9]{8}$")) {
@@ -55,7 +54,6 @@ public class MemberServiceImpl implements MemberService {
 				member.setAddress(safeAddress);
 			}
 		}
-
 		// 5 密碼 密碼至少為 8 個字元，且至少包含 1 個英文字母(大小寫皆可)與 1 個數字
 		String password = member.getPassword();
 		if (password == null || !password.matches("^(?=.*[A-Za-z])(?=.*\\d).{8,}$")) {
@@ -72,13 +70,11 @@ public class MemberServiceImpl implements MemberService {
 		if (memberDao.selectByEmail(email) != null) {
 			return "此帳號已經被註冊了";
 		}
-
-		// 8註冊方法在通過所有驗證後，呼叫 memberDao.insert(member)，新增資料。
+    	// 8註冊方法在通過所有驗證後，呼叫 memberDao.insert(member)，新增資料。
 		int count = memberDao.insert(member);
 		if (count < 0) {
 			return "系統錯誤，註冊失敗!";
 		}
-
 		// 9全部成功，回傳 null 代表沒有錯誤訊息或 代表的是 「錯誤訊息為空」。
 		return null;
 	}
