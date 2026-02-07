@@ -27,8 +27,7 @@ public class MemberDaoImpl implements MemberDao {
 		String sql = "Insert into member (name, email, phone, address, password)  values(?,?,?,?,?)";
 		try (
 			 Connection conn = ds.getConnection(); 
-			 PreparedStatement pstmt = conn.prepareStatement(sql);
-				
+			 PreparedStatement pstmt = conn.prepareStatement(sql);	
 			) {
 			pstmt.setString(1, member.getName());
 			pstmt.setString(2, member.getEmail());
@@ -41,10 +40,10 @@ public class MemberDaoImpl implements MemberDao {
 		}
 		return -1;
 	}
+	
 	@Override
 	public int deleteById(Integer id) {
-		String sql = "delete from member where id = ? ";
-
+		String sql = "delete from member where member_id = ? ";
 		try (Connection conn = ds.getConnection(); 
 			PreparedStatement pstmt = conn.prepareStatement(sql);) {
 			pstmt.setInt(1, id);
@@ -53,10 +52,27 @@ public class MemberDaoImpl implements MemberDao {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		return -1;
 	}
-
+	
+	@Override
+	public int update(Member member) {
+		String sql = "update member set name = ?, password=?, address=?, phone=? where member_id = ? ";
+		try (Connection conn = ds.getConnection(); 
+			PreparedStatement pstmt = conn.prepareStatement(sql);) {
+			pstmt.setString(1, member.getName());
+			pstmt.setString(2, member.getPassword());
+			pstmt.setString(3, member.getAddress());
+			pstmt.setString(4, member.getPhone());
+			pstmt.setInt(5,member.getMemberId());
+			int count = pstmt.executeUpdate();
+			return count;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return -1;
+	}
+	
 	@Override
 	public Member selectByEmail(String email) {
 		String sql = "select * from member where email =?";
@@ -109,11 +125,12 @@ public class MemberDaoImpl implements MemberDao {
 					member.setRegistrationTime(rs.getTimestamp("registration_time"));
 					return member;
 				}
-				
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
+
+	
 }

@@ -99,6 +99,7 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public Member profile(Member member) {
+		//顯示當前會員資料
 		String email = member.getEmail();
 		return memberDao.selectByEmail(email);
 	}

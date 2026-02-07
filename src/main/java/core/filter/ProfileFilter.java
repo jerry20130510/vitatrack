@@ -26,7 +26,6 @@ public class ProfileFilter extends HttpFilter {
 			chain.doFilter(req, resp);
 			
 		}else {
-			
 			resp.setStatus(401)	;	    
 			return;
 		}

@@ -61,11 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
         fetch('login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                email: loginForm.email.value,
-                password: loginForm.password.value
-
-            })
+            body: JSON.stringify({email: loginForm.email.value,password: loginForm.password.value})
         }).then(result => result.json())
             .then(result => {
                 console.log("這是後端回傳結果：", result);

@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 contentArea.innerHTML = `
                         <div class="member-card">
-                            <header class="member-card-header">會員資料</header>
+                            <header class="member-card-header">會員資訊</header>
                             <div class="member-card-body">
                                 <div class="member-form">
                                     <div class="form-row"><label>使用者帳號</label><p class="readonly">${member.email}</p></div>

@@ -9,6 +9,8 @@ public interface MemberDao {
 	
 	int deleteById(Integer id);
 	
+	int update(Member member);
+	
 	Member selectByEmail(String email);
 	
 	Member SelectByEmailandPassword(String email, String password);

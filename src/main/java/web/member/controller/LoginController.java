@@ -30,7 +30,6 @@ public class LoginController extends HttpServlet {
 		Gson gson = new Gson();
 		// 再轉 Member 物件
 		Member member = gson.fromJson(req.getReader(), Member.class);
-
 		JsonObject result = new JsonObject();
 		Member loginMember = memberService.login(member);
 
@@ -40,11 +39,9 @@ public class LoginController extends HttpServlet {
 		} else {
 			HttpSession session = req.getSession();
 			session.setAttribute("member", loginMember);
-
 			result.addProperty("success", true);
 			result.addProperty("message", "登入成功!");
 		}
-
 		resp.getWriter().write(result.toString());
 	}
 }
