@@ -1,10 +1,11 @@
 package web.blog.dao.impl;
 
-import web.blog.bean.Article;
+import web.blog.vo.Article;
 import web.blog.dao.ArticleDao;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.sql.DataSource;
 import java.sql.*;
 import java.util.ArrayList;
@@ -13,13 +14,9 @@ import java.util.List;
 public class ArticleDaoImpl implements ArticleDao {
     private DataSource ds;
 
-    public ArticleDaoImpl() {
-        try {
-            Context ctx = new InitialContext();
-            ds = (DataSource) ctx.lookup("java:comp/env/jdbc/vitatrack");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public ArticleDaoImpl() throws NamingException {
+        Context ctx = new InitialContext();
+        ds = (DataSource) ctx.lookup("java:comp/env/jdbc/vitatrack");
     }
 
     @Override
@@ -403,7 +400,7 @@ public class ArticleDaoImpl implements ArticleDao {
     }
 
     @Override
-    public Integer getTotalViews(String titleSlug) {
+    public int getTotalViews(String titleSlug) {
         String sql = "SELECT total_views FROM articles WHERE title_slug = ?";
         
         try (Connection conn = ds.getConnection();
@@ -420,11 +417,11 @@ public class ArticleDaoImpl implements ArticleDao {
             e.printStackTrace();
         }
         
-        return null;
+        return 0;
     }
 
     @Override
-    public Integer getTotalLikes(String titleSlug) {
+    public int getTotalLikes(String titleSlug) {
         String sql = "SELECT total_likes FROM articles WHERE title_slug = ?";
         
         try (Connection conn = ds.getConnection();
@@ -441,11 +438,11 @@ public class ArticleDaoImpl implements ArticleDao {
             e.printStackTrace();
         }
         
-        return null;
+        return 0;
     }
 
     @Override
-    public Integer getTotalShares(String titleSlug) {
+    public int getTotalShares(String titleSlug) {
         String sql = "SELECT total_shares FROM articles WHERE title_slug = ?";
         
         try (Connection conn = ds.getConnection();
@@ -462,6 +459,6 @@ public class ArticleDaoImpl implements ArticleDao {
             e.printStackTrace();
         }
         
-        return null;
+        return 0;
     }
 }

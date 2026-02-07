@@ -1,4 +1,4 @@
-package web.blog.bean;
+package web.blog.vo;
 
 import java.util.List;
 

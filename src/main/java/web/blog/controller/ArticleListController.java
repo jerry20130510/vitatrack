@@ -2,7 +2,7 @@ package web.blog.controller;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import web.blog.bean.ArticleListResponse;
+import web.blog.vo.ArticleListResponse;
 import web.blog.service.ArticleService;
 import web.blog.service.impl.ArticleServiceImpl;
 
@@ -11,6 +11,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.naming.NamingException;
 import java.io.IOException;
 import java.util.Map;
 
@@ -21,7 +22,11 @@ public class ArticleListController extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        articleService = new ArticleServiceImpl();
+        try {
+            articleService = new ArticleServiceImpl();
+        } catch (NamingException e) {
+            throw new ServletException("Failed to initialize ArticleService", e);
+        }
         gson = new GsonBuilder()
             .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
             .create();

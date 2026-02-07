@@ -3,7 +3,6 @@ package web.member.vo;
 import java.sql.Timestamp;
 
 public class Member {
-
 	private Integer memberId;
 	private String name;
 	private String email;
@@ -113,7 +112,4 @@ public class Member {
 	public void setRegistrationTime(Timestamp registrationTime) {
 		this.registrationTime = registrationTime;
 	}
-
-	
-
 }

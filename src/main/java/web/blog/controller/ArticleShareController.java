@@ -9,6 +9,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.naming.NamingException;
 import java.io.IOException;
 import java.util.Map;
 
@@ -19,7 +20,11 @@ public class ArticleShareController extends HttpServlet {
 
     @Override
     public void init() throws ServletException {
-        articleService = new ArticleServiceImpl();
+        try {
+            articleService = new ArticleServiceImpl();
+        } catch (NamingException e) {
+            throw new ServletException("Failed to initialize ArticleService", e);
+        }
         gson = new Gson();
     }
 

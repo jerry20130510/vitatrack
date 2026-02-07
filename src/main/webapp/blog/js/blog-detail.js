@@ -1,40 +1,10 @@
 // blog-detail.js - Article detail page logic
 
-// localStorage helpers
-const getLikedArticles = () => JSON.parse(localStorage.getItem('likedArticles') || '[]');
-const getSharedArticles = () => JSON.parse(localStorage.getItem('sharedArticles') || '[]');
-const addLikedArticle = slug => localStorage.setItem('likedArticles', JSON.stringify([...getLikedArticles(), slug]));
-const addSharedArticle = slug => localStorage.setItem('sharedArticles', JSON.stringify([...getSharedArticles(), slug]));
-
-
-const showError = (msg, isNotFound = false) => {
-    const container = el('article-content') || document.querySelector('.mn-main-content');
-    if (!container) return;
-    
-    const icon = isNotFound ? 'ri-file-unknow-line' : 'ri-wifi-off-line';
-    const title = isNotFound ? '找不到文章' : '無法載入文章';
-    const desc = isNotFound ? '此文章可能被移除或不存在' : '請檢查網路連線再試一次';
-    const btnText = isNotFound ? '返回文章列表' : '重新載入';
-    const btnAction = isNotFound ? 'href="blog-list.html"' : 'href="javascript:location.reload()"';
-    
-    container.innerHTML = `
-        <div class="col-12">
-            <div class="error-display">
-                <i class="${icon} error-icon"></i>
-                <h3 class="mn-title error-title">${title}</h3>
-                <p class="error-message">${desc}</p>
-                <a ${btnAction} class="mn-btn-2 error-button"><span>${btnText}</span></a>
-            </div>
-        </div>
-    `;
-    container.style.display = 'block';
-};
-
 function loadArticleDetail() {
     const slug = new URLSearchParams(location.search).get('slug');
     
     if (!slug) {
-        showError('文章不存在', true);
+        showNotFoundError('article-content', '此文章可能被移除或不存在', '返回文章列表', 'blog-list.html');
         return;
     }
 
@@ -52,14 +22,12 @@ function loadArticleDetail() {
             return response.json();
         })
         .then(result => {
-            // Check success wrapper
             if (!result.success) {
-                throw new Error(result.errMsg || 'LOAD_ERROR');
+                throw new Error(result.errMsg);
             }
             
-            const a = result.data;  // Extract data from wrapper
+            const a = result.data;
             
-            // Increment view count silently (no UI update)
             fetch(`${API_BASE}/articles/view?slug=${slug}`, { 
                 method: 'POST'
             }).catch(() => {});
@@ -75,14 +43,14 @@ function loadArticleDetail() {
             el('featured-image').alt = a.titleDisplay;
             el('article-title').textContent = a.titleDisplay;
             
-            // Author avatar with fallback
-            const authorName = a.authorDisplayName || '作者';
+            const authorName = a.authorDisplayName;
             const avatarImg = el('author-avatar');
             const fallback = el('author-avatar-fallback');
             
             const showFallback = () => {
                 avatarImg.style.display = 'none';
                 fallback.style.display = 'flex';
+                
                 fallback.textContent = authorName.charAt(0).toUpperCase();
                 fallback.style.background = `hsl(${authorName.charCodeAt(0) * 5 % 360}, 50%, 45%)`;
             };
@@ -114,7 +82,6 @@ function loadArticleDetail() {
             el('like-count').textContent = a.totalLikes;
             el('share-count').textContent = a.totalShares;
             
-            // Check localStorage and update button states
             const likeBtn = el('like-btn');
             const shareBtn = el('share-btn');
             
@@ -137,19 +104,16 @@ function loadArticleDetail() {
         .catch(error => {
             console.error('[Load] error:', error);
             if (error.message === 'NOT_FOUND') {
-                showError('文章不存在', true);
+                showNotFoundError('article-content', '此文章可能被移除或不存在', '返回文章列表', 'blog-list.html');
             } else {
-                showError('載入文章失敗，請稍後再試');
+                showLoadError('article-content');
             }
         });
 }
 
-document.addEventListener('DOMContentLoaded', loadArticleDetail);
-
 function toggleLike() {
     const slug = new URLSearchParams(location.search).get('slug');
     
-    // Check if already liked
     if (getLikedArticles().includes(slug)) {
         return;
     }
@@ -162,17 +126,14 @@ function toggleLike() {
         .then(response => response.json())
         .then(result => {
             if (!result.success) {
-                console.error('[Like] error:', result.errMsg);
-                return;
+                throw new Error(result.errMsg);
             }
-            // Update UI
             btn.classList.replace('btn-outline-danger', 'btn-danger');
             btn.classList.add('liked');
             btn.querySelector('i').classList.replace('ri-heart-line', 'ri-heart-fill');
             el('like-text').textContent = '已按讚';
             el('like-count').textContent = result.data.totalLikes;
             
-            // Save to localStorage
             addLikedArticle(slug);
         })
         .catch(error => console.error('[Like] error:', error));
@@ -200,18 +161,51 @@ function shareArticle() {
         .then(response => response.json())
         .then(result => {
             if (!result.success) {
-                console.error('[Share] error:', result.errMsg);
-                return;
+                throw new Error(result.errMsg);
             }
-            // Update UI
             btn.classList.replace('btn-outline-primary', 'btn-primary');
             btn.querySelector('i').classList.replace('ri-share-line', 'ri-share-fill');
             el('share-text').textContent = '已分享';
             el('share-count').textContent = result.data.totalShares;
             
-            // Save to localStorage
             addSharedArticle(slug);
             copyAndNotify();
         })
         .catch(error => console.error('[Share] error:', error));
 }
+
+const getLikedArticles = () => {
+    try {
+        return JSON.parse(localStorage.getItem('likedArticles') || '[]');
+    } catch (e) {
+        console.error('[Storage] error:', e);
+        return [];
+    }
+};
+
+const getSharedArticles = () => {
+    try {
+        return JSON.parse(localStorage.getItem('sharedArticles') || '[]');
+    } catch (e) {
+        console.error('[Storage] error:', e);
+        return [];
+    }
+};
+
+const addLikedArticle = slug => {
+    try {
+        localStorage.setItem('likedArticles', JSON.stringify([...getLikedArticles(), slug]));
+    } catch (e) {
+        console.error('[Storage] error:', e);
+    }
+};
+
+const addSharedArticle = slug => {
+    try {
+        localStorage.setItem('sharedArticles', JSON.stringify([...getSharedArticles(), slug]));
+    } catch (e) {
+        console.error('[Storage] error:', e);
+    }
+};
+
+document.addEventListener('DOMContentLoaded', loadArticleDetail);
