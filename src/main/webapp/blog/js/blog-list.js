@@ -4,21 +4,10 @@ let currentPage = 0;
 let currentCategory = '';
 let currentAuthor = '';
 
-document.querySelectorAll('.nav-link').forEach(link => {
-    link.addEventListener('click', (e) => {
-        e.preventDefault();
-        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-        link.classList.add('active');
-        currentCategory = link.dataset.category || '';
-        currentPage = 0;
-        loadArticles();
-    });
-});
-
 function loadArticles() {
-    toggle(el('mn-overlay'), true);
-    el('articles-container').style.display = 'none';
-    toggle(el('pagination'), false);
+    toggle(el('mn-overlay'), true);  
+    el('articles-container').style.display = 'none';  
+    toggle(el('pagination'), false);  
     
     const params = new URLSearchParams({ page: currentPage, size: 6 });
     if (currentCategory) params.append('category', currentCategory);
@@ -26,7 +15,12 @@ function loadArticles() {
 
     fetch(`${API_BASE}/articles?${params}`)
         .then(response => {
-            if (!response.ok) throw new Error('載入失敗');
+            if (!response.ok) {
+                if (response.status === 404) {
+                    throw new Error('NOT_FOUND');
+                }
+                throw new Error('LOAD_ERROR');
+            }
             return response.json();
         })
         .then(result => {
@@ -35,28 +29,19 @@ function loadArticles() {
             }
             const data = result.data;
             renderArticles(data.articles);
-            renderPagination(data);
-            el('articles-container').style.display = 'flex';
+            renderPagination(data); 
+            el('articles-container').style.display = 'flex';  
         })
         .catch(error => {
             console.error('[Load] error:', error);
-            const container = el('articles-container');
-            if (container) {
-                container.style.display = 'block';
-                container.innerHTML = `
-                    <div class="col-12">
-                        <div class="error-display">
-                            <i class="ri-wifi-off-line error-icon"></i>
-                            <h3 class="mn-title error-title">無法載入文章</h3>
-                            <p class="error-message">請檢查網路連線再試一次</p>
-                            <button onclick="loadArticles()" class="mn-btn-2"><span>重新載入</span></button>
-                        </div>
-                    </div>
-                `;
+            if (error.message === 'NOT_FOUND') {
+                showNotFoundError('articles-container', '此分類或篩選條件沒有文章', '返回文章列表', 'blog-list.html');
+            } else {
+                showLoadError('articles-container');
             }
         })
         .finally(() => {
-            toggle(el('mn-overlay'), false);
+            toggle(el('mn-overlay'), false);  
         });
 }
 
@@ -120,7 +105,6 @@ function goToPage(page) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Check for category parameter in URL
     const urlParams = new URLSearchParams(window.location.search);
     const categoryParam = urlParams.get('category');
     const authorParam = urlParams.get('authorSlug');

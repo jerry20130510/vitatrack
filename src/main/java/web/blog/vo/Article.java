@@ -17,7 +17,6 @@ public class Article {
     private Timestamp createdAt;
     private Timestamp updatedAt;
     
-    // Flattened author fields (for API compatibility)
     private String authorDisplayName;
     private String authorProfileImage;
 
