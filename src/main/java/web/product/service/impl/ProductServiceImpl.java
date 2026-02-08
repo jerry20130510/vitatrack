@@ -25,6 +25,18 @@ public class ProductServiceImpl implements ProductService {
         product.setCreatedByAdminId(1L);
         return productDao.insert(product);
     }
+
+	@Override
+	public boolean update(String sku, Product product) {
+	    if (sku == null || sku.trim().isEmpty()) return false;
+	    if (product == null) return false;
+	    if (product.getProductName() == null || product.getProductName().trim().isEmpty()) return false;
+	    if (product.getStockQuantity() < 0) return false;
+
+	    product.setUpdatedByAdminId(1);
+
+	    return productDao.updateBySku(sku, product);
+	}
 	
 
 }

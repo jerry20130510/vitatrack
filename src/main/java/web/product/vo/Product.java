@@ -12,20 +12,7 @@ public class Product {
 	private String shortDescription;
 	private String description;
 	private long CreatedByAdminId;
-	public Product(String sku, int categoryId, String productName, String size, int price, int stockQuantity,
-			int status, String shortDescription, String description, long createdByAdminId) {
-		super();
-		this.sku = sku;
-		this.categoryId = categoryId;
-		this.productName = productName;
-		this.size = size;
-		this.price = price;
-		this.stockQuantity = stockQuantity;
-		this.status = status;
-		this.shortDescription = shortDescription;
-		this.description = description;
-		CreatedByAdminId = createdByAdminId;
-	}
+	private int UpdatedByAdminId;
 	public String getSku() {
 		return sku;
 	}
@@ -86,5 +73,27 @@ public class Product {
 	public void setCreatedByAdminId(long createdByAdminId) {
 		CreatedByAdminId = createdByAdminId;
 	}
+	public int getUpdatedByAdminId() {
+		return UpdatedByAdminId;
+	}
+	public void setUpdatedByAdminId(int updatedByAdminId) {
+		UpdatedByAdminId = updatedByAdminId;
+	}
+	public Product(String sku, int categoryId, String productName, String size, int price, int stockQuantity,
+			int status, String shortDescription, String description, long createdByAdminId, int updatedByAdminId) {
+		super();
+		this.sku = sku;
+		this.categoryId = categoryId;
+		this.productName = productName;
+		this.size = size;
+		this.price = price;
+		this.stockQuantity = stockQuantity;
+		this.status = status;
+		this.shortDescription = shortDescription;
+		this.description = description;
+		CreatedByAdminId = createdByAdminId;
+		UpdatedByAdminId = updatedByAdminId;
+	}
+	
 
 }
