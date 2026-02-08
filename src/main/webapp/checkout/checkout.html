@@ -1424,6 +1424,7 @@
     <script src="assets/js/main.js"></script>
 
     <script>
+  //取得「下訂單」按鈕，並監聽 click 事件
 document.getElementById('btnCheckout').addEventListener('click', async function (e) {
   e.preventDefault();
 
@@ -1431,23 +1432,27 @@ document.getElementById('btnCheckout').addEventListener('click', async function 
   const textSpan = btn.querySelector('span');
   const oldText = textSpan ? textSpan.textContent : '';
 
-  // 防連點
+  // 防止使用者連續，有此情況會顯示送出中
   btn.style.pointerEvents = 'none';
   if (textSpan) textSpan.textContent = '送出中...';
-
+  
+  //// 呼叫後端，先寫死 memberId = 26
   try {
     const resp = await fetch('/vitatrack/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ memberId: 26 }) // MVP 暫用
+      body: new URLSearchParams({ memberId: 26 }) 
     });
 
     // 先保險：不一定永遠是 JSON
+    // 如果是 JSON → 用 resp.json()
+    // 否則 → 當純文字處理
     const contentType = resp.headers.get('content-type') || '';
     const data = contentType.includes('application/json')
       ? await resp.json()
       : { message: await resp.text() };
 
+    // 顯示後端錯誤訊息  
     if (!resp.ok) {
       alert(data.message || '建立訂單失敗');
       btn.style.pointerEvents = '';
@@ -1455,12 +1460,12 @@ document.getElementById('btnCheckout').addEventListener('click', async function 
       return;
     }
 
-    // 成功導頁（同資料夾）
+    // 成功導頁
     window.location.href =
       'order-confirm.html?orderId=' + encodeURIComponent(data.orderId) +
       '&totalAmount=' + encodeURIComponent(data.totalAmount) +
       '&status=' + encodeURIComponent(data.status);
-
+    // 顯示後端錯誤訊息
   } catch (err) {
     alert('系統錯誤或網路異常，請稍後再試');
     btn.style.pointerEvents = '';

@@ -12,6 +12,9 @@ public interface OrderItemDao {
      * 依 cartRows 批次新增 order_item
      * @return batch 執行結果
      */
-    int[] batchInsertFromCart(Connection conn, int orderId, List<CartRow> cartRows)
+    int[] batchInsertFromCart(
+    		Connection conn, 
+    		int orderId, 
+    		List<CartRow> cartRows)
             throws SQLException;
 }

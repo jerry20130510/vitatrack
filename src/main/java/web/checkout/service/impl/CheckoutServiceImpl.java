@@ -44,7 +44,7 @@ public class CheckoutServiceImpl implements CheckoutService {
                 throw new RuntimeException("Cart is empty.");
             }
 
-            // 2) 算 total（BigDecimal）
+            // 2) 算 total
             BigDecimal totalAmount = BigDecimal.ZERO;
             for (CartRow row : cartRows) {
                 BigDecimal rowSubtotal = row.getUnitPrice()
@@ -52,15 +52,15 @@ public class CheckoutServiceImpl implements CheckoutService {
                 totalAmount = totalAmount.add(rowSubtotal);
             }
 
-            // orders.total_amount 目前是 int（MVP 先轉回 int）
+            // orders.total_amount 目前是 int
             int totalAmountInt = totalAmount.intValue();
 
-            // 3) insert orders（比照你之前 amount / transaction_id 作法）
+            // 3) insert orders
             String status = "Unpaid";
             String paymentStatus = "PENDING";
-            String paymentMethod = "CARD";      // 之後可改成前端傳入
-            int amount = totalAmountInt;        // amount = total_amount
-            String transactionId = "NA";        // 金流完成再更新真實值
+            String paymentMethod = "CARD";      
+            int amount = totalAmountInt;        
+            String transactionId = "NA";        
 
             int orderId = orderDao.insertOrder(
             		conn,
