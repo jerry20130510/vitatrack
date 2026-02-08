@@ -36,14 +36,32 @@ public class ArticleListController extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json; charset=UTF-8");
         
-        int page = req.getParameter("page") != null ? Integer.parseInt(req.getParameter("page")) : 0;
-        int size = req.getParameter("size") != null ? Integer.parseInt(req.getParameter("size")) : 6;
-        String category = req.getParameter("category");
-        String authorSlug = req.getParameter("authorSlug");
-        
-        ArticleListResponse data = articleService.listArticles(page, size, category, authorSlug);
-        
-        Map<String, Object> response = Map.of("success", true, "data", data);
-        resp.getWriter().write(gson.toJson(response));
+        try {
+            int page = req.getParameter("page") != null ? Integer.parseInt(req.getParameter("page")) : 0;
+            int size = req.getParameter("size") != null ? Integer.parseInt(req.getParameter("size")) : 6;
+            String category = req.getParameter("category");
+            String authorSlug = req.getParameter("authorSlug");
+            
+            if (page < 0 || size <= 0) {
+                throw new NumberFormatException("Invalid page or size parameter");
+            }
+            
+            ArticleListResponse data = articleService.listArticles(page, size, category, authorSlug);
+            
+            Map<String, Object> response = Map.of("success", true, "data", data);
+            resp.getWriter().write(gson.toJson(response));
+            
+        } catch (NumberFormatException e) {
+            e.printStackTrace();
+            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            Map<String, Object> response = Map.of("success", false, "errMsg", "Bad Request");
+            resp.getWriter().write(gson.toJson(response));
+            
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            Map<String, Object> response = Map.of("success", false, "errMsg", "Server Error");
+            resp.getWriter().write(gson.toJson(response));
+        }
     }
 }
