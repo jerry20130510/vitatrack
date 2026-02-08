@@ -70,12 +70,6 @@ document.addEventListener("DOMContentLoaded", function () {
            
 
 
-
-
-
-
-
-
     logoutBtn.addEventListener('click', function (e) {
         e.preventDefault();
         fetch('logout', {

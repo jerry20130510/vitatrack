@@ -15,11 +15,7 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public String register(Member member) {
-		// 驗證註冊功能中各個必填欄位是否為空，若空return 此欄為必填欄位;前端有驗證的後端程式也要驗證
-		// 驗證帳號(即為email)是否註冊過，調用DaoImpl裡的方法進行驗證，若無登入成功;反之登入失敗
-
-		// trim() 方法會回傳一個去除了空格的字串，它永遠不會回傳 null（如果原字串不是 null）。
-		// 如果使用者只輸入空白，trim() 會回傳 ""（空字串）。
+	
 		// 1 姓名不能空白
 		String name = member.getName();
 		if (name == null || name.trim().isEmpty()) {
