@@ -5,7 +5,8 @@ import java.sql.SQLException;
 
 public interface OrderDao {
 
-	int insertOrder(Connection conn, 
+	int insertOrder(
+			Connection conn, 
 			int memberId, 
 			int totalAmount, 
 			String status, 

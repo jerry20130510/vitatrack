@@ -53,13 +53,13 @@ public class ArticleListController extends HttpServlet {
             
         } catch (NumberFormatException e) {
             e.printStackTrace();
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            resp.setStatus(400);
             Map<String, Object> response = Map.of("success", false, "errMsg", "Bad Request");
             resp.getWriter().write(gson.toJson(response));
             
         } catch (RuntimeException e) {
             e.printStackTrace();
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.setStatus(500);
             Map<String, Object> response = Map.of("success", false, "errMsg", "Server Error");
             resp.getWriter().write(gson.toJson(response));
         }

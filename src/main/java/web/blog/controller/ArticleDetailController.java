@@ -39,7 +39,7 @@ public class ArticleDetailController extends HttpServlet {
         try {
             String pathInfo = req.getPathInfo();
             if (pathInfo == null || pathInfo.equals("/")) {
-                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                resp.setStatus(400);
                 Map<String, Object> response = Map.of("success", false, "errMsg", "Missing article slug");
                 resp.getWriter().write(gson.toJson(response));
                 return;
@@ -51,14 +51,14 @@ public class ArticleDetailController extends HttpServlet {
                 Map<String, Object> response = Map.of("success", true, "data", data);
                 resp.getWriter().write(gson.toJson(response));
             } else {
-                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                resp.setStatus(404);
                 Map<String, Object> response = Map.of("success", false, "errMsg", "Article not found");
                 resp.getWriter().write(gson.toJson(response));
             }
             
         } catch (RuntimeException e) {
             e.printStackTrace();
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            resp.setStatus(500);
             Map<String, Object> response = Map.of("success", false, "errMsg", "Server Error");
             resp.getWriter().write(gson.toJson(response));
         }

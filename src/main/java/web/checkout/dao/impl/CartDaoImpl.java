@@ -50,7 +50,7 @@ public class CartDaoImpl implements CartDao {
                         rs.getInt("cart_item_id"),
                         rs.getString("sku"),
                         rs.getString("product_name"),
-                        rs.getBigDecimal("price"),   // ✅ BigDecimal
+                        rs.getBigDecimal("price"), 
                         rs.getInt("quantity")
                     );
                     result.add(row);

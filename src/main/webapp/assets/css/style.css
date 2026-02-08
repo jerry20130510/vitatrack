@@ -2181,7 +2181,7 @@ header {
   padding: 15px 0;
 }
 .mn-header .mn-header-items .right-header .mn-main-menu ul li .mega-menu li .mega-block {
-  width: 100%;
+  width: calc(50% - 30px);
   
   margin-right: 30px;
 }
@@ -10351,7 +10351,6 @@ button.btn-close.qty_close {
   -webkit-box-direction: normal;
       -ms-flex-direction: row;
           flex-direction: row;
-  justify-content: center;
 }
 .mn-login-content .mn-login-box {
   width: 40%;
@@ -10422,7 +10421,7 @@ button.btn-close.qty_close {
   background-color: transparent;
   border: 1px solid #e5e5e5;
   border-radius: 15px;
-  color: black;
+  color: #f1f4f7;
   font-size: 14px;
   outline: none;
 }
@@ -11213,5 +11212,3 @@ ul.gi li {
     padding: 15px;
   }
 }
-
-
