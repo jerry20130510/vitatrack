@@ -13,24 +13,34 @@ function loadArticleDetail() {
     
     fetch(`${API_BASE}/articles/${slug}`)
         .then(response => {
-            if (!response.ok) {
-                if (response.status === 404) {
-                    throw new Error('NOT_FOUND');
-                }
-                throw new Error('LOAD_ERROR');
-            }
+            if (response.status === 400) throw new Error('Bad Request');
+            if (response.status === 404) throw new Error('Article not found'); 
+            if (response.status === 500) throw new Error('Server Error');
+            if (!response.ok) throw new Error('Network Error');
             return response.json();
         })
         .then(result => {
             if (!result.success) {
-                throw new Error(result.errMsg);
+                throw new Error(result.errMsg || 'Server Error');
             }
             
             const a = result.data;
             
             fetch(`${API_BASE}/articles/view?slug=${slug}`, { 
                 method: 'POST'
-            }).catch(() => {});
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(result => {
+                    if (!result.success) {
+                        console.warn('[View] Failed:', result.errMsg);
+                    }
+                })
+                .catch(error => console.warn('[View] error:', error));
             
             el('page-title').textContent = a.titleDisplay;
             el('breadcrumb-title').textContent = a.titleDisplay;
@@ -103,10 +113,14 @@ function loadArticleDetail() {
         })
         .catch(error => {
             console.error('[Load] error:', error);
-            if (error.message === 'NOT_FOUND') {
-                showNotFoundError('article-content', '此文章可能被移除或不存在', '返回文章列表', 'blog-list.html');
+            if (error.message === 'Bad Request') {
+                showLoadError('article-content', '請求錯誤', '重新載入', 'location.reload()');
+            } else if (error.message === 'Article not found') {
+                showNotFoundError('article-content', '找不到內容', '返回列表', 'blog-list.html');
+            } else if (error.message === 'Server Error') {
+                showLoadError('article-content', '伺服器錯誤', '重試', 'loadArticleDetail()');
             } else {
-                showLoadError('article-content');
+                showLoadError('article-content', '網路錯誤', '重試', 'loadArticleDetail()');
             }
         });
 }
@@ -119,11 +133,17 @@ function toggleLike() {
     }
     
     const btn = el('like-btn');
+    btn.disabled = true;
     
     fetch(`${API_BASE}/articles/like?slug=${slug}`, { 
         method: 'POST'
     })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            return response.json();
+        })
         .then(result => {
             if (!result.success) {
                 throw new Error(result.errMsg);
@@ -136,7 +156,10 @@ function toggleLike() {
             
             addLikedArticle(slug);
         })
-        .catch(error => console.error('[Like] error:', error));
+        .catch(error => console.error('[Like] error:', error))
+        .finally(() => {
+            btn.disabled = false;
+        });
 }
 
 function shareArticle() {
@@ -155,10 +178,17 @@ function shareArticle() {
         return;
     }
     
+    btn.disabled = true;
+    
     fetch(`${API_BASE}/articles/share?slug=${slug}`, { 
         method: 'POST'
     })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+            return response.json();
+        })
         .then(result => {
             if (!result.success) {
                 throw new Error(result.errMsg);
@@ -171,7 +201,10 @@ function shareArticle() {
             addSharedArticle(slug);
             copyAndNotify();
         })
-        .catch(error => console.error('[Share] error:', error));
+        .catch(error => console.error('[Share] error:', error))
+        .finally(() => {
+            btn.disabled = false;
+        });
 }
 
 const getLikedArticles = () => {

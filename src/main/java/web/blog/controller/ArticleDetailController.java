@@ -36,21 +36,30 @@ public class ArticleDetailController extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json; charset=UTF-8");
         
-        String pathInfo = req.getPathInfo();
-        if (pathInfo == null || pathInfo.equals("/")) {
-            Map<String, Object> response = Map.of("success", false, "errMsg", "缺少文章slug");
-            resp.getWriter().write(gson.toJson(response));
-            return;
-        }
-        
-        Article data = articleService.getArticleDetail(pathInfo.substring(1));
-        
-        if (data != null) {
-            Map<String, Object> response = Map.of("success", true, "data", data);
-            resp.getWriter().write(gson.toJson(response));
-        } else {
-            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-            Map<String, Object> response = Map.of("success", false, "errMsg", "文章不存在");
+        try {
+            String pathInfo = req.getPathInfo();
+            if (pathInfo == null || pathInfo.equals("/")) {
+                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+                Map<String, Object> response = Map.of("success", false, "errMsg", "Missing article slug");
+                resp.getWriter().write(gson.toJson(response));
+                return;
+            }
+            
+            Article data = articleService.getArticleDetail(pathInfo.substring(1));
+            
+            if (data != null) {
+                Map<String, Object> response = Map.of("success", true, "data", data);
+                resp.getWriter().write(gson.toJson(response));
+            } else {
+                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                Map<String, Object> response = Map.of("success", false, "errMsg", "Article not found");
+                resp.getWriter().write(gson.toJson(response));
+            }
+            
+        } catch (RuntimeException e) {
+            e.printStackTrace();
+            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            Map<String, Object> response = Map.of("success", false, "errMsg", "Server Error");
             resp.getWriter().write(gson.toJson(response));
         }
     }
