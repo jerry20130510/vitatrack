@@ -35,14 +35,14 @@ public class ProductController extends HttpServlet{
 
 	            if (ok) {
 	                resp.setStatus(HttpServletResponse.SC_CREATED);
-	                resp.getWriter().write("{\"success\":新建成功}");
+	                resp.getWriter().write("新建成功");
 	            } else {
 	                resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-	                resp.getWriter().write("{\"success\":false}");
+	                resp.getWriter().write("新建失敗");
 	            }
 	        } catch (Exception e) {
 	            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-	            resp.getWriter().write("{\"success\":失敗}");
+	            resp.getWriter().write("資料庫連線失敗");
 	        }
 	    }
 	    

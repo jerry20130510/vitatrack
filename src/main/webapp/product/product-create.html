@@ -18,7 +18,7 @@
         </label>
 
         <label class="field">
-          <span>分類 ID（必填）</span>
+          <span>分類 ID（必填，需存在於 category）</span>
           <input name="categoryId" type="number" min="1" step="1" required />
         </label>
 
@@ -43,8 +43,8 @@
         </label>
 
         <label class="field">
-          <span>狀態（上架/下架）</span>
-          <input name="status" type="text" placeholder="例如 ON / OFF（請填 DB 允許值）" />
+          <span>狀態</span>
+          <input name="status" type="text" placeholder=" 1=ON / 0=OFF " />
         </label>
 
         <label class="field grid-span-2">
@@ -65,6 +65,7 @@
 
       <section class="result">
         <div class="hint">
+          提醒：categoryId 必須在 category 表存在；status 必須符合資料表 enum 值。
         </div>
         <pre id="resultBox" aria-live="polite"></pre>
       </section>
