@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
-                              "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd" >
 
+                       
 <hibernate-configuration>
 
 	<session-factory>
+	<property name="hibernate.connection.datasource">java:comp/env/jdbc/vitatrack</property>
+	<property name="hibernate.current_session_context_class">thread</property>
+	<property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+	<property name="hibernate.show_sql">true</property>
+	<property name="hibernate.format_sql">true</property>
+	<property name="hibernate.highlight_sql">true</property>
 	
-		<property name="hibernate.connection.datasource">java:comp/env/jdbc/vitatrack</property>
-		<property name="hibernate.current_session_context_class">thread</property>
 		
-		<property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
-		<property name="hibernate.show_sql">true</property>
-		<property name="hibernate.format_sql">true</property>
-		<property name="hibernate.highlight_sql">true</property>
-
-		<mapping class="web.member.vo.Member" />	
-		<mapping class="web.blog.vo.Article" />
-		<mapping class="web.blog.vo.ArticleListResponse" />
-		<mapping class="web.blog.vo.Blogger" />
-		<mapping class="web.checkout.vo.CartRow" />
-		<mapping class="web.checkout.vo.CheckoutResult" />
+	<mapping class="web.blog.vo.Article" />	
+	<mapping class="web.blog.vo.Blogger" />	
+	<mapping class="web.checkout.vo.CartRow" />
+	<mapping class="web.checkout.vo.CheckoutResult" />
+	<mapping class="web.member.vo.Member" />
+	<mapping class="web.product.vo.Product" />	
+	
 	</session-factory>
 </hibernate-configuration>
+

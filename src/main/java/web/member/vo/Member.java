@@ -2,16 +2,36 @@ package web.member.vo;
 
 import java.sql.Timestamp;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+@Entity
+@Table(name ="member")
 public class Member {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "member_id")
 	private Integer memberId;
+	@Column(name="name")
 	private String name;
+	@Column(name="email")
 	private String email;
+	@Column(name="phone")
 	private String phone;
+	@Column(name="address")
 	private String address;
+	@Column(name="password")
 	private String password;
 	private String confirmPassword;
+	@Column(name="veryify_code")
 	private String verifyCode;
+	@Column(name ="member_status")
 	private Integer memberStatus;
+	@Column(name ="registration_time")
 	private Timestamp registrationTime;
 
 	public Member() {
