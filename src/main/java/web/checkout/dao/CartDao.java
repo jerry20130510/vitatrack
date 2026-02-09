@@ -21,5 +21,5 @@ public interface CartDao {
     /**
      * 結帳
      */
-    int[] attachCartItemsToOrder(int orderId, List<CartRow> cartRows) throws SQLException;
+    int[] attachCartItemsToOrder(Connection conn, int orderId, List<CartRow> cartRows) throws SQLException;
 }
