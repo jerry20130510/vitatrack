@@ -30,11 +30,11 @@ public class ProfileController extends HttpServlet {
 		
 		HttpSession session = req.getSession();
 		Member member= (Member)session.getAttribute("member");
+		// 除錯點 1：檢查 Service 查完後是不是空的
 		System.out.println("Session member: " + session.getAttribute("member"));
 		Member profileMember =memberService.profile(member);
 		// 除錯點 2：檢查 Service 查完後是不是空的
 	    System.out.println("Profile Member: " + profileMember);
-	    
 		resp.setContentType("application/json");
 		Gson gson = new Gson();
 		// 再轉 Member 物件

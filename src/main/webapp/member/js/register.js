@@ -75,10 +75,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     registerBtn.addEventListener("click", function (event) {
         // event.preventDefault();
-
-
         // 驗證註冊功能中各個必填欄位是否為空，若空return 此欄為必填欄位;前端有驗證的後端程式也要驗證
-
         // trim() 方法會回傳一個去除了空格的字串，它永遠不會回傳 null（如果原字串不是 null）。
         // 如果使用者只輸入空白，trim() 會回傳 ""（空字串）。
         // 1 姓名不能空白
@@ -149,7 +146,6 @@ document.addEventListener("DOMContentLoaded", function () {
             })
     });
     // 彈窗按鈕 → 前往登入頁面 
-
     const loginBtn = document.getElementById("loginBtn");
     loginBtn.addEventListener("click", function () {
         console.log("前往登入頁按鈕被按！");

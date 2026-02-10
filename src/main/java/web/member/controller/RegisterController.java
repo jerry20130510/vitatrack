@@ -30,16 +30,13 @@ public class RegisterController extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
 		// 設定回應資料格式為JSON
 		resp.setContentType("application/json;charset=utf-8");
 		
 		// 接收Json物件
 		Gson gson = new Gson();
 		JsonObject result = new JsonObject();
-
 		Member member = gson.fromJson(req.getReader(), Member.class);
-
 		// 調用service層的方法
 		//最終結果：Service 最終回傳 null 給 Controller，Controller 看到是 null 就導向「註冊成功頁面」。
 		String errMsg = memberService.register(member);
@@ -53,7 +50,6 @@ public class RegisterController extends HttpServlet {
 		}
 		//輸出純文字的json格式
 		resp.getWriter().write(result.toString());
-
 	}
 
 }

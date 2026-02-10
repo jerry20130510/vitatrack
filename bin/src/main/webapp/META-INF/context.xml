@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context>
+
+	<Resource name="jdbc/vitatrack" type="javax.sql.DataSource"
+		driverClassName="com.mysql.cj.jdbc.Driver"
+		jdbcUrl="jdbc:mysql://tibame.c8gprzfylp8c.us-east-1.rds.amazonaws.com:3306/vitatrack"
+		username="admin"
+		password="tibame24708053" 
+		factory="com.zaxxer.hikari.HikariJNDIFactory"
+		dataSource.cachePrepStmts="true" 
+		dataSource.prepStmtCacheSize="250"
+		dataSource.prepStmtCacheSqlLimit="2048" 
+	/>
+
+</Context>

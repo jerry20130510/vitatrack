@@ -32,56 +32,73 @@ public class CheckoutServiceImpl implements CheckoutService {
             throw new RuntimeException(e);
         }
     }
-    
+
     @Override
     public CheckoutResult checkout(int memberId) {
-        try (Connection conn = ds.getConnection()) {  
+
+        try (Connection conn = ds.getConnection()) {
             conn.setAutoCommit(false);
-        	
-            // 1) 查 open cart
-            List<CartRow> cartRows = cartDao.findOpenCartByMemberId(memberId);
-            if (cartRows == null || cartRows.isEmpty()) {
-                throw new RuntimeException("Cart is empty.");
+
+            try {
+                // 1) 查 open cart
+                List<CartRow> cartRows = cartDao.findOpenCartByMemberId(conn, memberId);
+                if (cartRows == null || cartRows.isEmpty()) {
+                    throw new RuntimeException("Cart is empty.");
+                }
+
+                // 2) 算 total
+                BigDecimal totalAmount = BigDecimal.ZERO;
+                for (CartRow row : cartRows) {
+                    BigDecimal rowSubtotal = row.getUnitPrice()
+                            .multiply(BigDecimal.valueOf(row.getQuantity()));
+                    totalAmount = totalAmount.add(rowSubtotal);
+                }
+
+                // orders.total_amount 目前是 int
+                int totalAmountInt = totalAmount.intValue();
+
+                // 3) insert orders
+                String status = "Unpaid";
+                String paymentStatus = "PENDING";
+                String paymentMethod = "CARD";
+                int amount = totalAmountInt;
+                String transactionId = "NA";
+
+                int orderId = orderDao.insertOrder(
+                        conn,
+                        memberId,
+                        totalAmountInt,
+                        status,
+                        paymentMethod,
+                        paymentStatus,
+                        amount,
+                        transactionId
+                );
+
+                // 4) insert order_item（batch）
+                orderItemDao.batchInsertFromCart(conn, orderId, cartRows);
+
+                // 5) 更新 cart_item 綁 order_id
+                cartDao.attachCartItemsToOrder(conn, orderId, cartRows);
+
+                // 全部成功才 commit
+                conn.commit();
+
+                return new CheckoutResult(orderId, totalAmountInt, status);
+
+            } catch (Exception ex) {
+                // 任一失敗就 rollback，避免資料卡住
+                try {
+                    conn.rollback();
+                } catch (Exception ignore) {}
+
+                ex.printStackTrace();
+                return new CheckoutResult(0, 0, "FAILED: " + ex.getMessage());
             }
 
-            // 2) 算 total（BigDecimal）
-            BigDecimal totalAmount = BigDecimal.ZERO;
-            for (CartRow row : cartRows) {
-                BigDecimal rowSubtotal = row.getUnitPrice()
-                        .multiply(BigDecimal.valueOf(row.getQuantity()));
-                totalAmount = totalAmount.add(rowSubtotal);
-            }
-
-            // orders.total_amount 目前是 int（MVP 先轉回 int）
-            int totalAmountInt = totalAmount.intValue();
-
-            // 3) insert orders（比照你之前 amount / transaction_id 作法）
-            String status = "Unpaid";
-            String paymentStatus = "PENDING";
-            String paymentMethod = "CARD";      // 之後可改成前端傳入
-            int amount = totalAmountInt;        // amount = total_amount
-            String transactionId = "NA";        // 金流完成再更新真實值
-
-            int orderId = orderDao.insertOrder(
-            		conn,
-            		memberId,
-                    totalAmountInt,
-                    status,
-                    paymentMethod,
-                    paymentStatus,
-                    amount,
-                    transactionId
-            );
-
-            // 4) insert order_item（batch）
-            orderItemDao.batchInsertFromCart(conn,orderId, cartRows);
-
-            // 5) 更新 cart_item 綁 order_id
-            cartDao.attachCartItemsToOrder(orderId, cartRows);
-            return new CheckoutResult(orderId, totalAmountInt, status);
         } catch (Exception ex) {
             ex.printStackTrace();
+            return new CheckoutResult(0, 0, "FAILED: " + ex.getMessage());
         }
-        return null;
     }
 }

@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8"/>
+  <title>訂單確認</title>
+</head>
+<body>
+  <h2>訂單已建立（待付款）</h2>
+
+  <p>OrderId：<span id="orderId"></span></p>
+  <p>TotalAmount：<span id="totalAmount"></span></p>
+  <p>Status：<span id="status"></span></p>
+
+  <script>
+    const p = new URLSearchParams(location.search);
+    document.getElementById('orderId').textContent = p.get('orderId') || '';
+    document.getElementById('totalAmount').textContent = p.get('totalAmount') || '';
+    document.getElementById('status').textContent = p.get('status') || '';
+  </script>
+</body>
+</html>

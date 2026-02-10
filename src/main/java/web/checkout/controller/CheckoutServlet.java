@@ -21,10 +21,11 @@ public class CheckoutServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
     	
-        // 統一回 JSON，避免 DevTools Response 看到空白
+        // 設定回傳格式為 JSON
         resp.setContentType("application/json; charset=UTF-8");
 
         try {
+        	//取得請求參數
             String memberIdStr = req.getParameter("memberId");
             if (memberIdStr == null || memberIdStr.isBlank()) {
                 resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -33,7 +34,8 @@ public class CheckoutServlet extends HttpServlet {
             }
 
             int memberId = Integer.parseInt(memberIdStr);
-
+            
+            //呼叫 Service 執行結帳流程
             CheckoutResult result = checkoutService.checkout(memberId);
 
             // 成功回傳
@@ -46,21 +48,22 @@ public class CheckoutServlet extends HttpServlet {
 
         } catch (Exception ex) {
 
-            // ✅ 1) 一定要印，不然 Eclipse Console 永遠看不到真正原因
+            // 在Eclipse Console 印出stack trace
             ex.printStackTrace();
 
-            // ✅ 2) 找 root cause（通常 SQLException 在最底層）
+            // 找 root cause
             Throwable root = ex;
             while (root.getCause() != null) root = root.getCause();
 
             String msg = (root.getMessage() == null) ? root.toString() : root.getMessage();
 
+            //回傳錯誤給前端
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             resp.getWriter().write("{\"error\":\"" + escapeJson(msg) + "\"}");
         }
     }
 
-    // 簡單 JSON escape，避免 error 裡有 " 或 \ 造成 JSON 壞掉
+    // 避免 error 裡有 " 或 \ 造成 JSON 壞掉
     private String escapeJson(String s) {
         if (s == null) return "";
         return s.replace("\\", "\\\\").replace("\"", "\\\"");

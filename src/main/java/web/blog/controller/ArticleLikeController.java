@@ -34,6 +34,7 @@ public class ArticleLikeController extends HttpServlet {
         String slug = req.getParameter("slug");
         
         if (slug == null || slug.trim().isEmpty()) {
+            resp.setStatus(400);
             Map<String, Object> response = Map.of("success", false, "errMsg", "缺少slug參數");
             resp.getWriter().write(gson.toJson(response));
             return;
@@ -41,6 +42,7 @@ public class ArticleLikeController extends HttpServlet {
         
         String errMsg = articleService.incrementLikes(slug);
         if (errMsg != null) {
+            resp.setStatus(404);
             Map<String, Object> response = Map.of("success", false, "errMsg", errMsg);
             resp.getWriter().write(gson.toJson(response));
             return;
