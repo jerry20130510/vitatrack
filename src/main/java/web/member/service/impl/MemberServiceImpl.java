@@ -106,8 +106,9 @@ public class MemberServiceImpl implements MemberService {
 			if (password == null || password.isEmpty()) {
 				return null;
 			}
+			member = memberDao.SelectByEmailandPassword(email, password);
 			tx.commit();
-			return memberDao.SelectByEmailandPassword(email, password);
+			return member;
 		} catch (Exception e) {
 			tx.rollback();
 			e.printStackTrace();
