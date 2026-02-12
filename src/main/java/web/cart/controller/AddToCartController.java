@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import web.cart.dao.impl.AddToCartDaoImpl;
 import web.cart.service.AddToCartService;
 import web.cart.service.impl.AddToCartServiceImpl;
 import web.cart.vo.AddToCartItem;
