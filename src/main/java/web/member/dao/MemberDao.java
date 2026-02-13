@@ -6,9 +6,9 @@ public interface MemberDao {
 	
 	int insert(Member member);
 	
-	int deleteById(Integer id);
+	int deleteByEmail(String Email);
 	
-	int update(Member member);
+	int updateByEmail(Member member);
 	
 	Member selectByEmail(String email);
 	

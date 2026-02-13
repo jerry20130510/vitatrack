@@ -8,43 +8,30 @@ import web.member.dao.MemberDao;
 import web.member.vo.Member;
 
 public class MemberDaoImpl implements MemberDao {
-//	private DataSource ds;
-//
-//	public MemberDaoImpl() {
-//		try {
-//			ds = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/vitatrack");
-//		} catch (NamingException e) {
-//			e.printStackTrace();
-//		}
-//	}
 
 	@Override
 	public int insert(Member member) {
 		 Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 		    session.persist(member);
 		    return 1;
-
 	}
 
 	@Override
-	public int deleteById(Integer memberId) {
-		final String hql = "DELETE FROM Member m WHERE m.memberId = :id";
+	public int deleteByEmail(String email) {
+		final String hql = "DELETE FROM Member m WHERE m.email = :email";
 		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-		int deleteConut = session.createQuery(hql).setParameter("id", memberId).executeUpdate();
+		int deleteConut = session.createQuery(hql).setParameter("email", email).executeUpdate();
 		return deleteConut;
 	}
 
 	// 更新 單筆會員
 	@Override
-	public int update(Member member) {
-		final String hql = "UPDATE Member m " + "SET m.name = :name, " + "m.password = :password, "
-				+ "m.address = :address, " + "m.phone = :phone " + "WHERE m.memberId = :id";
-		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-		return session.createQuery(hql).setParameter("name", member.getName())
-				.setParameter("password", member.getPassword()).setParameter("address", member.getAddress())
-				.setParameter("phone", member.getPhone()).setParameter("id", member.getMemberId()).executeUpdate();
+	public int updateByEmail(Member member) {
+	    Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+	    session.merge(member); 
+	    return 1; 
 	}
-
+	
 	@Override
 	public Member selectByEmail(String email) {
 		final String hql = "FROM Member m WHERE m.email = :email";
