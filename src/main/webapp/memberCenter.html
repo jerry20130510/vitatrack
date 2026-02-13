@@ -105,6 +105,34 @@
 			align-items: center;
 			justify-content: center;
 		}
+
+		#saveBtn {
+			margin-left: 20px;
+			/* 按鈕與文字之間的固定間距 */
+			white-space: nowrap;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		/* 確保主內容區不會限制高度 */
+		.member-main {
+			height: auto !important;
+			min-height: 400px;
+			overflow: visible !important;
+			/* 確保內容不會被切掉 */
+		}
+
+		.member-card-body {
+			padding-bottom: 50px;
+			/* 給底部留一點空間放按鈕 */
+		}
+
+		/* 修正按鈕樣式，確保它在寬度不足時不會縮小 */
+		.mn-btn-1 {
+			flex-shrink: 0;
+			cursor: pointer;
+		}
 	</style>
 </head>
 
@@ -377,9 +405,10 @@
 								<li class="menu-group">
 
 									<ul>
-										<li><a href="javascript:void(0)" class="menu-link" data-page="profile">會員資訊</a></li>
+										<li><a href="javascript:void(0)" class="menu-link" data-page="profile">會員資訊</a>
+										</li>
 										<li><a href="privacy" class="menu-link" data-page="privacy">隱私設定</a></li>
-										<li><a href="order"   class="menu-link" data-page="order">我的訂單</a></li>
+										<li><a href="order" class="menu-link" data-page="order">我的訂單</a></li>
 									</ul>
 								</li>
 

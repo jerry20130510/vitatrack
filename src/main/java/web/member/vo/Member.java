@@ -10,17 +10,16 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import org.hibernate.annotations.DynamicUpdate;
+
+import lombok.Data;
+
+
 
 @Entity
 @Table(name = "member")
-@Setter
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@Data
+@DynamicUpdate
 public class Member {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,8 +39,8 @@ public class Member {
 	private String confirmPassword;
 	@Column(name = "verify_code")
 	private String verifyCode;
-	@Column(name = "member_status")
+	@Column(name = "member_status",insertable = false)
 	private Integer memberStatus;
-	@Column(name = "registration_time")
+	@Column(name = "registration_time",insertable = false)
 	private Timestamp registrationTime;
 }
