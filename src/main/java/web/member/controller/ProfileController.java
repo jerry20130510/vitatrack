@@ -48,7 +48,6 @@ public class ProfileController extends HttpServlet {
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		resp.setContentType("application/json");
-
 		Gson gson = new Gson();
 		UpdateMemberRequest memberDTO = gson.fromJson(req.getReader(), UpdateMemberRequest.class);
 		HttpSession session = req.getSession(false);
