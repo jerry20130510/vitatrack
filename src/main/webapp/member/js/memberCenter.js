@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function info(e) {
         e.preventDefault();
 
-        fetch('profile') // 你的 Servlet
+        fetch('profile') 
             .then(res => res.json())
             .then(member => {
                 console.log(member);
@@ -24,7 +24,6 @@ document.addEventListener("DOMContentLoaded", function () {
                     <header class="member-card-header">會員資訊</header>
                     <div class="member-card-body">
                         <div class="member-form">
-                            
                             <div class="form-row" data-editable="false"><label>使用者帳號</label><p class="readonly">${member.email}</p></div>
                             <div class="form-row" data-field="name"><label>姓名</label><p class="readonly">${member.name}</p></div>
                             <div class="form-row" data-editable="false"><label>Email</label><p class="readonly">${member.email}</p></div>
