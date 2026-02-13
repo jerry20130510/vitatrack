@@ -53,7 +53,7 @@ function loadArticleDetail() {
             el('featured-image').alt = a.titleDisplay;
             el('article-title').textContent = a.titleDisplay;
             
-            const authorName = a.authorDisplayName;
+            const authorName = a.blogger?.displayName;
             const avatarImg = el('author-avatar');
             const fallback = el('author-avatar-fallback');
             
@@ -65,7 +65,7 @@ function loadArticleDetail() {
                 fallback.style.background = `hsl(${authorName.charCodeAt(0) * 5 % 360}, 50%, 45%)`;
             };
             
-            if (a.authorProfileImage) {
+            if (a.blogger?.profileImage) {
                 avatarImg.crossOrigin = 'anonymous';
                 avatarImg.referrerPolicy = 'no-referrer';
                 avatarImg.onerror = () => showFallback();
@@ -73,7 +73,7 @@ function loadArticleDetail() {
                     avatarImg.style.display = 'block';
                     fallback.style.display = 'none';
                 };
-                avatarImg.src = a.authorProfileImage;
+                avatarImg.src = a.blogger?.profileImage;
             } else {
                 showFallback();
             }
