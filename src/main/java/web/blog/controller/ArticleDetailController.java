@@ -6,10 +6,12 @@ import web.blog.vo.Article;
 import web.blog.service.ArticleService;
 import web.blog.service.impl.ArticleServiceImpl;
 
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.naming.NamingException;
 import java.io.IOException;
 import java.util.Map;
 
@@ -19,15 +21,19 @@ public class ArticleDetailController extends HttpServlet {
     private Gson gson;
 
     @Override
-    public void init() {
-        articleService = new ArticleServiceImpl();
+    public void init() throws ServletException {
+        try {
+            articleService = new ArticleServiceImpl();
+        } catch (NamingException e) {
+            throw new ServletException("Failed to initialize ArticleService", e);
+        }
         gson = new GsonBuilder()
             .setDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'")
             .create();
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json; charset=UTF-8");
         
         try {
@@ -51,6 +57,7 @@ public class ArticleDetailController extends HttpServlet {
             }
             
         } catch (RuntimeException e) {
+            e.printStackTrace();
             resp.setStatus(500);
             Map<String, Object> response = Map.of("success", false, "errMsg", "Server Error");
             resp.getWriter().write(gson.toJson(response));

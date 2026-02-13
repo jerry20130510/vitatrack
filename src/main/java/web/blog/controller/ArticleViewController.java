@@ -4,10 +4,12 @@ import com.google.gson.Gson;
 import web.blog.service.ArticleService;
 import web.blog.service.impl.ArticleServiceImpl;
 
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.naming.NamingException;
 import java.io.IOException;
 import java.util.Map;
 
@@ -17,13 +19,17 @@ public class ArticleViewController extends HttpServlet {
     private Gson gson;
 
     @Override
-    public void init() {
-        articleService = new ArticleServiceImpl();
+    public void init() throws ServletException {
+        try {
+            articleService = new ArticleServiceImpl();
+        } catch (NamingException e) {
+            throw new ServletException("Failed to initialize ArticleService", e);
+        }
         gson = new Gson();
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         resp.setContentType("application/json; charset=UTF-8");
         String slug = req.getParameter("slug");
         
