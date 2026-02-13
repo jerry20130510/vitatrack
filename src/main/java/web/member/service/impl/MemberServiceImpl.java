@@ -38,7 +38,7 @@ public class MemberServiceImpl implements MemberService {
 			validatePassword(member.getPassword(), member.getConfirmPassword());
 			// 7 判斷帳號是否有重複，資料庫的email不能等於新註冊的email
 			// 邏輯觀念錯誤 以及 語法回傳值不符。
-			// 正確邏輯應該是:檢查資料庫裡「是否已經存在這個會員物件」。如果查出來的結果 不是 null，代表這個 Email 已經被註冊過了。
+			// 正確邏輯應該是:檢查資料庫裡「是否已經存在這個會員物件」。如果查出來的結果 不是 null，代表這個Email已經被註冊過了。
 			if (memberDao.selectByEmail(member.getEmail()) != null) {
 				throw new IllegalArgumentException("此帳號已經被註冊了");
 			}
@@ -70,7 +70,6 @@ public class MemberServiceImpl implements MemberService {
 			if (password == null || password.isEmpty()) {
 				return null;
 			}
-			member = memberDao.SelectByEmailandPassword(email, password);
 			tx.commit();
 			return member;
 		} catch (Exception e) {
