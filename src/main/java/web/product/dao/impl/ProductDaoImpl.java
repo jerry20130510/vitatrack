@@ -1,45 +1,50 @@
 package web.product.dao.impl;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.util.List;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 
+import core.util.HibernateUtil;
 import web.product.dao.ProductDao;
+import web.product.vo.Product;
 
 public class ProductDaoImpl implements ProductDao {
 
-	private DataSource ds;
-
-	public ProductDaoImpl() {
-		try {
-			ds = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/vitatrack");
-		} catch (NamingException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	@Override
-	public int getProductStock(int productId) {
-		
-		String sql = "SELECT stock FROM products_test WHERE product_id = ?";
-
-		try (Connection conn = ds.getConnection(); 
-			 PreparedStatement pstmt = conn.prepareStatement(sql);
-		) {
-		   	pstmt.setInt(1, productId);
-			try (ResultSet rs = pstmt.executeQuery()){
-
-			if (rs.next()) {
-				return rs.getInt("stock");
-			}
-			    return 0;
-			}
+	public List<Product> selectAll() {
+		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+		Session session = sessionFactory.getCurrentSession();
+		try {
+			Transaction transaction = session.beginTransaction();
+			
+			List<Product> list = session
+					.createQuery("FROM Product", Product.class)
+					.getResultList();
+			transaction.commit();
+			return list;
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			session.getTransaction().rollback();
+			throw e;
 		}
 	}
+	
+	@Override
+	public boolean insert(Product product) {
+		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+		Session session = sessionFactory.getCurrentSession();
+		try {
+			Transaction transaction = session.beginTransaction();
+			session.persist(product);
+			transaction.commit();
+			return true;
+		} catch (HibernateException e) {
+			session.getTransaction().rollback();
+			
+		}
+		return false;
+	}
+
 }

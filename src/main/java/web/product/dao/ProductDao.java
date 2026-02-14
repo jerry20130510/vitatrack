@@ -1,5 +1,13 @@
 package web.product.dao;
 
+import java.util.List;
+
+import web.product.vo.Product;
+
 public interface ProductDao {
-    int getProductStock(int productId);
+
+	boolean insert(Product product);
+
+	List<Product> selectAll();
+    
 }

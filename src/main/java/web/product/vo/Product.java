@@ -1,28 +1,51 @@
 package web.product.vo;
 
+
+import java.math.BigDecimal;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
+
+
+@Entity
+@Table(name = "product")
 public class Product {
-	
+	 public Product() {
+	    }
+	@Id
 	private String sku;
-	private int categoryId;
+	@Column (name = "category_id")
+	private Integer categoryId;
+	@Column (name = "product_name")
 	private String productName;
+	@Column (name = "size")
 	private String size;
-	private int price;
-	private int stockQuantity;
-	private int status;
+	@Column (name = "price")
+	private BigDecimal price;
+	@Column (name = "stock_quantity")
+	private Integer stockQuantity;
+	@Column (name = "status")
+	private String status;
+	@Column (name = "short_description")
 	private String shortDescription;
+	@Column (name = "description")
 	private String description;
-	private long CreatedByAdminId;
-	private int UpdatedByAdminId;
+	@Column (name = "created_by_admin_id")
+	private Long createdByAdminId;
+	@Column (name = "updated_by_admin_id")
+	private Long updatedByAdminId;
 	public String getSku() {
 		return sku;
 	}
 	public void setSku(String sku) {
 		this.sku = sku;
 	}
-	public int getCategoryId() {
+	public Integer getCategoryId() {
 		return categoryId;
 	}
-	public void setCategoryId(int categoryId) {
+	public void setCategoryId(Integer categoryId) {
 		this.categoryId = categoryId;
 	}
 	public String getProductName() {
@@ -37,22 +60,22 @@ public class Product {
 	public void setSize(String size) {
 		this.size = size;
 	}
-	public int getPrice() {
+	public BigDecimal getPrice() {
 		return price;
 	}
-	public void setPrice(int price) {
+	public void setPrice(BigDecimal price) {
 		this.price = price;
 	}
-	public int getStockQuantity() {
+	public Integer getStockQuantity() {
 		return stockQuantity;
 	}
-	public void setStockQuantity(int stockQuantity) {
+	public void setStockQuantity(Integer stockQuantity) {
 		this.stockQuantity = stockQuantity;
 	}
-	public int getStatus() {
+	public String getStatus() {
 		return status;
 	}
-	public void setStatus(int status) {
+	public void setStatus(String status) {
 		this.status = status;
 	}
 	public String getShortDescription() {
@@ -68,19 +91,20 @@ public class Product {
 		this.description = description;
 	}
 	public long getCreatedByAdminId() {
-		return CreatedByAdminId;
+		return createdByAdminId;
 	}
 	public void setCreatedByAdminId(long createdByAdminId) {
-		CreatedByAdminId = createdByAdminId;
+		this.createdByAdminId = createdByAdminId;
 	}
-	public int getUpdatedByAdminId() {
-		return UpdatedByAdminId;
+	public long getUpdatedByAdminId() {
+		return updatedByAdminId;
 	}
-	public void setUpdatedByAdminId(int updatedByAdminId) {
-		UpdatedByAdminId = updatedByAdminId;
+	public void setUpdatedByAdminId(long updatedByAdminId) {
+		this.updatedByAdminId = updatedByAdminId;
 	}
-	public Product(String sku, int categoryId, String productName, String size, int price, int stockQuantity,
-			int status, String shortDescription, String description, long createdByAdminId, int updatedByAdminId) {
+	public Product(String sku, Integer categoryId, String productName, String size, BigDecimal price,
+			Integer stockQuantity, String status, String shortDescription, String description, long createdByAdminId,
+			long updatedByAdminId) {
 		super();
 		this.sku = sku;
 		this.categoryId = categoryId;
@@ -91,9 +115,8 @@ public class Product {
 		this.status = status;
 		this.shortDescription = shortDescription;
 		this.description = description;
-		CreatedByAdminId = createdByAdminId;
-		UpdatedByAdminId = updatedByAdminId;
+		this.createdByAdminId = createdByAdminId;
+		this.updatedByAdminId = updatedByAdminId;
 	}
-	
 
 }
