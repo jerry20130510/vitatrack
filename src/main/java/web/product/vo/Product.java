@@ -1,10 +1,9 @@
 package web.product.vo;
 
-
-import java.math.BigDecimal;
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
+
+import java.math.BigDecimal;
 import javax.persistence.Id;
 import javax.persistence.Table;
 

@@ -6,7 +6,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-
 import core.util.HibernateUtil;
 import web.product.dao.ProductDao;
 import web.product.vo.Product;
@@ -33,6 +32,7 @@ public class ProductDaoImpl implements ProductDao {
 	
 	@Override
 	public boolean insert(Product product) {
+
 		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
 		Session session = sessionFactory.getCurrentSession();
 		try {
@@ -42,7 +42,7 @@ public class ProductDaoImpl implements ProductDao {
 			return true;
 		} catch (HibernateException e) {
 			session.getTransaction().rollback();
-			
+
 		}
 		return false;
 	}
