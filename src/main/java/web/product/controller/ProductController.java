@@ -27,10 +27,7 @@ public class ProductController extends HttpServlet{
 	        resp.setContentType("application/json; charset=UTF-8");
 
 	        try (BufferedReader reader = req.getReader()) {
-	            String body = reader.lines().collect(Collectors.joining());
-
-	            Product product = gson.fromJson(body, Product.class);
-
+	            Product product = gson.fromJson(req.getReader(), Product.class);
 	            boolean ok = productService.create(product);
 
 	            if (ok) {

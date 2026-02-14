@@ -1,8 +1,13 @@
 package web.product.vo;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+
+@Entity
 public class Product {
 	
 	private String sku;
+	@Column(name ="")
 	private int categoryId;
 	private String productName;
 	private String size;

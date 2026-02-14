@@ -8,6 +8,8 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
 
+import org.hibernate.Session;
+
 import web.product.dao.ProductDao;
 import web.product.vo.Product;
 
@@ -26,6 +28,9 @@ public class ProductDaoImpl implements ProductDao {
 
 	@Override
 	public boolean insert(Product product) {
+		Tra
+		Session session = Session.
+		
 		String sql = "INSERT INTO product "
 				+ "(sku, category_id, product_name, size, price, stock_quantity, status, short_description, description, created_by_admin_id) "
 				+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
