@@ -1,33 +1,44 @@
 package web.product.dao.impl;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.util.List;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 
+<<<<<<< HEAD
 import org.hibernate.Session;
 
+=======
+import core.util.HibernateUtil;
+>>>>>>> main
 import web.product.dao.ProductDao;
 import web.product.vo.Product;
 
 public class ProductDaoImpl implements ProductDao {
 
-	private DataSource ds;
-
-	public ProductDaoImpl() {
+	@Override
+	public List<Product> selectAll() {
+		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+		Session session = sessionFactory.getCurrentSession();
 		try {
-			ds = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/vitatrack");
-		} catch (NamingException e) {
-			e.printStackTrace();
+			Transaction transaction = session.beginTransaction();
+			
+			List<Product> list = session
+					.createQuery("FROM Product", Product.class)
+					.getResultList();
+			transaction.commit();
+			return list;
+		} catch (Exception e) {
+			session.getTransaction().rollback();
+			throw e;
 		}
-
 	}
-
+	
 	@Override
 	public boolean insert(Product product) {
+<<<<<<< HEAD
 		Tra
 		Session session = Session.
 		
@@ -55,42 +66,20 @@ public class ProductDaoImpl implements ProductDao {
 
 		} catch (SQLException e) {
 			e.printStackTrace();
+=======
+		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+		Session session = sessionFactory.getCurrentSession();
+		try {
+			Transaction transaction = session.beginTransaction();
+			session.persist(product);
+			transaction.commit();
+			return true;
+		} catch (HibernateException e) {
+			session.getTransaction().rollback();
+			
+>>>>>>> main
 		}
 		return false;
 	}
 
-	@Override
-	public boolean updateBySku(String sku, Product product) {
-	    String sql = "UPDATE product SET "
-	            + "category_id = ?, "
-	            + "product_name = ?, "
-	            + "size = ?, "
-	            + "price = ?, "
-	            + "stock_quantity = ?, "
-	            + "status = ?, "
-	            + "short_description = ?, "
-	            + "description = ?, "
-	            + "updated_by_admin_id = ? "
-	            + "WHERE sku = ?";		
-	    
-	    try (Connection conn = ds.getConnection();
-	            PreparedStatement ps = conn.prepareStatement(sql)) {
-		           ps.setInt(1, product.getCategoryId());
-		           ps.setString(2, product.getProductName());
-		           ps.setString(3, product.getSize());
-		           ps.setInt(4, product.getPrice());
-		           ps.setInt(5, product.getStockQuantity());
-		           ps.setLong(6, product.getStatus());
-		           ps.setString(7, product.getShortDescription());
-		           ps.setString(8, product.getDescription());
-		           ps.setInt(9, product.getUpdatedByAdminId());
-		           ps.setString(10, sku);
-		           
-		           return ps.executeUpdate() == 1;
-		           
-	    }catch (SQLException e) {
-			e.printStackTrace();
-		}
-	    return false;
-	}
 }

@@ -10,42 +10,36 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
-import lombok.AllArgsConstructor;
+import org.hibernate.annotations.DynamicUpdate;
 import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+
+
 
 @Entity
-@Table(name ="member")
-@Setter
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
-
+@Table(name = "member")
+@Data
+@DynamicUpdate
 public class Member {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "member_id")
 	private Integer memberId;
-	@Column(name="name")
+	@Column(name = "name")
 	private String name;
-	@Column(name="email")
+	@Column(name = "email")
 	private String email;
-	@Column(name="phone")
+	@Column(name = "phone")
 	private String phone;
-	@Column(name="address")
+	@Column(name = "address")
 	private String address;
-	@Column(name="password")
+	@Column(name = "password")
 	private String password;
 	@Transient
 	private String confirmPassword;
-	@Column(name="veryify_code")
+	@Column(name = "verify_code")
 	private String verifyCode;
-	@Column(name ="member_status")
+	@Column(name = "member_status",insertable = false)
 	private Integer memberStatus;
-	@Column(name ="registration_time")
+	@Column(name = "registration_time",insertable = false)
 	private Timestamp registrationTime;
-
-	
 }

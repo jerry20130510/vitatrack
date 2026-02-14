@@ -149,7 +149,7 @@ public class ArticleDaoImpl implements ArticleDao {
             
         } catch (SQLException e) {
             e.printStackTrace();
-            // throw new RuntimeException("Failed to find articles by category", e);
+            throw new RuntimeException("Failed to find articles by category", e);
         }
     }
 

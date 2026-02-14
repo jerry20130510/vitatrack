@@ -1,8 +1,6 @@
 package web.product.controller;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.util.stream.Collectors;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -16,16 +14,25 @@ import web.product.service.ProductService;
 import web.product.service.impl.ProductServiceImpl;
 import web.product.vo.Product;
 
-@WebServlet ("/admin/product/*")
-public class ProductController extends HttpServlet{
+
+@WebServlet("/product-add")
+public class ProductController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	 private final Gson gson = new Gson();
-	    private final ProductService productService = new ProductServiceImpl();
+	private ProductService productService;
+	
+	@Override
+	public void init() throws ServletException {
+		productService = new ProductServiceImpl();
+	}
+	
+	@Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Gson gson = new Gson();
+        Product product = gson.fromJson(req.getReader(), Product.class);
 
-	    @Override
-	    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-	        resp.setContentType("application/json; charset=UTF-8");
+        boolean success = productService.add(product);
 
+<<<<<<< HEAD
 	        try (BufferedReader reader = req.getReader()) {
 	            Product product = gson.fromJson(req.getReader(), Product.class);
 	            boolean ok = productService.create(product);
@@ -100,3 +107,9 @@ public class ProductController extends HttpServlet{
 	    }
 		
 	};
+=======
+        resp.getWriter().write(gson.toJson(success));
+	}
+
+}
+>>>>>>> main

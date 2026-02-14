@@ -1,10 +1,13 @@
 package web.product.dao;
 
+import java.util.List;
+
 import web.product.vo.Product;
 
 public interface ProductDao {
-	
-	boolean insert (Product product);
-	boolean updateBySku(String sku, Product product);
 
+	boolean insert(Product product);
+
+	List<Product> selectAll();
+    
 }
