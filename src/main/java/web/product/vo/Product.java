@@ -1,36 +1,23 @@
 package web.product.vo;
 
-<<<<<<< HEAD
 import javax.persistence.Column;
 import javax.persistence.Entity;
-
-@Entity
-=======
 
 import java.math.BigDecimal;
-
-import javax.persistence.Column;
-import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
 
 
 @Entity
 @Table(name = "product")
->>>>>>> main
 public class Product {
 	 public Product() {
 	    }
 	@Id
 	private String sku;
-<<<<<<< HEAD
-	@Column(name ="")
-	private int categoryId;
-=======
 	@Column (name = "category_id")
 	private Integer categoryId;
 	@Column (name = "product_name")
->>>>>>> main
 	private String productName;
 	@Column (name = "size")
 	private String size;
