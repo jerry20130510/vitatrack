@@ -31,7 +31,8 @@ public class ProductListController extends HttpServlet {
 	
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-	       try {
+			resp.setContentType("application/json;charset=utf-8");
+		try {
 	            List<Product> list = productService.selectAll();
 
 	            Gson gson = new Gson();
@@ -40,9 +41,7 @@ public class ProductListController extends HttpServlet {
 	        } catch (Exception e) {
 	            e.printStackTrace();
 	            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-	            resp.setCharacterEncoding("UTF-8");
-	            resp.setContentType("application/json; charset=UTF-8");
 	            resp.getWriter().write("{\"success\": false}");
 	        }
-	    }	
+	 }	
 }
