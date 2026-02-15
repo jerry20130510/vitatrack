@@ -6,7 +6,7 @@ import org.hibernate.Transaction;
 import web.blog.dao.ArticleDao;
 import web.blog.dao.impl.ArticleDaoImpl;
 import web.blog.service.ArticleService;
-import web.blog.service.S3PresignedUrlService;
+// import web.blog.service.S3PresignedUrlService;
 import web.blog.vo.Article;
 import web.blog.vo.ArticleListResponse;
 
@@ -22,10 +22,10 @@ import java.util.UUID;
 public class ArticleServiceImpl implements ArticleService {
 
     private final ArticleDao articleDao = new ArticleDaoImpl();
-    private final S3PresignedUrlService s3Service;
+    // private final S3PresignedUrlService s3Service;
 
     public ArticleServiceImpl() throws NamingException {
-        this.s3Service = new S3PresignedUrlServiceImpl();
+        // this.s3Service = new S3PresignedUrlServiceImpl();
     }
 
     private void detachBlogger(Article article) {
@@ -151,7 +151,7 @@ public class ArticleServiceImpl implements ArticleService {
             article.setSummary(summary);
             article.setContent(content);
             article.setCategory(category);
-            article.setImageUrl(s3Service.moveToPermanent(imageUrl));
+            article.setImageUrl(imageUrl); // s3Service.moveToPermanent(imageUrl)
             article.setAuthorSlug(authorSlug);
             article.setTitleSlug(generateSlug(titleDisplay));
 
@@ -190,7 +190,7 @@ public class ArticleServiceImpl implements ArticleService {
             article.setSummary(summary);
             article.setContent((String) request.get("content"));
             article.setCategory((String) request.get("category"));
-            article.setImageUrl(s3Service.moveToPermanent((String) request.get("imageUrl")));
+            article.setImageUrl((String) request.get("imageUrl")); // s3Service.moveToPermanent((String) request.get("imageUrl"))
             article.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
             Timestamp expectedUpdatedAt = parseUpdatedAt(request.get("updatedAt"), existing.getUpdatedAt());
