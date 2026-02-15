@@ -1,6 +1,8 @@
 package web.blog.dao;
 
 import web.blog.vo.Article;
+
+import java.sql.Timestamp;
 import java.util.List;
 
 public interface ArticleDao {
@@ -17,4 +19,9 @@ public interface ArticleDao {
     int getTotalViews(String titleSlug);
     int getTotalLikes(String titleSlug);
     int getTotalShares(String titleSlug);
+
+    Article findById(Long id);
+    int insert(Article article);
+    int update(Article article, Timestamp expectedUpdatedAt);
+    void delete(Article article);
 }
