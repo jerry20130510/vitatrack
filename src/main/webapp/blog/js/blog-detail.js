@@ -26,7 +26,7 @@ function loadArticleDetail() {
             
             const a = result.data;
             
-            fetch(`${API_BASE}/articles/view?slug=${slug}`, { 
+            fetch(`${API_BASE}/articles/${slug}/views`, { 
                 method: 'POST'
             })
                 .then(response => {
@@ -135,7 +135,7 @@ function toggleLike() {
     const btn = el('like-btn');
     btn.disabled = true;
     
-    fetch(`${API_BASE}/articles/like?slug=${slug}`, { 
+    fetch(`${API_BASE}/articles/${slug}/likes`, { 
         method: 'POST'
     })
         .then(response => {
@@ -180,7 +180,7 @@ function shareArticle() {
     
     btn.disabled = true;
     
-    fetch(`${API_BASE}/articles/share?slug=${slug}`, { 
+    fetch(`${API_BASE}/articles/${slug}/shares`, { 
         method: 'POST'
     })
         .then(response => {
