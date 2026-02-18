@@ -1,4 +1,4 @@
-package web.checkout.controller; // ← 依你實際位置調整
+package web.checkout.controller;
 
 import java.io.IOException;
 
