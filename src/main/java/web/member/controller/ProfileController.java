@@ -55,6 +55,7 @@ public class ProfileController extends HttpServlet {
 		if (loginMember == null) {
 			throw new RuntimeException("尚未登入");
 		}
+		System.out.println("session 內 memberId = " + loginMember.getMemberId());
 		JsonObject result = new JsonObject();
 		try {
 			memberService.updateProfile(loginMember.getMemberId(), memberDTO);

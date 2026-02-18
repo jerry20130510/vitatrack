@@ -62,6 +62,19 @@ public class MemberServiceImpl implements MemberService {
 		// 驗證帳號和密碼
 		try {
 			tx = session.beginTransaction();
+
+			Member dbMember = session.createQuery("FROM Member WHERE email = :email", Member.class)
+					.setParameter("email", member.getEmail()).uniqueResult();
+
+			if (dbMember == null) {
+				tx.commit();
+				return null;
+			}
+
+			if (!dbMember.getPassword().equals(member.getPassword())) {
+				tx.commit();
+				return null;
+			}
 			String email = member.getEmail();
 			String password = member.getPassword();
 			if (email == null || email.isEmpty()) {
@@ -71,7 +84,7 @@ public class MemberServiceImpl implements MemberService {
 				return null;
 			}
 			tx.commit();
-			return member;
+			return dbMember;
 		} catch (Exception e) {
 			if (tx != null) {
 				tx.rollback();

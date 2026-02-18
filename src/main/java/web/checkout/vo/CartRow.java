@@ -10,7 +10,7 @@ public class CartRow {
     private BigDecimal unitPrice; 
     private int quantity;
 
-    // 建構子（對齊 CartDaoImpl 查詢）
+    // 建構子
     public CartRow(int cartItemId, String sku, String productName, BigDecimal unitPrice, int quantity) {
         this.cartItemId = cartItemId;
         this.sku = sku;

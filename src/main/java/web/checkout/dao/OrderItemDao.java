@@ -17,4 +17,7 @@ public interface OrderItemDao {
     		int orderId, 
     		List<CartRow> cartRows)
             throws SQLException;
+    // 查詢綠界所需要的 ItemName
+    List<String> selectProductNamesByOrderId(Connection conn, int orderId) throws SQLException;
+
 }
