@@ -14,5 +14,5 @@ public class ArticleUpdateRequest {
     private String content;
     private String category;
     private String imageUrl;
-    private Timestamp updatedAt;  // Optimistic locking - Gson converts ISO string automatically
+    private Timestamp updatedAt;
 }
