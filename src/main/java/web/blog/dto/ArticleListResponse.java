@@ -1,4 +1,6 @@
-package web.blog.vo;
+package web.blog.dto;
+
+import web.blog.vo.Article;
 
 import java.util.List;
 
