@@ -8,7 +8,7 @@ import web.blog.service.ArticleService;
 import web.blog.service.impl.ArticleEngagementServiceImpl;
 import web.blog.service.impl.ArticleServiceImpl;
 import web.blog.vo.Article;
-import web.blog.vo.ArticleListResponse;
+import web.blog.dto.ArticleListResponse;
 
 import javax.naming.NamingException;
 import javax.servlet.ServletException;
