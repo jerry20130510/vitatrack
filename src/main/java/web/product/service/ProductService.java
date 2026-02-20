@@ -8,4 +8,8 @@ public interface ProductService {
 	boolean add(Product product);
 
 	List<Product> selectAll();
+
+	boolean update(Product product);
+
+	boolean deleteBySku(String sku);
 }
