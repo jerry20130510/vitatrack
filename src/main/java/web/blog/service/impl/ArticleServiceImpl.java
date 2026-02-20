@@ -5,17 +5,18 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import web.blog.dao.ArticleDao;
 import web.blog.dao.impl.ArticleDaoImpl;
+import web.blog.dto.ArticleCreateRequest;
+import web.blog.dto.ArticleUpdateRequest;
+import web.blog.dto.ArticleListResponse;
+import web.blog.vo.Article;
 import web.blog.service.ArticleService;
 // import web.blog.service.S3PresignedUrlService;
-import web.blog.vo.Article;
-import web.blog.vo.ArticleListResponse;
 
 import javax.naming.NamingException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.TimeZone;
 import java.util.UUID;
 
@@ -28,7 +29,7 @@ public class ArticleServiceImpl implements ArticleService {
         // this.s3Service = new S3PresignedUrlServiceImpl();
     }
 
-    private void detachBlogger(Article article) {
+    private void initAuthorFields(Article article) {
         if (article != null && article.getBlogger() != null) {
             article.setAuthorDisplayName(article.getBlogger().getDisplayName());
             article.setAuthorProfileImage(article.getBlogger().getProfileImage());
@@ -59,7 +60,7 @@ public class ArticleServiceImpl implements ArticleService {
 
             int totalPages = (int) Math.ceil((double) totalElements / size);
             tx.commit();
-            for (Article a : articles) { detachBlogger(a);
+            for (Article a : articles) { initAuthorFields(a);
                 
             }
             return new ArticleListResponse(page, size, totalElements, totalPages, articles);
@@ -76,8 +77,8 @@ public class ArticleServiceImpl implements ArticleService {
         try {
             tx = session.beginTransaction();
             Article article = articleDao.findByTitleSlugWithAuthor(titleSlug);
+            initAuthorFields(article);
             tx.commit();
-            detachBlogger(article);
             return article;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
@@ -95,10 +96,10 @@ public class ArticleServiceImpl implements ArticleService {
             List<Article> articles = articleDao.findByAuthorSlug(authorSlug, offset, size);
             int totalElements = articleDao.countByAuthorSlug(authorSlug);
             int totalPages = (int) Math.ceil((double) totalElements / size);
-            tx.commit();
-            for (Article a : articles) { detachBlogger(a);
-                
+            for (Article a : articles) {
+                initAuthorFields(a);
             }
+            tx.commit();
             return new ArticleListResponse(page, size, totalElements, totalPages, articles);
         } catch (Exception e) {
             if (tx != null) tx.rollback();
@@ -113,11 +114,12 @@ public class ArticleServiceImpl implements ArticleService {
         try {
             tx = session.beginTransaction();
             Article article = articleDao.findById(id);
-            tx.commit();
             if (article == null || !article.getAuthorSlug().equals(authorSlug)) {
+                tx.commit();
                 return null;
             }
-            detachBlogger(article);
+            initAuthorFields(article);
+            tx.commit();
             return article;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
@@ -126,16 +128,16 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public Article createArticle(Map<String, Object> request, String authorSlug) {
+    public Article createArticle(ArticleCreateRequest request, String authorSlug) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
         Transaction tx = null;
         try {
             tx = session.beginTransaction();
-            String titleDisplay = (String) request.get("titleDisplay");
-            String summary = (String) request.get("summary");
-            String content = (String) request.get("content");
-            String category = (String) request.get("category");
-            String imageUrl = (String) request.get("imageUrl");
+            String titleDisplay = request.getTitleDisplay();
+            String summary = request.getSummary();
+            String content = request.getContent();
+            String category = request.getCategory();
+            String imageUrl = request.getImageUrl();
 
             if (titleDisplay == null || titleDisplay.trim().isEmpty()) {
                 tx.commit();
@@ -151,14 +153,14 @@ public class ArticleServiceImpl implements ArticleService {
             article.setSummary(summary);
             article.setContent(content);
             article.setCategory(category);
-            article.setImageUrl(imageUrl); // s3Service.moveToPermanent(imageUrl)
+            article.setImageUrl(imageUrl); // Direct assignment instead of s3Service.moveToPermanent(imageUrl)
             article.setAuthorSlug(authorSlug);
             article.setTitleSlug(generateSlug(titleDisplay));
 
             articleDao.insert(article);
             Article result = articleDao.findById(article.getId());
             tx.commit();
-            detachBlogger(result);
+            initAuthorFields(result);
             return result;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
@@ -167,7 +169,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public Article updateArticle(Long id, Map<String, Object> request, String authorSlug) {
+    public Article updateArticle(Long id, ArticleUpdateRequest request, String authorSlug) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
         Transaction tx = null;
         try {
@@ -178,7 +180,7 @@ public class ArticleServiceImpl implements ArticleService {
                 return null;
             }
 
-            String summary = (String) request.get("summary");
+            String summary = request.getSummary();
             if (summary == null || summary.trim().isEmpty()) {
                 tx.commit();
                 return null;
@@ -186,14 +188,14 @@ public class ArticleServiceImpl implements ArticleService {
 
             Article article = new Article();
             article.setId(id);
-            article.setTitleDisplay((String) request.get("titleDisplay"));
+            article.setTitleDisplay(request.getTitleDisplay());
             article.setSummary(summary);
-            article.setContent((String) request.get("content"));
-            article.setCategory((String) request.get("category"));
-            article.setImageUrl((String) request.get("imageUrl")); // s3Service.moveToPermanent((String) request.get("imageUrl"))
+            article.setContent(request.getContent());
+            article.setCategory(request.getCategory());
+            article.setImageUrl(request.getImageUrl()); // Direct assignment instead of s3Service.moveToPermanent()
             article.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
-            Timestamp expectedUpdatedAt = parseUpdatedAt(request.get("updatedAt"), existing.getUpdatedAt());
+            Timestamp expectedUpdatedAt = parseUpdatedAt(request.getUpdatedAt(), existing.getUpdatedAt());
 
             int rows = articleDao.update(article, expectedUpdatedAt);
             if (rows == 0) {
@@ -202,7 +204,7 @@ public class ArticleServiceImpl implements ArticleService {
             }
             Article result = articleDao.findById(id);
             tx.commit();
-            detachBlogger(result);
+            initAuthorFields(result);
             return result;
         } catch (Exception e) {
             if (tx != null) tx.rollback();
@@ -242,20 +244,7 @@ public class ArticleServiceImpl implements ArticleService {
         return slug + "-" + suffix;
     }
 
-    private Timestamp parseUpdatedAt(Object updatedAtObj, Timestamp fallback) {
-        Long updatedAtEpoch = null;
-        if (updatedAtObj instanceof Number) {
-            updatedAtEpoch = ((Number) updatedAtObj).longValue();
-        } else if (updatedAtObj instanceof String) {
-            try {
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-                sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-                Date parsed = sdf.parse((String) updatedAtObj);
-                updatedAtEpoch = parsed.getTime();
-            } catch (Exception e) {
-                throw new RuntimeException("Invalid updatedAt format: " + updatedAtObj, e);
-            }
-        }
-        return updatedAtEpoch != null ? new Timestamp(updatedAtEpoch) : fallback;
+    private Timestamp parseUpdatedAt(Timestamp updatedAt, Timestamp fallback) {
+        return updatedAt != null ? updatedAt : fallback;
     }
 }
