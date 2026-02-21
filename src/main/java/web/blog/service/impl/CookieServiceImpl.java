@@ -59,6 +59,16 @@ public class CookieServiceImpl implements CookieService {
         clearCookie(response, COOKIE_OAUTH_STATE);
     }
 
+    @Override
+    public void setReturnUrlCookie(HttpServletResponse response, String returnUrl) {
+        setCookie(response, "return_url", returnUrl, OAUTH_STATE_EXPIRY_SECONDS);
+    }
+
+    @Override
+    public void deleteReturnUrlCookie(HttpServletResponse response) {
+        clearCookie(response, "return_url");
+    }
+
     private void setCookie(HttpServletResponse response, String name, String value, int maxAge) {
         response.addHeader("Set-Cookie",
             String.format("%s=%s; Path=/; Max-Age=%d; HttpOnly; SameSite=Lax", name, value, maxAge));

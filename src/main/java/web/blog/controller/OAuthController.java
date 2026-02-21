@@ -62,6 +62,11 @@ public class OAuthController extends HttpServlet {
     }
 
     private void handleGoogleLogin(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String returnUrl = req.getParameter("returnUrl");
+        if (returnUrl != null) {
+            cookieService.setReturnUrlCookie(resp, returnUrl);
+        }
+        
         String state = UUID.randomUUID().toString();
         cookieService.setStateCookie(resp, state);
         String authUrl = googleOAuthService.getAuthorizationUrl(state);
@@ -108,7 +113,10 @@ public class OAuthController extends HttpServlet {
             cookieService.setAccessTokenCookie(resp, accessToken);
             cookieService.setRefreshTokenCookie(resp, refreshToken);
 
-            resp.sendRedirect("http://localhost:8080/blog-admin.html");
+            String returnUrl = getCookieValue(req, "return_url");
+            cookieService.deleteReturnUrlCookie(resp);
+            
+            resp.sendRedirect("http://localhost:8080" + (returnUrl != null ? returnUrl : "/blog-admin.html"));
 
         } catch (Exception e) {
             System.err.println("OAuth callback failed: " + e.getMessage());

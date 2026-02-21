@@ -11,4 +11,6 @@ public interface CookieService {
     void clearAuthCookies(HttpServletResponse response);
     void setStateCookie(HttpServletResponse response, String state);
     void clearStateCookie(HttpServletResponse response);
+    void setReturnUrlCookie(HttpServletResponse response, String returnUrl);
+    void deleteReturnUrlCookie(HttpServletResponse response);
 }
