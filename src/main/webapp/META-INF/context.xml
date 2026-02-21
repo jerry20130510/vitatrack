@@ -37,20 +37,6 @@
                  value="${JWT_REFRESH_EXPIRY:-604800}"
                  type="java.lang.Integer"/>
 
-    <!-- Database Configuration -->
-    <Resource name="jdbc/vitatrack"
-              auth="Container"
-              type="javax.sql.DataSource"
-              url="${DB_URL}"
-              username="${DB_USERNAME}"
-              password="${DB_PASSWORD}"
-              driverClassName="com.mysql.cj.jdbc.Driver"
-              maxTotal="20"
-              maxIdle="10"
-              maxWaitMillis="10000"
-              testOnBorrow="true"
-              validationQuery="SELECT 1"/>
-
     <!-- AWS S3 Configuration -->
     <Environment name="aws.s3.bucket"
                  value="${AWS_S3_BUCKET}"
