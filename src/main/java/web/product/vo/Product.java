@@ -89,21 +89,21 @@ public class Product {
 	public void setDescription(String description) {
 		this.description = description;
 	}
-	public long getCreatedByAdminId() {
+	public Long getCreatedByAdminId() {
 		return createdByAdminId;
 	}
-	public void setCreatedByAdminId(long createdByAdminId) {
+	public void setCreatedByAdminId(Long createdByAdminId) {
 		this.createdByAdminId = createdByAdminId;
 	}
-	public long getUpdatedByAdminId() {
+	public Long getUpdatedByAdminId() {
 		return updatedByAdminId;
 	}
-	public void setUpdatedByAdminId(long updatedByAdminId) {
+	public void setUpdatedByAdminId(Long updatedByAdminId) {
 		this.updatedByAdminId = updatedByAdminId;
 	}
 	public Product(String sku, Integer categoryId, String productName, String size, BigDecimal price,
-			Integer stockQuantity, String status, String shortDescription, String description, long createdByAdminId,
-			long updatedByAdminId) {
+			Integer stockQuantity, String status, String shortDescription, String description, Long createdByAdminId,
+			Long updatedByAdminId) {
 		super();
 		this.sku = sku;
 		this.categoryId = categoryId;

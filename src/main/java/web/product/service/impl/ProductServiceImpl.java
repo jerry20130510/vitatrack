@@ -1,8 +1,15 @@
 package web.product.service.impl;
 
 
+import java.math.BigDecimal;
 import java.util.List;
 
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
+
+import core.util.HibernateUtil;
 import web.product.dao.ProductDao;
 import web.product.dao.impl.ProductDaoImpl;
 import web.product.service.ProductService;
@@ -11,8 +18,10 @@ import web.product.vo.Product;
 
 public class ProductServiceImpl implements ProductService {
 	private ProductDao productDao;
+    private final SessionFactory sessionFactory;
 	
 	public ProductServiceImpl(){
+		this.sessionFactory =  HibernateUtil.getSessionFactory();
 		productDao = new ProductDaoImpl();
 	}
 	
@@ -71,6 +80,74 @@ public class ProductServiceImpl implements ProductService {
 	@Override
 	public List<Product> selectAll() {
 		return productDao.selectAll();
+	}
+
+	@Override
+	public boolean update(Product product) {
+        
+		if (product == null) {
+			return false;
+		}
+
+        if (product.getSku() == null || product.getSku().trim().isEmpty()) {
+        	return false;
+        }
+        if (product.getProductName() == null || product.getProductName().trim().isEmpty()) {
+        	return false;
+        }
+        if (product.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
+        	return false;
+        }
+        if (product.getSize() == null || product.getSize().trim().isEmpty()) {
+        	return false;
+        }
+        if (product.getStockQuantity() <= 0) {
+        	return false;
+        }
+        if (product.getDescription() == null || product.getDescription().trim().isEmpty()) {
+        	return false;
+        }
+        if (product.getShortDescription() == null || product.getShortDescription().trim().isEmpty()) {
+        	return false;
+        }
+        if (product.getStatus() == null) {
+			return false;
+		}
+
+        Session session = sessionFactory.getCurrentSession();
+        try {
+            session.beginTransaction();
+
+            boolean result = productDao.updateEditableFields(product);
+
+            session.getTransaction().commit();
+            return result;
+
+        } catch (Exception e) {
+            if (session.getTransaction() != null) {
+                session.getTransaction().rollback();
+            }
+            e.printStackTrace();
+            return false;
+        }
+
+	}
+
+	@Override
+	public boolean deleteBySku(String sku) {
+		Session session = sessionFactory.getCurrentSession();
+		Transaction tx = null;
+		try {
+			tx = session.beginTransaction();
+			boolean ok = productDao.deleteBySku(sku);
+			tx.commit();
+			return ok;
+		} catch (HibernateException e) {
+			if (tx != null) {
+				tx.rollback();
+			}
+			e.printStackTrace();
+		}		return false;
 	}
 
 }
