@@ -58,7 +58,6 @@ public class CheckoutServiceImpl implements CheckoutService {
                 int totalAmountInt = totalAmount.intValue();
 
                 // 3) insert orders
-                String status = "Unpaid";
                 String paymentStatus = "PENDING";
                 String paymentMethod = "CARD";
                 int amount = totalAmountInt;
@@ -68,7 +67,6 @@ public class CheckoutServiceImpl implements CheckoutService {
                         conn,
                         memberId,
                         totalAmountInt,
-                        status,
                         paymentMethod,
                         paymentStatus,
                         amount,
@@ -84,7 +82,7 @@ public class CheckoutServiceImpl implements CheckoutService {
                 // 全部成功才 commit
                 conn.commit();
 
-                return new CheckoutResult(orderId, totalAmountInt, status);
+                return new CheckoutResult(orderId, totalAmountInt, paymentStatus);
 
             } catch (Exception ex) {
                 // 任一失敗就 rollback，避免資料卡住
