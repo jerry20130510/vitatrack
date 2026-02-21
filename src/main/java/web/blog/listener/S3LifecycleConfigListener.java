@@ -12,19 +12,14 @@ public class S3LifecycleConfigListener implements ServletContextListener {
     
     @Override
     public void contextInitialized(ServletContextEvent sce) {
-        System.out.println("[S3 Lifecycle] Skipping S3 lifecycle configuration (configure manually if needed)");
-        // Temporarily disabled to allow app to start with parameterized config
-        // Uncomment below to enable automatic S3 lifecycle policy configuration
-        /*
         try {
             S3PresignedUrlService s3Service = new S3PresignedUrlServiceImpl();
             s3Service.configureLifecyclePolicy();
-            System.out.println("S3 lifecycle policy configured successfully");
+            System.out.println("[S3 Lifecycle] S3 lifecycle policy configured successfully");
         } catch (Exception e) {
-            System.err.println("Failed to configure S3 lifecycle policy: " + e.getMessage());
+            System.err.println("[S3 Lifecycle] Failed to configure S3 lifecycle policy: " + e.getMessage());
             e.printStackTrace();
         }
-        */
     }
     
     @Override
