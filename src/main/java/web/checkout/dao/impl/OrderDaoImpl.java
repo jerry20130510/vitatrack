@@ -12,22 +12,21 @@ import web.checkout.vo.OrderPaymentInfo;
 public class OrderDaoImpl implements OrderDao {
 
 	@Override
-	public int insertOrder(Connection conn, int memberId, int totalAmount, String status, String paymentMethod,
+	public int insertOrder(Connection conn, int memberId, int totalAmount, String paymentMethod,
 			String paymentStatus, int amount, String transactionId) throws SQLException {
 
 		String sql = "INSERT INTO orders "
-				+ "(member_id, status, total_amount, payment_method, payment_status, amount, transaction_id) "
-				+ "VALUES (?, ?, ?, ?, ?, ?, ?)";
+				+ "(member_id, total_amount, payment_method, payment_status, amount, transaction_id) "
+				+ "VALUES (?, ?, ?, ?, ?, ?)";
 
 		try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
 			ps.setInt(1, memberId);
-			ps.setString(2, status); // enum: Paid/Unpaid/Shipped
-			ps.setInt(3, totalAmount); // int
-			ps.setString(4, paymentMethod); // varchar(50)
-			ps.setString(5, paymentStatus); // varchar(20)
-			ps.setInt(6, amount); // int
-			ps.setString(7, transactionId); // varchar(50)
+			ps.setInt(2, totalAmount); // int
+			ps.setString(3, paymentMethod); // varchar(50)
+			ps.setString(4, paymentStatus); // varchar(20)
+			ps.setInt(5, amount); // int
+			ps.setString(6, transactionId); // varchar(50)
 
 			ps.executeUpdate();
 
@@ -90,4 +89,63 @@ public class OrderDaoImpl implements OrderDao {
 		}
 	}
 
+	@Override
+	public String selectTransactionId(Connection conn, String transactionId) throws SQLException {
+
+		final String sql = "SELECT transaction_id FROM orders WHERE transaction_id = ?";
+
+		try (PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setString(1, transactionId);
+
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+					return rs.getString("transaction_id");
+				}
+				return null;
+			}
+		}
+	}
+
+	@Override
+	public String selectPaymentStatus(Connection conn, String transactionId) throws SQLException {
+
+		final String sql = "SELECT payment_status FROM orders WHERE transaction_id = ?";
+
+		try (PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setString(1, transactionId);
+
+			try (ResultSet rs = ps.executeQuery()) {
+				if (rs.next()) {
+					return rs.getString("payment_status");
+				}
+				return null;
+			}
+		}
+	}
+
+	@Override
+	public int updatePaymentStatus(Connection conn, String transactionId, String paymentStatus) throws SQLException {
+
+		final String sql = "UPDATE orders SET payment_status = ? WHERE transaction_id = ?";
+
+		try (PreparedStatement ps = conn.prepareStatement(sql)) {
+			ps.setString(1, paymentStatus);
+			ps.setString(2, transactionId);
+			int rows = ps.executeUpdate();
+			return rows;
+		}
+	}
+	
+	@Override
+	public int updateCallbackMeta(Connection conn, String transactionId, String failureReason, String rawResponse) throws SQLException {
+
+	    final String sql = "UPDATE orders SET failure_reason = ?, raw_response = ? WHERE transaction_id = ?";
+
+	    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+	        ps.setString(1, failureReason);
+	        ps.setString(2, rawResponse);
+	        ps.setString(3, transactionId);
+	        return ps.executeUpdate();
+	    }
+	}
 }
