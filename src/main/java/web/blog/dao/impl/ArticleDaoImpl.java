@@ -142,16 +142,14 @@ public class ArticleDaoImpl implements ArticleDao {
     @Override
     public int update(Article article, Timestamp expectedUpdatedAt) {
         return getSession()
-            .createQuery("""
-                UPDATE Article SET
-                    titleDisplay = :titleDisplay,
-                    summary = :summary,
-                    content = :content,
-                    imageUrl = :imageUrl,
-                    category = :category,
-                    updatedAt = :newUpdatedAt
-                WHERE id = :id AND updatedAt = :expectedUpdatedAt
-                """)
+            .createQuery("UPDATE Article SET\n" +
+                "    titleDisplay = :titleDisplay,\n" +
+                "    summary = :summary,\n" +
+                "    content = :content,\n" +
+                "    imageUrl = :imageUrl,\n" +
+                "    category = :category,\n" +
+                "    updatedAt = :newUpdatedAt\n" +
+                "WHERE id = :id AND updatedAt = :expectedUpdatedAt")
             .setParameter("titleDisplay", article.getTitleDisplay())
             .setParameter("summary", article.getSummary())
             .setParameter("content", article.getContent())
