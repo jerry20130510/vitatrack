@@ -7,7 +7,7 @@ import web.blog.service.ArticleEngagementService;
 import web.blog.service.ArticleService;
 import web.blog.service.impl.ArticleEngagementServiceImpl;
 import web.blog.service.impl.ArticleServiceImpl;
-import web.blog.vo.Article;
+import web.blog.dto.ArticlePublicResponse;
 import web.blog.dto.ArticleListResponse;
 
 import javax.naming.NamingException;
@@ -83,13 +83,13 @@ public class ArticlePublicController extends HttpServlet {
         String category = req.getParameter("category");
         String authorSlug = req.getParameter("authorSlug");
 
-        ArticleListResponse data = articleService.listArticles(page, size, category, authorSlug);
+        ArticleListResponse<ArticlePublicResponse> data = articleService.listArticles(page, size, category, authorSlug);
         Map<String, Object> response = Map.of("success", true, "data", data);
         resp.getWriter().write(gson.toJson(response));
     }
 
     private void handleDetail(HttpServletResponse resp, String slug) throws IOException {
-        Article data = articleService.getArticleDetail(slug);
+        ArticlePublicResponse data = articleService.getArticleDetail(slug);
 
         if (data != null) {
             Map<String, Object> response = Map.of("success", true, "data", data);
