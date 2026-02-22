@@ -54,25 +54,7 @@ public class Article implements Serializable {
     @Column(name = "updated_at", insertable = false, updatable = false)
     private Timestamp updatedAt;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "author_slug", referencedColumnName = "author_slug", insertable = false, updatable = false)
     private Blogger blogger;
-
-    @Getter(AccessLevel.NONE)
-    @Setter
-    @javax.persistence.Transient
-    private String authorDisplayName;
-
-    @Getter(AccessLevel.NONE)
-    @Setter
-    @javax.persistence.Transient
-    private String authorProfileImage;
-
-    public String getAuthorDisplayName() {
-        return authorDisplayName != null ? authorDisplayName : (blogger != null ? blogger.getDisplayName() : null);
-    }
-
-    public String getAuthorProfileImage() {
-        return authorProfileImage != null ? authorProfileImage : (blogger != null ? blogger.getProfileImage() : null);
-    }
 }

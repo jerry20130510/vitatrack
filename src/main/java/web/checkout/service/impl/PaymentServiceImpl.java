@@ -26,8 +26,8 @@ public class PaymentServiceImpl implements PaymentService {
 
 	// ===== 建議改成設定檔，現在先寫死讓你跑通 =====
 	private static final String MERCHANT_ID = "3002607";
-	private static final String RETURN_URL = "https://localhost:8080/vitatrack/checkout/ecpay/callback";
-	private static final String ORDER_RESULT_URL = "https://YOUR_FRONTEND_DOMAIN/payment-result.html";
+	private static final String RETURN_URL = "https://leaseless-eventfully-sharyn.ngrok-free.dev/vitatrack/checkout/ecpay/callback";
+	private static final String ORDER_RESULT_URL = "https://leaseless-eventfully-sharyn.ngrok-free.dev/vitatrack/checkout/付款成功.html";
 	private static final String TRADE_DESC = "Vitatrack訂單";
 	private static final String CHOOSE_PAYMENT = "ALL";
 	private static final String PAYMENT_TYPE = "aio";
