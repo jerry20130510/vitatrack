@@ -16,7 +16,7 @@ import web.product.vo.Product;
 
 
 @WebServlet("/product-add")
-public class ProductController extends HttpServlet {
+public class ProductAddController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private ProductService productService;
 	
