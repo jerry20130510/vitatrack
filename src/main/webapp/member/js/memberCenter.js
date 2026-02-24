@@ -2,20 +2,31 @@
 // 根據點擊的分頁，抓取資料渲染對應html
 
 document.addEventListener("DOMContentLoaded", function () {
-
     const contentArea = document.getElementById('content-area');
     const menuLinks = document.querySelectorAll('.menu-link');
     const profile = menuLinks[0];
     const logoutBtn = document.getElementById('logoutBtn');
     const memberInfo = document.getElementById('memberInfo');
 
+    loadMember();
+
     memberInfo.addEventListener("click", info);
     profile.addEventListener("click", info);
 
+    function loadMember() {
+    fetch('profile')
+        .then(res => res.json())
+        .then(member => {
+            const welcomeText = document.getElementById('welcomeText');
+            if (welcomeText) {
+                welcomeText.textContent = `${member.name}，歡迎回來`;
+            }
+        });
+}
     function info(e) {
         e.preventDefault();
 
-        fetch('profile') 
+        fetch('profile')
             .then(res => res.json())
             .then(member => {
                 console.log(member);
@@ -46,10 +57,10 @@ document.addEventListener("DOMContentLoaded", function () {
     };
 
     contentArea.addEventListener('click', function (e) {
-         const btn = e.target.closest('button');
-         if (!btn) {
+        const btn = e.target.closest('button');
+        if (!btn) {
             return;
-         }
+        }
         if (btn.id === 'saveBtn') {
             saveChanges();
         }
@@ -63,28 +74,28 @@ document.addEventListener("DOMContentLoaded", function () {
     function enableEdit() {
         const rows = document.querySelectorAll('.form-row');
         rows.forEach(row => {
-        if (row.dataset.editable === "false") return;
-        const p = row.querySelector('p.readonly');
-        if (!p) return; // 如果找不到 <p> 元素，直接返回
-        const input = document.createElement('input');
-        input.type = 'text';
-        input.value = p.textContent; // 用當前顯示的值作為預設值
-        input.className = 'edit-input';
-        row.replaceChild(input, p);
+            if (row.dataset.editable === "false") return;
+            const p = row.querySelector('p.readonly');
+            if (!p) return; //如果找不到 <p> 元素，直接返回
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.value = p.textContent; //用當前顯示的值作為預設值
+            input.className = 'edit-input';
+            row.replaceChild(input, p);
         });
     }
 
     function saveChanges() {
-       
+
         const updatedData = {};
-          // 取得所有有 class="form-row" 的元素
+        //取得所有有 class="form-row" 的元素
         const rows = document.querySelectorAll('.form-row');
 
         rows.forEach(row => {
             const field = row.dataset.field;
-             // 找到裡面的 input
-             const input = row.querySelector('input.edit-input');
-             // 如果這列有 field，且找到 input，就把值放進 updatedData
+            //找到裡面的 input
+            const input = row.querySelector('input.edit-input');
+            //如果這列有 field，且找到 input，就把值放進 updatedData
             if (field && input) {
                 updatedData[field] = input.value;
             }

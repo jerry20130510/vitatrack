@@ -1,25 +1,16 @@
 package web.checkout.dao;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
+
+import org.hibernate.Session;
 
 import web.checkout.vo.CartRow;
 
 public interface CartDao {
+	
+    // 查看尚未結帳的購物車
+    List<CartRow> findOpenCartByMemberId(Session session, int memberId);
 
-    /**
-     * 看購物車
-     */
-    List<CartRow> findOpenCartByMemberId(int memberId);
-
-    /**
-     * 結帳前查購物車
-     */
-    List<CartRow> findOpenCartByMemberId(Connection conn, int memberId) throws SQLException;
-
-    /**
-     * 結帳
-     */
-    int[] attachCartItemsToOrder(Connection conn, int orderId, List<CartRow> cartRows) throws SQLException;
+    // 更新cart_item 的 order_id
+    int attachCartItemsToOrder(Session session, int orderId, List<CartRow> cartRows);
 }

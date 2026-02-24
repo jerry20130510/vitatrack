@@ -1,23 +1,17 @@
 package web.checkout.dao;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.List;
 
-import web.checkout.vo.CartRow;
+import org.hibernate.Session;
+
+import web.checkout.vo.OrderItem;
 
 public interface OrderItemDao {
 
-    /**
-     * 依 cartRows 批次新增 order_item
-     * @return batch 執行結果
-     */
-    int[] batchInsertFromCart(
-    		Connection conn, 
-    		int orderId, 
-    		List<CartRow> cartRows)
-            throws SQLException;
-    // 查詢綠界所需要的 ItemName
-    List<String> selectProductNamesByOrderId(Connection conn, int orderId) throws SQLException;
+	// 新增一筆訂單明細
+	void save(Session session, OrderItem item);
+
+	// 查該訂單的商品名稱清單
+	List<String> selectProductNamesByOrderId(Session session, int orderId);
 
 }
