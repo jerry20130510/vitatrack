@@ -12,7 +12,7 @@ import javax.servlet.http.HttpSession;
 import web.member.service.MemberService;
 import web.member.service.impl.MemberServiceImpl;
 import web.member.vo.Member;
-import web.member.vo.UpdateMemberRequest;
+import web.member.dto.UpdateMemberRequest;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;

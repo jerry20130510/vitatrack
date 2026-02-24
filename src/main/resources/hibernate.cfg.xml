@@ -13,6 +13,7 @@
 		<mapping class="web.checkout.vo.CheckoutResult" />
 		<mapping class="web.member.vo.Member" />
 		<mapping class="web.product.vo.Product" />
+		<mapping class="web.member.vo.PasswordResetTokens" />
 	</session-factory>
 </hibernate-configuration>
 
