@@ -47,7 +47,7 @@ public class OrderDaoImpl implements OrderDao {
 	@Override
 	public int updateTransactionId(Session session, int orderId, String transactionId) {
 
-		String hql = "UPDATE Order o SET o.transactionId = :txid WHERE o.orderId = :oid";
+		String hql = "UPDATE Orders o SET o.transactionId = :txid WHERE o.orderId = :oid";
 
 		Query<?> q = session.createQuery(hql);
 		q.setParameter("txid", transactionId);
@@ -60,7 +60,7 @@ public class OrderDaoImpl implements OrderDao {
 	@Override
 	public boolean existsTransactionId(Session session, String transactionId) {
 
-		String hql = "SELECT 1 FROM Order o WHERE o.transactionId = :txid";
+		String hql = "SELECT 1 FROM Orders o WHERE o.transactionId = :txid";
 
 		Integer one = session.createQuery(hql, Integer.class).setParameter("txid", transactionId).setMaxResults(1)
 				.uniqueResult();
@@ -72,7 +72,7 @@ public class OrderDaoImpl implements OrderDao {
 	@Override
 	public Orders selectByTransactionId(Session session, String transactionId) {
 
-		String hql = "FROM Order o WHERE o.transactionId = :txid";
+		String hql = "FROM Orders o WHERE o.transactionId = :txid";
 
 		return session.createQuery(hql, Orders.class)
 				.setParameter("txid", transactionId)
