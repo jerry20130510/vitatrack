@@ -15,3 +15,4 @@ public class SessionConfigListener implements ServletContextListener {
         config.setMaxAge(1800);
     }
 }
+

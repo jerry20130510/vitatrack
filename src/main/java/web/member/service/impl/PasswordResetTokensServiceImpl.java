@@ -22,6 +22,7 @@ public class PasswordResetTokensServiceImpl implements PasswordResetTokensServic
 	private MemberDao memberDao;
 	private PasswordResetTokensDao passwordResetTokenDao;
 	private EmailUtil emailUtil;
+
 	public PasswordResetTokensServiceImpl() throws NamingException {
 		memberDao = new MemberDaoImpl();
 		passwordResetTokenDao = new PasswordResetTokensDaoImpl();
@@ -54,30 +55,30 @@ public class PasswordResetTokensServiceImpl implements PasswordResetTokensServic
 			tx.rollback();
 			throw new RuntimeException(e);
 		}
-		  // transaction commit 成功後再寄信
-        if (token != null) {
-            emailUtil.sendResetPasswordEmail(email, token);
-        }
-	
+		// transaction commit 成功後再寄信
+		if (token != null) {
+			emailUtil.sendResetPasswordEmail(email, token);
+		}
+
 	}
 
 	// 確認這個Token是否合法、有效、可使用
 	@Override
 	public PasswordResetTokens validateToken(String token) {
+		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+
 		// 避免後續DAO查詢時出現不必要錯誤或無效查詢
 		if (token == null || token.trim().isEmpty()) {
-			throw new IllegalArgumentException("Token 不可為空");
+
+			throw new IllegalArgumentException("Token不可為空");
 		}
-		// 從資料庫拿token
-		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-        
-        PasswordResetTokens resetToken;
-        resetToken = passwordResetTokenDao.findByToken(token);
-		if (resetToken == null) {		
+		PasswordResetTokens resetToken;
+		resetToken = passwordResetTokenDao.findByToken(token);
+		if (resetToken == null) {
 			throw new IllegalArgumentException("Token無效或不存在");
 		}
 		// 為避免重複使用同一個重設連結，檢查token使否使用過
-		if (resetToken.getUsed()) {			
+		if (resetToken.getUsed()) {
 			throw new IllegalArgumentException("Token已使用過");
 		}
 		// 是否過期;System.currentTimeMillis():取得現在時間（毫秒）
@@ -116,8 +117,10 @@ public class PasswordResetTokensServiceImpl implements PasswordResetTokensServic
 			passwordResetTokenDao.update(resetToken);
 			tx.commit();
 		} catch (Exception e) {
-			if (tx != null)
+			e.printStackTrace();
+			if (tx != null) {
 				tx.rollback();
+			}
 			throw new RuntimeException("密碼重設失敗", e);
 		}
 	}
