@@ -8,9 +8,11 @@ import web.blog.dao.impl.ArticleDaoImpl;
 import web.blog.dto.ArticleCreateRequest;
 import web.blog.dto.ArticleUpdateRequest;
 import web.blog.dto.ArticleListResponse;
+import web.blog.dto.ArticlePublicResponse;
+import web.blog.dto.ArticleAdminResponse;
 import web.blog.vo.Article;
 import web.blog.service.ArticleService;
-// import web.blog.service.S3PresignedUrlService;
+import web.blog.service.S3PresignedUrlService;
 
 import javax.naming.NamingException;
 import java.sql.Timestamp;
@@ -19,26 +21,64 @@ import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 public class ArticleServiceImpl implements ArticleService {
 
     private final ArticleDao articleDao = new ArticleDaoImpl();
-    // private final S3PresignedUrlService s3Service;
+    private final S3PresignedUrlService s3Service;
 
     public ArticleServiceImpl() throws NamingException {
-        // this.s3Service = new S3PresignedUrlServiceImpl();
+        this.s3Service = new S3PresignedUrlServiceImpl();
     }
 
-    private void initAuthorFields(Article article) {
-        if (article != null && article.getBlogger() != null) {
-            article.setAuthorDisplayName(article.getBlogger().getDisplayName());
-            article.setAuthorProfileImage(article.getBlogger().getProfileImage());
-            article.setBlogger(null);
+    private ArticlePublicResponse toPublicResponse(Article article) {
+        if (article == null) return null;
+        ArticlePublicResponse dto = new ArticlePublicResponse();
+        dto.setId(article.getId());
+        dto.setTitleSlug(article.getTitleSlug());
+        dto.setTitleDisplay(article.getTitleDisplay());
+        dto.setSummary(article.getSummary());
+        dto.setContent(article.getContent());
+        dto.setImageUrl(article.getImageUrl());
+        dto.setCategory(article.getCategory());
+        dto.setAuthorSlug(article.getAuthorSlug());
+        dto.setTotalLikes(article.getTotalLikes());
+        dto.setTotalViews(article.getTotalViews());
+        dto.setTotalShares(article.getTotalShares());
+        dto.setCreatedAt(article.getCreatedAt());
+        if (article.getBlogger() != null) {
+            dto.setAuthorDisplayName(article.getBlogger().getDisplayName());
+            dto.setAuthorProfileImage(article.getBlogger().getProfileImage());
         }
+        return dto;
+    }
+
+    private ArticleAdminResponse toAdminResponse(Article article) {
+        if (article == null) return null;
+        ArticleAdminResponse dto = new ArticleAdminResponse();
+        dto.setId(article.getId());
+        dto.setTitleSlug(article.getTitleSlug());
+        dto.setTitleDisplay(article.getTitleDisplay());
+        dto.setSummary(article.getSummary());
+        dto.setContent(article.getContent());
+        dto.setImageUrl(article.getImageUrl());
+        dto.setCategory(article.getCategory());
+        dto.setAuthorSlug(article.getAuthorSlug());
+        dto.setTotalLikes(article.getTotalLikes());
+        dto.setTotalViews(article.getTotalViews());
+        dto.setTotalShares(article.getTotalShares());
+        dto.setCreatedAt(article.getCreatedAt());
+        dto.setUpdatedAt(article.getUpdatedAt());
+        if (article.getBlogger() != null) {
+            dto.setAuthorDisplayName(article.getBlogger().getDisplayName());
+            dto.setAuthorProfileImage(article.getBlogger().getProfileImage());
+        }
+        return dto;
     }
 
     @Override
-    public ArticleListResponse listArticles(int page, int size, String category, String authorSlug) {
+    public ArticleListResponse<ArticlePublicResponse> listArticles(int page, int size, String category, String authorSlug) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
         Transaction tx = null;
         try {
@@ -60,10 +100,10 @@ public class ArticleServiceImpl implements ArticleService {
 
             int totalPages = (int) Math.ceil((double) totalElements / size);
             tx.commit();
-            for (Article a : articles) { initAuthorFields(a);
-                
-            }
-            return new ArticleListResponse(page, size, totalElements, totalPages, articles);
+            List<ArticlePublicResponse> dtos = articles.stream()
+                .map(this::toPublicResponse)
+                .collect(Collectors.toList());
+            return new ArticleListResponse<>(page, size, totalElements, totalPages, dtos);
         } catch (Exception e) {
             if (tx != null) tx.rollback();
             throw new RuntimeException(e);
@@ -71,15 +111,14 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public Article getArticleDetail(String titleSlug) {
+    public ArticlePublicResponse getArticleDetail(String titleSlug) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
         Transaction tx = null;
         try {
             tx = session.beginTransaction();
             Article article = articleDao.findByTitleSlugWithAuthor(titleSlug);
-            initAuthorFields(article);
             tx.commit();
-            return article;
+            return toPublicResponse(article);
         } catch (Exception e) {
             if (tx != null) tx.rollback();
             throw new RuntimeException(e);
@@ -87,7 +126,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public ArticleListResponse listArticlesAdmin(String authorSlug, int page, int size) {
+    public ArticleListResponse<ArticleAdminResponse> listArticlesAdmin(String authorSlug, int page, int size) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
         Transaction tx = null;
         try {
@@ -96,11 +135,11 @@ public class ArticleServiceImpl implements ArticleService {
             List<Article> articles = articleDao.findByAuthorSlug(authorSlug, offset, size);
             int totalElements = articleDao.countByAuthorSlug(authorSlug);
             int totalPages = (int) Math.ceil((double) totalElements / size);
-            for (Article a : articles) {
-                initAuthorFields(a);
-            }
             tx.commit();
-            return new ArticleListResponse(page, size, totalElements, totalPages, articles);
+            List<ArticleAdminResponse> dtos = articles.stream()
+                .map(this::toAdminResponse)
+                .collect(Collectors.toList());
+            return new ArticleListResponse<>(page, size, totalElements, totalPages, dtos);
         } catch (Exception e) {
             if (tx != null) tx.rollback();
             throw new RuntimeException(e);
@@ -108,7 +147,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public Article getArticleDetailAdmin(Long id, String authorSlug) {
+    public ArticleAdminResponse getArticleDetailAdmin(Long id, String authorSlug) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
         Transaction tx = null;
         try {
@@ -118,9 +157,8 @@ public class ArticleServiceImpl implements ArticleService {
                 tx.commit();
                 return null;
             }
-            initAuthorFields(article);
             tx.commit();
-            return article;
+            return toAdminResponse(article);
         } catch (Exception e) {
             if (tx != null) tx.rollback();
             throw new RuntimeException(e);
@@ -128,7 +166,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public Article createArticle(ArticleCreateRequest request, String authorSlug) {
+    public ArticleAdminResponse createArticle(ArticleCreateRequest request, String authorSlug) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
         Transaction tx = null;
         try {
@@ -153,15 +191,14 @@ public class ArticleServiceImpl implements ArticleService {
             article.setSummary(summary);
             article.setContent(content);
             article.setCategory(category);
-            article.setImageUrl(imageUrl); // Direct assignment instead of s3Service.moveToPermanent(imageUrl)
+            article.setImageUrl(s3Service.moveToPermanent(imageUrl));
             article.setAuthorSlug(authorSlug);
             article.setTitleSlug(generateSlug(titleDisplay));
 
             articleDao.insert(article);
             Article result = articleDao.findById(article.getId());
             tx.commit();
-            initAuthorFields(result);
-            return result;
+            return toAdminResponse(result);
         } catch (Exception e) {
             if (tx != null) tx.rollback();
             throw new RuntimeException(e);
@@ -169,7 +206,7 @@ public class ArticleServiceImpl implements ArticleService {
     }
 
     @Override
-    public Article updateArticle(Long id, ArticleUpdateRequest request, String authorSlug) {
+    public ArticleAdminResponse updateArticle(Long id, ArticleUpdateRequest request, String authorSlug) {
         Session session = HibernateUtil.getSessionFactory().getCurrentSession();
         Transaction tx = null;
         try {
@@ -192,7 +229,7 @@ public class ArticleServiceImpl implements ArticleService {
             article.setSummary(summary);
             article.setContent(request.getContent());
             article.setCategory(request.getCategory());
-            article.setImageUrl(request.getImageUrl()); // Direct assignment instead of s3Service.moveToPermanent()
+            article.setImageUrl(s3Service.moveToPermanent(request.getImageUrl()));
             article.setUpdatedAt(new Timestamp(System.currentTimeMillis()));
 
             Timestamp expectedUpdatedAt = parseUpdatedAt(request.getUpdatedAt(), existing.getUpdatedAt());
@@ -204,8 +241,7 @@ public class ArticleServiceImpl implements ArticleService {
             }
             Article result = articleDao.findById(id);
             tx.commit();
-            initAuthorFields(result);
-            return result;
+            return toAdminResponse(result);
         } catch (Exception e) {
             if (tx != null) tx.rollback();
             throw new RuntimeException(e);

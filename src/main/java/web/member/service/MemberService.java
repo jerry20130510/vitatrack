@@ -1,7 +1,8 @@
 package web.member.service;
 
 import web.member.vo.Member;
-import web.member.vo.UpdateMemberRequest;
+import web.member.vo.PasswordResetTokens;
+import web.member.dto.UpdateMemberRequest;
 
 public interface MemberService {
 
@@ -37,7 +38,7 @@ public interface MemberService {
 	        address = address.trim();
 	        if (address.isEmpty()) return null;
 	        if (address.length() > 200) throw new IllegalArgumentException("地址長度過長");
-	        // 簡單防 XSS
+	        // 簡單防XSS
 	        return address.replaceAll("<[^>]*>", "");
 	    }
 
@@ -48,5 +49,5 @@ public interface MemberService {
 	Member profile(Member member);
 
     Member updateProfile(Integer memberID,UpdateMemberRequest dto);
-
+    
 }

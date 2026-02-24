@@ -28,7 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
         customAlert.style.display = "none";
     };
 
-    
+
     // === 前端格式驗證函式 ===
     function isValidEmail(email) {
         // 簡單正規檢查 email 格式
@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     loginBtn.addEventListener("click", function (event) {
-         
+
         //帳號和密碼一起做驗證
         //不驗證「這個 email 是否存在」
         //不提示「密碼錯誤」
@@ -61,7 +61,7 @@ document.addEventListener("DOMContentLoaded", function () {
         fetch('login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({email: loginForm.email.value,password: loginForm.password.value})
+            body: JSON.stringify({ email: loginForm.email.value, password: loginForm.password.value })
         }).then(result => result.json())
             .then(result => {
                 console.log("這是後端回傳結果：", result);
@@ -102,8 +102,31 @@ document.addEventListener("DOMContentLoaded", function () {
             return;
         }
         // 改成 AJAX 送後端
-        alert("重設密碼連結已寄出到：" + email);
-        fpAlert.style.display = "none"; // 關閉彈窗
+        fetch('forgetPassword', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                email: email
+            })
+        })
+            .then(response => response.json())
+            .then(result => {
+                console.log("forgetPassword 回傳：", result);
+
+                if (result.success) {
+                    showAlert("重設密碼連結已寄出<br>請檢查您的信箱");
+                } else {
+                    showAlert(result.message);
+                }
+
+                fpAlert.style.display = "none";
+            })
+            .catch(error => {
+                console.error("Error:", error);
+                showAlert("發生錯誤，請稍後再試");
+            });
     });
 
     // 關閉忘記密碼彈窗

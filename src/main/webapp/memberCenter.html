@@ -133,6 +133,12 @@
 			flex-shrink: 0;
 			cursor: pointer;
 		}
+
+		.gi_breadcrumb_inner .col-md-6:first-child {
+			display: flex;
+			align-items: center;
+			gap: 20px;
+		}
 	</style>
 </head>
 
@@ -370,7 +376,10 @@
 					<div class="col-12">
 						<div class="row gi_breadcrumb_inner">
 							<div class="col-md-6 col-sm-12">
-								<h2 class="mn-breadcrumb-title">會員中心</h2>
+								<div class="title-row">
+									<h2 class="mn-breadcrumb-title">會員中心 </h2>
+									<p id="welcomeText" style="margin-top:10px;"></p>
+								</div>
 							</div>
 							<div class="col-md-6 col-sm-12">
 								<ul class="mn-breadcrumb-list">

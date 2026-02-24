@@ -1,19 +1,17 @@
 package web.blog.dto;
 
-import web.blog.vo.Article;
-
 import java.util.List;
 
-public class ArticleListResponse {
+public class ArticleListResponse<T> {
     private int page;
     private int size;
     private int totalElements;
     private int totalPages;
-    private List<Article> articles;
+    private List<T> articles;
 
     public ArticleListResponse() {}
 
-    public ArticleListResponse(int page, int size, int totalElements, int totalPages, List<Article> articles) {
+    public ArticleListResponse(int page, int size, int totalElements, int totalPages, List<T> articles) {
         this.page = page;
         this.size = size;
         this.totalElements = totalElements;
@@ -53,11 +51,11 @@ public class ArticleListResponse {
         this.totalPages = totalPages;
     }
 
-    public List<Article> getArticles() {
+    public List<T> getArticles() {
         return articles;
     }
 
-    public void setArticles(List<Article> articles) {
+    public void setArticles(List<T> articles) {
         this.articles = articles;
     }
 }
