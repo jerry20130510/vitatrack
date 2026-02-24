@@ -9,8 +9,6 @@
 		<property name="hibernate.highlight_sql">true</property>
 		<mapping class="web.blog.vo.Article" />
 		<mapping class="web.blog.vo.Blogger" />
-		<mapping class="web.checkout.vo.CartRow" />
-		<mapping class="web.checkout.vo.CheckoutResult" />
 		<mapping class="web.member.vo.Member" />
 		<mapping class="web.product.vo.Product" />
 		<mapping class="web.member.vo.PasswordResetTokens" />
