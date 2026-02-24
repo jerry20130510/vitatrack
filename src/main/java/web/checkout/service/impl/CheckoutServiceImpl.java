@@ -1,12 +1,12 @@
 package web.checkout.service.impl;
 
 import java.math.BigDecimal;
-import java.sql.Connection;
 import java.util.List;
 
-import javax.naming.InitialContext;
-import javax.sql.DataSource;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
+import core.util.HibernateUtil;
 import web.checkout.dao.CartDao;
 import web.checkout.dao.OrderDao;
 import web.checkout.dao.OrderItemDao;
@@ -16,87 +16,130 @@ import web.checkout.dao.impl.OrderItemDaoImpl;
 import web.checkout.service.CheckoutService;
 import web.checkout.vo.CartRow;
 import web.checkout.vo.CheckoutResult;
+import web.checkout.vo.Orders;
+import web.checkout.vo.OrderItem;
 
 public class CheckoutServiceImpl implements CheckoutService {
 
-    private final CartDao cartDao = new CartDaoImpl();
-    private final OrderDao orderDao = new OrderDaoImpl();
-    private final OrderItemDao orderItemDao = new OrderItemDaoImpl();
+	private final CartDao cartDao = new CartDaoImpl();
+	private final OrderDao orderDao = new OrderDaoImpl();
+	private final OrderItemDao orderItemDao = new OrderItemDaoImpl();
 
-    private final DataSource ds;
+	@Override
+	public CheckoutResult checkout(int memberId) {
 
-    public CheckoutServiceImpl() {
-        try {
-            ds = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/vitatrack");
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
+		Session session = null;
+		// 開始 Transaction
+		Transaction tx = null;
 
-    @Override
-    public CheckoutResult checkout(int memberId) {
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+			tx = session.beginTransaction();
 
-        try (Connection conn = ds.getConnection()) {
-            conn.setAutoCommit(false);
+			// 1.查詢 open cart
+			List<CartRow> cartRows = cartDao.findOpenCartByMemberId(session, memberId);
+			// 1.1如果查不到，顯示Cart is empty.
+			if (cartRows == null || cartRows.isEmpty()) {
+				throw new RuntimeException("Cart is empty.");
+			}
 
-            try {
-                // 1) 查 open cart
-                List<CartRow> cartRows = cartDao.findOpenCartByMemberId(conn, memberId);
-                if (cartRows == null || cartRows.isEmpty()) {
-                    throw new RuntimeException("Cart is empty.");
-                }
+			// 2.計算總金額
+			BigDecimal totalAmount;
+			totalAmount = BigDecimal.valueOf(0);
+			for (CartRow row : cartRows) {
+				// 2.1取得單價
+				BigDecimal price = row.getUnitPrice();
 
-                // 2) 算 total
-                BigDecimal totalAmount = BigDecimal.ZERO;
-                for (CartRow row : cartRows) {
-                    BigDecimal rowSubtotal = row.getUnitPrice()
-                            .multiply(BigDecimal.valueOf(row.getQuantity()));
-                    totalAmount = totalAmount.add(rowSubtotal);
-                }
+				// 2.2取得數量
+				int quantity = row.getQuantity();
 
-                // orders.total_amount 目前是 int
-                int totalAmountInt = totalAmount.intValue();
+				// 2.3將 quantity 轉成 BigDecimal
+				BigDecimal quantityBD = BigDecimal.valueOf(quantity);
 
-                // 3) insert orders
-                String paymentStatus = "PENDING";
-                String paymentMethod = "CARD";
-                int amount = totalAmountInt;
-                String transactionId = "NA";
+				// 2.4單價 × 數量
+				BigDecimal rowSubtotal = price.multiply(quantityBD);
+				totalAmount = totalAmount.add(rowSubtotal);
+			}
+			// 2.5將 BigDecimal 轉成 int
+			int totalAmountInt = totalAmount.intValue();
 
-                int orderId = orderDao.insertOrder(
-                        conn,
-                        memberId,
-                        totalAmountInt,
-                        paymentMethod,
-                        paymentStatus,
-                        amount,
-                        transactionId
-                );
+			// 3.建立 orders
+			Orders order = new Orders();
+			order.setMemberId(memberId);
+			order.setTotalAmount(totalAmount);
+			order.setAmount(totalAmount);
+			order.setPaymentStatus("PENDING");
+			order.setCreatedAt(new java.sql.Timestamp(System.currentTimeMillis()));
+			order.setPaymentMethod("ECPAY");
+			order.setTransactionId("TXN" + System.currentTimeMillis());
 
-                // 4) insert order_item（batch）
-                orderItemDao.batchInsertFromCart(conn, orderId, cartRows);
+			// ✅ 不改 DB 的硬解
+			order.setPaymentTime(new java.sql.Timestamp(System.currentTimeMillis()));
 
-                // 5) 更新 cart_item 綁 order_id
-                cartDao.attachCartItemsToOrder(conn, orderId, cartRows);
+			orderDao.save(session, order);
 
-                // 全部成功才 commit
-                conn.commit();
+			// 4.建立 order_item
+			Integer orderId = order.getOrderId();
+			for (CartRow row : cartRows) {
+				OrderItem oi = new OrderItem();
+				// 4.1 order_id
+				oi.setOrder(order);
+				// 4.2 sku
+				oi.setSku(row.getSku());
+				// 4.3 product_name
+				oi.setProductName(row.getProductName());
+				// 4.4 unit_price
+				oi.setUnitPrice(row.getUnitPrice());
+				// 4.5 quantity
+				oi.setQuantity(row.getQuantity());
+				// 4.6 subtotal
+				BigDecimal price = row.getUnitPrice();
+				int quantity = row.getQuantity();
+				BigDecimal quantityBD = BigDecimal.valueOf(quantity);
+				BigDecimal subtotal = price.multiply(quantityBD);
+				oi.setSubtotal(subtotal);
+				orderItemDao.save(session, oi);
+			}
 
-                return new CheckoutResult(orderId, totalAmountInt, paymentStatus);
+			// 5.更新 cart_item.order_id
+			int updatedCount = cartDao.attachCartItemsToOrder(session, orderId, cartRows);
+			if (updatedCount <= 0) {
+				throw new RuntimeException("attachCartItemsToOrder updated 0 rows.");
+			}
+			
+			// commit Transaction
+			tx.commit();
+			// 6.回傳 CheckoutResult
+			return new CheckoutResult(orderId, totalAmountInt, "PENDING");
 
-            } catch (Exception ex) {
-                // 任一失敗就 rollback，避免資料卡住
-                try {
-                    conn.rollback();
-                } catch (Exception ignore) {}
+		} catch (Exception ex) {
+		    if (tx != null) {
+		        try {
+		            tx.rollback();
+		        } catch (Exception ignore) {}
+		    }
 
-                ex.printStackTrace();
-                return new CheckoutResult(0, 0, "FAILED: " + ex.getMessage());
-            }
+		    // 🔥 找出最底層錯誤原因
+		    Throwable root = ex;
+		    while (root.getCause() != null) {
+		        root = root.getCause();
+		    }
 
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return new CheckoutResult(0, 0, "FAILED: " + ex.getMessage());
-        }
-    }
+		    System.out.println("=================================");
+		    System.out.println("🔥 ROOT CAUSE CLASS: " + root.getClass().getName());
+		    System.out.println("🔥 ROOT CAUSE MESSAGE: " + root.getMessage());
+		    System.out.println("=================================");
+
+		    ex.printStackTrace();
+
+		    return new CheckoutResult(0, 0, "FAILED: " + root.getMessage());
+		} finally {
+			if (session != null) {
+				try {
+					session.close();
+				} catch (Exception ignore) {
+				}
+			}
+		}
+	}
 }

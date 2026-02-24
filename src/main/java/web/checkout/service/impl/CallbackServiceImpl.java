@@ -1,27 +1,18 @@
 package web.checkout.service.impl;
 
-import java.sql.Connection;
 import java.util.Map;
 import java.util.TreeMap;
 
-import javax.naming.InitialContext;
-import javax.sql.DataSource;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
+import core.util.HibernateUtil;
 import web.checkout.dao.OrderDao;
 import web.checkout.dao.impl.OrderDaoImpl;
 import web.checkout.service.CallbackService;
+import web.checkout.vo.Orders;
 
 public class CallbackServiceImpl implements CallbackService {
-
-	private final DataSource ds;
-
-	public CallbackServiceImpl() {
-		try {
-			ds = (DataSource) new InitialContext().lookup("java:comp/env/jdbc/vitatrack");
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
 
 	private static final String HASH_KEY = "pwFHCqoQZGmho4w6";
 	private static final String HASH_IV = "EkRm7IFT261dpevs";
@@ -54,12 +45,14 @@ public class CallbackServiceImpl implements CallbackService {
 		// 2.7 轉 sha256 轉 字串 轉 大寫
 		String myCmv = sha256(encoded).toUpperCase();
 		System.out.println("Jerry 算出的 CheckMacValue=" + myCmv);
+
 		// 3.比對CheckMacValue
 		boolean ok = (cmv != null) && cmv.equalsIgnoreCase(myCmv);
 		// 3.1 驗簽失敗，回覆ECPay，並不繼續動作
 		if (!ok) {
 			return "0|ERROR";
 		}
+
 		// 4.取出 ECPay 的 TransactionId(MerchantTradeNo)
 		// 4.1 取出 ECPay 的 TransactionId(MerchantTradeNo)
 		String merchantTradeNo = params.get("MerchantTradeNo");
@@ -67,60 +60,85 @@ public class CallbackServiceImpl implements CallbackService {
 		if (merchantTradeNo == null || merchantTradeNo.isBlank()) {
 			return "0|ERROR";
 		}
-		// 5.取出 DB 的 TransactionId
-		String dbTransactionId = null;
-		try (Connection conn = ds.getConnection()) {
-			dbTransactionId = orderDao.selectTransactionId(conn, merchantTradeNo);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return "0|ERROR";
-		}
-		// 6.比對 TransactionId
-		boolean ok1 = (dbTransactionId != null) && merchantTradeNo.equalsIgnoreCase(dbTransactionId);
-		if (!ok1) {
-			return "0|ERROR";
-		}
 
-		// 7.查目前 payment_status
-		// 7.1 查目前 payment_status
-		try (Connection conn = ds.getConnection()) {
-			String currentStatus = orderDao.selectPaymentStatus(conn, merchantTradeNo);
+		Session session = null;
+		Transaction tx = null;
+
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+			tx = session.beginTransaction();
+
+			// 5.取出 DB 的 TransactionId
+			Orders order = orderDao.selectByTransactionId(session, merchantTradeNo);
+			// 5.1 DB 找不到這筆交易
+			if (order == null) {
+				tx.rollback();
+				return "0|ERROR";
+			}
+
+			// 6.比對 TransactionId
+			boolean ok1 = merchantTradeNo.equalsIgnoreCase(order.getTransactionId());
+			// 6.1 TransactionId 不一致
+			if (!ok1) {
+				tx.rollback();
+				return "0|ERROR";
+			}
+
+			// 7.查目前 payment_status
+			// 7.1 查目前 payment_status
+			String currentStatus = order.getPaymentStatus();
+
 			// 7.2 如果已 SUCCESS -> 直接 1|OK
 			if ("SUCCESS".equalsIgnoreCase(currentStatus)) {
+				tx.commit();
 				return "1|OK";
 			}
+
 			// 7.3取得ECPay的RtnCode
 			String rtnCode = params.get("RtnCode");
 			String newStatus = "1".equals(rtnCode) ? "SUCCESS" : "FAILED";
+
 			// 8.依 RtnCode 更新 SUCCESS / FAILED
-			int rows = orderDao.updatePaymentStatus(conn, merchantTradeNo, newStatus);
-			if (rows != 1) {
-				return "0|ERROR";
-			}
+			order.setPaymentStatus(newStatus);
+
 			// 9.更新 raw_response、failureReason
-			// 9.1組 raw_response
+			// 9.1 組 raw_response
 			StringBuilder respSb = new StringBuilder();
 			for (Map.Entry<String, String> e : params.entrySet()) {
-				respSb.append(e.getKey())
-					.append("=")
-					.append(e.getValue())
-					.append("&");
+				respSb.append(e.getKey()).append("=").append(e.getValue()).append("&");
 			}
-			respSb.setLength(respSb.length() - 1);
+			if (respSb.length() > 0) {
+				respSb.setLength(respSb.length() - 1);
+			}
 			String rawResponse = respSb.toString();
-			// 9.2產failureReason
+
+			// 9.2 產 failureReason
 			String failureReason = "1".equals(rtnCode) ? null : params.get("RtnMsg");
 
-			int metaRows = orderDao.updateCallbackMeta(conn, merchantTradeNo, failureReason, rawResponse);
-			if (metaRows != 1) {
-			    return "0|ERROR";
-			}
+			// 9.3 寫回 DB
+			order.setRawResponse(rawResponse);
+			order.setFailureReason(failureReason);
+
+			tx.commit();
+			return "1|OK";
+
 		} catch (Exception e) {
+			if (tx != null) {
+				try {
+					tx.rollback();
+				} catch (Exception ignore) {
+				}
+			}
 			e.printStackTrace();
 			return "0|ERROR";
+		} finally {
+			if (session != null) {
+				try {
+					session.close();
+				} catch (Exception ignore) {
+				}
+			}
 		}
-		
-		return "1|OK";
 	}
 
 	// UrlEncode 方法
