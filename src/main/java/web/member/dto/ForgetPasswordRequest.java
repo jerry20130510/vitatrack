@@ -1,6 +1,4 @@
-package web.member.vo;
-
-
+package web.member.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -9,13 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Data 
-@Setter
-@Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UpdateMemberRequest {
-	private String name;
-	private String phone;
-	private String address;
-	private String password;
+public class ForgetPasswordRequest {
+	private String email;
 }
