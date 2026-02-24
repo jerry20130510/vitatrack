@@ -19,3 +19,5 @@ buildNumber.properties
 bin/
 .DS_Store
 bin/
+# 忽略 mail.properties
+mail.properties
