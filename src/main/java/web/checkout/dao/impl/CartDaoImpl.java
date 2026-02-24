@@ -1,128 +1,60 @@
 package web.checkout.dao.impl;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-import javax.sql.DataSource;
+import org.hibernate.Session;
+import org.hibernate.query.Query;
 
 import web.checkout.dao.CartDao;
 import web.checkout.vo.CartRow;
 
 public class CartDaoImpl implements CartDao {
+	
+    // 查看尚未結帳的購物車
+	@Override
+	public List<CartRow> findOpenCartByMemberId(Session session,int memberId) {
 
-    private DataSource ds;
+		String hql = "SELECT new web.checkout.vo.CartRow("
+				+ "  ci.cartItemId, p.sku, p.productName, p.price, ci.quantity" + ") " 
+				+ "FROM CartItem ci "
+				+ "JOIN ci.product p " 
+				+ "WHERE ci.memberId = :mid AND ci.orderId IS NULL";
 
-    public CartDaoImpl() {
-        try {
-            ds = (DataSource) new InitialContext()
-                    .lookup("java:comp/env/jdbc/vitatrack");
-        } catch (NamingException e) {
-            e.printStackTrace();
-        }
-    }
+		Query<CartRow> query = session.createQuery(hql, CartRow.class);
 
-    /**
-     * 一般查詢（自己開 Connection，用在非 transaction 場景）
-     */
-    @Override
-    public List<CartRow> findOpenCartByMemberId(int memberId) {
+		query.setParameter("mid", memberId);
 
-        String sql =
-            "SELECT ci.cart_item_id, p.sku, p.product_name, p.price, ci.quantity " +
-            "FROM cart_item ci " +
-            "JOIN product p ON ci.sku = p.sku " +
-            "WHERE ci.member_id = ? AND ci.order_id IS NULL";
+		List<CartRow> result = query.getResultList();
 
-        List<CartRow> result = new ArrayList<>();
+		return result;
+	}
+	
+	// 更新購物車的 order_id
+	@Override
+	public int attachCartItemsToOrder(Session session,int orderId, List<CartRow> cartRows) {
 
-        try (Connection conn = ds.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+		// 1.取出購物車的 cart_item_id
+		List<Integer> ids = new ArrayList<>();
 
-            ps.setInt(1, memberId);
+		for (CartRow row : cartRows) {
 
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    CartRow row = new CartRow(
-                        rs.getInt("cart_item_id"),
-                        rs.getString("sku"),
-                        rs.getString("product_name"),
-                        rs.getBigDecimal("price"),
-                        rs.getInt("quantity")
-                    );
-                    result.add(row);
-                }
-            }
+		    Integer id = row.getCartItemId();
 
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to query cart items", e);
-        }
+		    ids.add(id);
+		}
+		
+		// 2.更新購物車的 order_id
+		String hql = "UPDATE CartItem ci SET ci.orderId = :oid WHERE ci.cartItemId IN (:ids)";
 
-        return result;
-    }
+		Query query = session.createQuery(hql);
 
-    /**
-     * Transaction 版查詢（使用外部傳入的 Connection）
-     */
-    @Override
-    public List<CartRow> findOpenCartByMemberId(Connection conn, int memberId)
-            throws SQLException {
+		query.setParameter("oid", orderId);
 
-        String sql =
-            "SELECT ci.cart_item_id, p.sku, p.product_name, p.price, ci.quantity " +
-            "FROM cart_item ci " +
-            "JOIN product p ON ci.sku = p.sku " +
-            "WHERE ci.member_id = ? AND ci.order_id IS NULL";
+		query.setParameterList("ids", ids);
 
-        List<CartRow> list = new ArrayList<>();
+		int updatedCount = query.executeUpdate();
 
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, memberId);
-
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    CartRow row = new CartRow(
-                        rs.getInt("cart_item_id"),
-                        rs.getString("sku"),
-                        rs.getString("product_name"),
-                        rs.getBigDecimal("price"),   // ✅ BigDecimal
-                        rs.getInt("quantity")
-                    );
-                    list.add(row);
-                }
-            }
-        }
-
-        return list;
-    }
-
-    /**
-     * 將購物車項目綁定到訂單（UPDATE cart_item.order_id）
-     * ⚠️ Transaction 版本：必須使用外部傳入的 Connection
-     */
-    @Override
-    public int[] attachCartItemsToOrder(
-            Connection conn,
-            int orderId,
-            List<CartRow> cartRows) throws SQLException {
-
-        String sql =
-            "UPDATE cart_item SET order_id = ? WHERE cart_item_id = ?";
-
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-
-            for (CartRow row : cartRows) {
-                ps.setInt(1, orderId);
-                ps.setInt(2, row.getCartItemId());
-                ps.addBatch();
-            }
-
-            return ps.executeBatch();
-        }
-    }
+		return updatedCount;
+	}
 }
