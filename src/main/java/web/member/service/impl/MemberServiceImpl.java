@@ -1,8 +1,5 @@
 package web.member.service.impl;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 import javax.naming.NamingException;
 
@@ -11,21 +8,17 @@ import org.hibernate.Transaction;
 
 import core.util.HibernateUtil;
 import web.member.dao.MemberDao;
-import web.member.dao.PasswordResetTokensDao;
 import web.member.dao.impl.MemberDaoImpl;
-import web.member.dao.impl.PasswordResetTokensDaoImpl;
 import web.member.service.MemberService;
 import web.member.vo.Member;
-import web.member.vo.PasswordResetTokens;
 import web.member.dto.UpdateMemberRequest;
 
 public class MemberServiceImpl implements MemberService {
 	private MemberDao memberDao;
-	private PasswordResetTokensDao passwordResetTokenDao;
 
 	public MemberServiceImpl() throws NamingException {
 		memberDao = new MemberDaoImpl();
-		passwordResetTokenDao = new PasswordResetTokensDaoImpl();
+	
 	}
 
 	@Override
