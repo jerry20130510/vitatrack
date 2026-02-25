@@ -9,11 +9,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-
 import web.member.service.MemberService;
 import web.member.service.impl.MemberServiceImpl;
-import web.member.vo.Member;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 @WebServlet("/logout")
