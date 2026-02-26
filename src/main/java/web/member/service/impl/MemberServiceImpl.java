@@ -1,6 +1,5 @@
 package web.member.service.impl;
 
-
 import javax.naming.NamingException;
 
 import org.hibernate.Session;
@@ -18,7 +17,7 @@ public class MemberServiceImpl implements MemberService {
 
 	public MemberServiceImpl() throws NamingException {
 		memberDao = new MemberDaoImpl();
-	
+
 	}
 
 	@Override
@@ -150,7 +149,6 @@ public class MemberServiceImpl implements MemberService {
 			}
 			tx.commit();
 			return member;
-
 		} catch (Exception e) {
 			if (tx != null) {
 				tx.rollback();
@@ -161,22 +159,22 @@ public class MemberServiceImpl implements MemberService {
 
 	@Override
 	public boolean remove(String email) {
+		if (email == null || email.trim().isEmpty()) {
+			return false;
+		}
 		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 		Transaction tx = null;
 		try {
 			tx = session.beginTransaction();
-			if (email != null) {
-				memberDao.deleteByEmail(email);
-			}
+			int count = memberDao.deleteByEmail(email);
 			tx.commit();
+			return count > 0;
 		} catch (Exception e) {
 			if (tx != null) {
 				tx.rollback();
 			}
-			throw new IllegalArgumentException("刪除失敗",e);
+			throw new IllegalArgumentException("刪除失敗", e);
 		}
-		return false;
 	}
 
-	
 }
