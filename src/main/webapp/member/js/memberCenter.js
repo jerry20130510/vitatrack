@@ -7,16 +7,20 @@ document.addEventListener("DOMContentLoaded", function () {
     const profile = menuLinks[0];
     const logoutBtn = document.getElementById('logoutBtn');
     const memberInfo = document.getElementById('memberInfo');
+    const privacy = menuLinks[1];
 
     loadMember();
 
     memberInfo.addEventListener("click", info);
     profile.addEventListener("click", info);
+    privacy.addEventListener("click", showDeleteBtn);
 
     function loadMember() {
     fetch('profile')
         .then(res => res.json())
         .then(member => {
+            currentMember = member;
+            console.log("這是會員中心拿到的會員資料：", member);
             const welcomeText = document.getElementById('welcomeText');
             if (welcomeText) {
                 welcomeText.textContent = `${member.name}，歡迎回來`;
@@ -68,7 +72,12 @@ document.addEventListener("DOMContentLoaded", function () {
             console.dir(btn);
             enableEdit('editBtn');
         }
+        if (btn && btn.id === 'deleteBtn') {
+            deleteAccount();
+        }
     });
+
+
 
 
     function enableEdit() {
@@ -122,6 +131,62 @@ document.addEventListener("DOMContentLoaded", function () {
                 alert("更新過程中發生錯誤，請稍後再試。");
             });
     }
+
+
+    function showDeleteBtn(){
+        contentArea.innerHTML = `
+        <main class="member-main">
+						<div class="member-card">
+							<header class="member-card-header">
+								隱私設定
+							</header>
+							<div class="member-card-body">
+								<!-- 左：表單 -->
+								<div class="member-form">
+
+									<div class="form-row">
+										<label>刪除帳號</label>
+										<p class="readonly"></p>
+										<button class="mn-btn-1 btn" id="deleteBtn"
+											type="button"><span>刪除</span></button>
+									</div>
+								</div>
+							</div>
+						</div>
+
+					</main>
+
+                `;
+    }
+
+    function deleteAccount() {
+        if (!confirm("確定要刪除帳號嗎？此操作無法復原！")) {
+            return;
+        }
+
+        fetch('deleteAccount',{
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({                                  
+              email: currentMember.email
+            })
+        })
+        .then(result => result.json())
+        .then(result =>{
+            if(result.success) {
+                alert(result.message);
+                window.location.href = 'index.html';
+            } else {
+                alert("刪除帳號失敗：" + result.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert("刪除帳號過程中發生錯誤，請稍後再試。");
+        });
+    }
+
+
 
 
 
