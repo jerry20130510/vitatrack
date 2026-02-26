@@ -65,8 +65,6 @@ public class PasswordResetTokensServiceImpl implements PasswordResetTokensServic
 	// 確認這個Token是否合法、有效、可使用
 	@Override
 	public PasswordResetTokens validateToken(String token) {
-		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-
 		// 避免後續DAO查詢時出現不必要錯誤或無效查詢
 		if (token == null || token.trim().isEmpty()) {
 
