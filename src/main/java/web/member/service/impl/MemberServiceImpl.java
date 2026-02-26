@@ -159,5 +159,24 @@ public class MemberServiceImpl implements MemberService {
 		}
 	}
 
+	@Override
+	public boolean remove(String email) {
+		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+		Transaction tx = null;
+		try {
+			tx = session.beginTransaction();
+			if (email != null) {
+				memberDao.deleteByEmail(email);
+			}
+			tx.commit();
+		} catch (Exception e) {
+			if (tx != null) {
+				tx.rollback();
+			}
+			throw new IllegalArgumentException("刪除失敗",e);
+		}
+		return false;
+	}
+
 	
 }
