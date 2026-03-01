@@ -85,4 +85,23 @@ public class ProductDaoImpl implements ProductDao {
 		session.delete(target);
 		return true;
 	}
+
+	@Override
+	public Product selectBySku(String sku) {
+	    SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
+	    Session session = sessionFactory.getCurrentSession();
+	    try {
+	        Transaction transaction = session.beginTransaction();
+
+	        Product product = session.get(Product.class, sku);
+
+	        transaction.commit();
+	        return product;
+	    } catch (Exception e) {
+	        session.getTransaction().rollback();
+	        throw e;
+	    }
+		
+	}
+
 }
