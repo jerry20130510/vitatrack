@@ -12,4 +12,8 @@ public interface ProductService {
 	boolean update(Product product);
 
 	boolean deleteBySku(String sku);
+
+	List<Product> findAll();
+	
+	Product selectBySku(String sku);
 }
