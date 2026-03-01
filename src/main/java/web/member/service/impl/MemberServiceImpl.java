@@ -1,9 +1,5 @@
 package web.member.service.impl;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.UUID;
-
 import javax.naming.NamingException;
 
 import org.hibernate.Session;
@@ -11,21 +7,17 @@ import org.hibernate.Transaction;
 
 import core.util.HibernateUtil;
 import web.member.dao.MemberDao;
-import web.member.dao.PasswordResetTokensDao;
 import web.member.dao.impl.MemberDaoImpl;
-import web.member.dao.impl.PasswordResetTokensDaoImpl;
 import web.member.service.MemberService;
 import web.member.vo.Member;
-import web.member.vo.PasswordResetTokens;
 import web.member.dto.UpdateMemberRequest;
 
 public class MemberServiceImpl implements MemberService {
 	private MemberDao memberDao;
-	private PasswordResetTokensDao passwordResetTokenDao;
 
 	public MemberServiceImpl() throws NamingException {
 		memberDao = new MemberDaoImpl();
-		passwordResetTokenDao = new PasswordResetTokensDaoImpl();
+
 	}
 
 	@Override
@@ -157,7 +149,6 @@ public class MemberServiceImpl implements MemberService {
 			}
 			tx.commit();
 			return member;
-
 		} catch (Exception e) {
 			if (tx != null) {
 				tx.rollback();
@@ -166,5 +157,24 @@ public class MemberServiceImpl implements MemberService {
 		}
 	}
 
-	
+	@Override
+	public boolean remove(String email) {
+		if (email == null || email.trim().isEmpty()) {
+			return false;
+		}
+		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+		Transaction tx = null;
+		try {
+			tx = session.beginTransaction();
+			int count = memberDao.deleteByEmail(email);
+			tx.commit();
+			return count > 0;
+		} catch (Exception e) {
+			if (tx != null) {
+				tx.rollback();
+			}
+			throw new IllegalArgumentException("刪除失敗", e);
+		}
+	}
+
 }
