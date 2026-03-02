@@ -150,4 +150,18 @@ public class ProductServiceImpl implements ProductService {
 		}		return false;
 	}
 
+	@Override
+	public List<Product> findAll() {
+		return productDao.selectAll();
+	}
+
+	@Override
+	public Product selectBySku(String sku) {
+		if (sku == null || sku.trim().isEmpty()) {
+	        return null;
+	    }
+	    return productDao.selectBySku(sku);
+	}
+
+
 }
