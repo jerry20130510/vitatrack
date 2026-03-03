@@ -7,20 +7,24 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import web.member.service.MemberService;
 import web.member.service.PasswordResetTokensService;
+import web.member.service.impl.MemberServiceImpl;
 import web.member.service.impl.PasswordResetTokensServiceImpl;
+import web.member.vo.Member;
 import web.member.dto.ForgetPasswordRequest;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 
-@WebServlet("/forgetPassword")
-public class ForgetPasswordController extends HttpServlet {
+@WebServlet("/deleteAccount")
+public class DeleteAccountController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
-	private PasswordResetTokensService passwordResetTokensService;
+	private MemberService memberService;
 
-	public ForgetPasswordController() throws NamingException {
-		passwordResetTokensService = new PasswordResetTokensServiceImpl();
+	public DeleteAccountController() throws NamingException {
+		memberService = new MemberServiceImpl();
 	}
 
 	@Override
@@ -29,10 +33,10 @@ public class ForgetPasswordController extends HttpServlet {
 		Gson gson = new Gson();
 		JsonObject result = new JsonObject();
 		try {
-			ForgetPasswordRequest fpRequest = gson.fromJson(req.getReader(),ForgetPasswordRequest.class);
-			passwordResetTokensService.createResetToken(fpRequest.getEmail());
+			Member member = gson.fromJson(req.getReader(),Member.class);
+			memberService.remove(member.getEmail());
 			result.addProperty("success", true);
-			result.addProperty("message", "已寄出密碼重設連結");
+			result.addProperty("message", "帳號已刪除成功");
 		} catch (RuntimeException e) {
 			result.addProperty("success", false);
 			result.addProperty("message", e.getMessage());	

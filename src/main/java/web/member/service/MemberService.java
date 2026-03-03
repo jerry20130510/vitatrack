@@ -50,4 +50,6 @@ public interface MemberService {
 
     Member updateProfile(Integer memberID,UpdateMemberRequest dto);
     
+    boolean remove(String email);
+    
 }

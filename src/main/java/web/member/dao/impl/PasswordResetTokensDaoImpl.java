@@ -17,7 +17,7 @@ public class PasswordResetTokensDaoImpl implements PasswordResetTokensDao {
 	@Override
 	public PasswordResetTokens findByToken(String token) {
 		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-		PasswordResetTokens result = session.createQuery("FROM password_reset_tokens WHERE token = :token",
+		PasswordResetTokens result = session.createQuery("FROM PasswordResetTokens WHERE token = :token",
 				PasswordResetTokens.class)
 		.setParameter("token", token)
 		.uniqueResult();

@@ -16,7 +16,7 @@ import web.product.service.impl.ProductServiceImpl;
 import web.product.vo.Product;
 
 @WebServlet("/product-list")
-public class ProductListController extends HttpServlet {
+public class ProductListController_adm extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private ProductService productService;
 	
