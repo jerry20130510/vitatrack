@@ -47,33 +47,31 @@ public class CheckoutServiceImpl implements CheckoutService {
 			BigDecimal totalAmount;
 			totalAmount = BigDecimal.valueOf(0);
 			for (CartRow row : cartRows) {
-				// 2.1取得單價
+				// 2.1 取得單價
 				BigDecimal price = row.getUnitPrice();
 
-				// 2.2取得數量
+				// 2.2 取得數量
 				int quantity = row.getQuantity();
 
-				// 2.3將 quantity 轉成 BigDecimal
+				// 2.3 將 quantity 轉成 BigDecimal
 				BigDecimal quantityBD = BigDecimal.valueOf(quantity);
 
-				// 2.4單價 × 數量
+				// 2.4 單價 × 數量
 				BigDecimal rowSubtotal = price.multiply(quantityBD);
 				totalAmount = totalAmount.add(rowSubtotal);
 			}
-			// 2.5將 BigDecimal 轉成 int
+			// 2.5 將 BigDecimal 轉成 int
 			int totalAmountInt = totalAmount.intValue();
 
 			// 3.建立 orders
 			Orders order = new Orders();
 			order.setMemberId(memberId);
 			order.setTotalAmount(totalAmount);
-			order.setAmount(totalAmount);
 			order.setPaymentStatus("PENDING");
-			order.setCreatedAt(new java.sql.Timestamp(System.currentTimeMillis()));
 			order.setPaymentMethod("ECPAY");
+			order.setCreatedAt(new java.sql.Timestamp(System.currentTimeMillis()));
+			order.setAmount(totalAmount);
 			order.setTransactionId("TXN" + System.currentTimeMillis());
-
-			// ✅ 不改 DB 的硬解
 			order.setPaymentTime(new java.sql.Timestamp(System.currentTimeMillis()));
 
 			orderDao.save(session, order);
@@ -107,9 +105,9 @@ public class CheckoutServiceImpl implements CheckoutService {
 				throw new RuntimeException("attachCartItemsToOrder updated 0 rows.");
 			}
 			
-			// commit Transaction
+			// 6.提交 Transaction
 			tx.commit();
-			// 6.回傳 CheckoutResult
+			// 7.回傳 CheckoutResult
 			return new CheckoutResult(orderId, totalAmountInt, "PENDING");
 
 		} catch (Exception ex) {
