@@ -1,6 +1,10 @@
 package web.member.dao;
 
+
+import java.util.List;
+
 import web.member.vo.Member;
+import web.member_admin.dto.MemberListResponse;
 
 public interface MemberDao {
 
@@ -13,5 +17,13 @@ public interface MemberDao {
 	Member selectByEmail(String email);
 
 	Member SelectByEmailandPassword(String email, String password);
+	
+	List<MemberListResponse> selectAllWithPagination(int offset,int size);
+	
+	long countAllMembers();
+	
+	List<MemberListResponse> searchMemberWithPagination(String keyword, int offset, int size);
+	
+	long countMemberByKeyword(String keyword);
 
 }
