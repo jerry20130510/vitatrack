@@ -76,9 +76,13 @@
     const debugBoxEl = document.getElementById('debugBox');
     const retryBtn = document.getElementById('retryBtn');
 
-    // 你的 context path（你網址是 /vitatrack/...）
-    const CONTEXT_PATH = '/vitatrack';
-    const PAYMENT_API = `${CONTEXT_PATH}/api/checkout/payment`;
+    function getContextPath() {
+  const parts = window.location.pathname.split('/').filter(Boolean);
+  return parts.length > 0 ? '/' + parts[0] : '';
+}
+
+const CONTEXT_PATH = getContextPath();
+const PAYMENT_API = `${CONTEXT_PATH}/api/checkout/payment`;
 
     // =========================
     // 1) 呼叫 PaymentServlet（POST）

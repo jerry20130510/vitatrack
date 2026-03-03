@@ -29,8 +29,7 @@ public class PaymentServiceImpl implements PaymentService {
 	// === 固定參數 ===
 	private static final String MERCHANT_ID = "3002607";
 	private static final String RETURN_URL = "https://leaseless-eventfully-sharyn.ngrok-free.dev/vitatrack/checkout/ecpay/callback";
-	private static final String ORDER_RESULT_URL = "https://leaseless-eventfully-sharyn.ngrok-free.dev/vitatrack/checkout/付款成功.html";
-
+	private static final String ORDER_RESULT_URL_BASE ="https://leaseless-eventfully-sharyn.ngrok-free.dev/vitatrack/checkout/付款確認中.html";
 	private static final String TRADE_DESC = "Vitatrack訂單";
 	private static final String CHOOSE_PAYMENT = "ALL";
 	private static final String PAYMENT_TYPE = "aio";
@@ -110,7 +109,6 @@ public class PaymentServiceImpl implements PaymentService {
 	}
 
 	// 組綠界 payload
-
 	private EcpayCheckoutPayload createEcpayCheckout(Session session, int orderId) {
 
 		// 1.先驗證訂單
@@ -134,7 +132,7 @@ public class PaymentServiceImpl implements PaymentService {
 		formParams.put("TradeDesc", TRADE_DESC);
 		formParams.put("ItemName", info.getItemName());
 		formParams.put("ReturnURL", RETURN_URL);
-		formParams.put("OrderResultURL", ORDER_RESULT_URL);
+		formParams.put("OrderResultURL", ORDER_RESULT_URL_BASE + "?orderId=" + orderId);
 		formParams.put("ChoosePayment", CHOOSE_PAYMENT);
 		formParams.put("EncryptType", ENCRYPT_TYPE);
 		formParams.put("CheckMacValue", genCheckMacValueSha256(formParams));
