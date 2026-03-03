@@ -5,7 +5,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>付款失敗 - Vitatrack</title>
+  <title>付款確認中 - Vitatrack</title>
   <link rel="shortcut icon" href="assets/img/favicon/favicon.png">
 
   <link href="assets/css/vendor/materialdesignicons.min.css" rel="stylesheet">
@@ -29,7 +29,7 @@
     }
     .iconWrap{
       width:104px;height:104px;border-radius:999px;
-      background:#fef2f2;border:2px solid #fecaca;
+      background:#fff7ed;border:2px solid #fed7aa;
       display:flex;align-items:center;justify-content:center;
       margin: 0 auto 14px;
     }
@@ -47,13 +47,10 @@
     .rowx:last-child{ border-bottom:none; padding-bottom:12px; }
     .label{ color:#6b7280; }
     .value{ font-weight:700; color:#111827; word-break:break-all; }
-    .failReason{
-      margin: 0 0 16px;
-      background:#fff1f2; border:1px solid #fecdd3;
-      color:#9f1239; padding:12px 12px; border-radius:12px;
-      font-size:14px; text-align:left; line-height:1.6;
-    }
-    .xmark{ width:56px; height:56px; }
+    .hint{ margin-top: 14px; color:#9ca3af; font-size:12.5px; line-height:1.6; }
+
+    .hourglass{ width:52px;height:52px; animation: spin 1.15s linear infinite; }
+    @keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
   </style>
 </head>
 
@@ -88,20 +85,19 @@
       <div class="row justify-content-center">
         <div class="col-lg-7 col-xl-6">
           <div class="bg-white p-4 p-md-5 pay-card text-center">
-
-            <div class="iconWrap" aria-label="付款失敗">
-              <svg class="xmark" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M18 6L6 18M6 6l12 12" stroke="#dc2626" stroke-width="2.2" stroke-linecap="round"/>
+            <div class="iconWrap" aria-label="付款確認中">
+              <svg class="hourglass" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path d="M7 2h10v4c0 1.5-1 3-2.2 4 1.2 1 2.2 2.5 2.2 4v4H7v-4c0-1.5 1-3 2.2-4C8 9 7 7.5 7 6V2Z"
+                      stroke="#f59e0b" stroke-width="1.8" stroke-linejoin="round"/>
+                <path d="M9 6c0 1.2 1.2 2.4 3 3 1.8-.6 3-1.8 3-3"
+                      stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round"/>
+                <path d="M15 18c0-1.2-1.2-2.4-3-3-1.8.6-3 1.8-3 3"
+                      stroke="#f59e0b" stroke-width="1.8" stroke-linecap="round"/>
               </svg>
             </div>
 
-            <div class="title">付款失敗</div>
-            <p class="sub">很抱歉，這筆付款未完成。您可以重新發起付款或稍後再試。</p>
-
-            <div class="failReason">
-              <div style="font-weight:800; margin-bottom:6px;">失敗原因</div>
-              <div id="failureReason">—</div>
-            </div>
+            <div class="title">付款確認中</div>
+            <p class="sub">我們正在向金流確認交易結果。通常幾秒內完成，請不要關閉頁面。</p>
 
             <div class="info">
               <div class="rowx">
@@ -109,20 +105,27 @@
                 <div class="value" id="orderId">—</div>
               </div>
               <div class="rowx">
-                <div class="label">金額</div>
+                <div class="label">付款金額</div>
                 <div class="value" id="totalAmount">—</div>
               </div>
               <div class="rowx">
-                <div class="label">訂單建立時間</div>
+                <div class="label">付款時間</div>
                 <div class="value" id="paymentTime">—</div>
+              </div>
+              <div class="rowx">
+                <div class="label">付款方式</div>
+                <div class="value" id="paymentMethod">—</div>
               </div>
             </div>
 
             <div class="mt-4 d-flex gap-2 justify-content-center flex-wrap">
-              <button class="btn btn-dark px-4" id="btnBackToPending">回付款確認</button>
-              <button class="btn btn-outline-dark px-4" id="btnHome">回首頁</button>
+              <button class="btn btn-dark px-4" id="btnRefresh">重新查詢</button>
+              <button class="btn btn-outline-dark px-4" id="btnBack">返回商城</button>
             </div>
 
+            <div class="hint">
+              若長時間仍顯示「確認中」，可能是金流回調延遲或網路異常；可點「重新查詢」再次確認。
+            </div>
           </div>
         </div>
       </div>
@@ -135,8 +138,10 @@
   // ✅ 自動抓 contextPath：/vitatrack 或 ''
   const parts = location.pathname.split("/").filter(Boolean);
   const ctx = parts.length > 0 ? `/${parts[0]}` : "";
-
   const API_BASE = `${ctx}/api/checkout/result`;
+
+  const SUCCESS_PAGE = "付款成功.html";
+  const FAILED_PAGE  = "付款失敗.html";
 
   function getQueryParam(name) {
     const params = new URLSearchParams(location.search);
@@ -162,7 +167,27 @@
     return await res.json();
   }
 
-  async function init() {
+  function fillInfo(data) {
+    setText("orderId", data.orderId ?? "—");
+    setText("totalAmount", fmtMoney(data.totalAmount));
+    setText("paymentTime", data.paymentTime ?? "—");
+    setText("paymentMethod", data.paymentMethod ?? "—");
+  }
+
+  function routeByStatus(data) {
+    const status = (data.paymentStatus || "").toUpperCase();
+    if (status === "SUCCESS") {
+      location.href = `${SUCCESS_PAGE}?orderId=${encodeURIComponent(data.orderId)}`;
+      return true;
+    }
+    if (status === "FAILED") {
+      location.href = `${FAILED_PAGE}?orderId=${encodeURIComponent(data.orderId)}`;
+      return true;
+    }
+    return false;
+  }
+
+  async function runOnce() {
     const orderId = getQueryParam("orderId");
     if (!orderId) return;
 
@@ -170,25 +195,17 @@
 
     try {
       const data = await fetchResult(orderId);
-      setText("orderId", data.orderId ?? orderId);
-      setText("totalAmount", fmtMoney(data.totalAmount));
-      setText("paymentTime", data.paymentTime ?? "—");
-      setText("failureReason", data.failureReason ?? "—");
+      fillInfo(data);
+      routeByStatus(data);
     } catch (e) {
       console.warn("fetchResult error:", e);
     }
   }
 
-  init();
+  runOnce();
 
-  document.getElementById("btnBackToPending").addEventListener("click", () => {
-    const orderId = getQueryParam("orderId");
-    location.href = orderId ? `付款確認中.html?orderId=${encodeURIComponent(orderId)}` : "付款確認中.html";
-  });
-
-  document.getElementById("btnHome").addEventListener("click", () => {
-    location.href = "index.html";
-  });
+  document.getElementById("btnRefresh").addEventListener("click", runOnce);
+  document.getElementById("btnBack").addEventListener("click", () => location.href = "index.html");
 </script>
 </body>
 </html>

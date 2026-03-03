@@ -1,12 +1,10 @@
 package web.checkout.dao;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-
 import org.hibernate.Session;
 
-import web.checkout.vo.Orders;
 import web.checkout.vo.OrderPaymentInfo;
+import web.checkout.vo.Orders;
+import web.checkout.vo.ResultDTO;
 
 public interface OrderDao {
 
@@ -24,5 +22,7 @@ public interface OrderDao {
 
 	// 用 transaction_id 查訂單是否存在
 	Orders selectByTransactionId(Session session, String transactionId);
-
+	
+	//查詢訂單狀態(提供前端判斷付款成功或失敗)
+	ResultDTO selectByOrderId(Session session, int orderId);
 }

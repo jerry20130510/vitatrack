@@ -1,16 +1,12 @@
 package web.checkout.dao.impl;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import org.hibernate.Session;
 import org.hibernate.query.Query;
 
 import web.checkout.dao.OrderDao;
-import web.checkout.vo.Orders;
 import web.checkout.vo.OrderPaymentInfo;
+import web.checkout.vo.Orders;
+import web.checkout.vo.ResultDTO;
 
 public class OrderDaoImpl implements OrderDao {
 
@@ -67,17 +63,43 @@ public class OrderDaoImpl implements OrderDao {
 
 		return one != null;
 	}
-	
+
 	// 用 transaction_id 查訂單是否存在
 	@Override
 	public Orders selectByTransactionId(Session session, String transactionId) {
 
 		String hql = "FROM Orders o WHERE o.transactionId = :txid";
 
-		return session.createQuery(hql, Orders.class)
-				.setParameter("txid", transactionId)
-				.setMaxResults(1)
+		return session.createQuery(hql, Orders.class).setParameter("txid", transactionId).setMaxResults(1)
 				.uniqueResult();
 	}
 
+	// 查詢訂單狀態(提供前端判斷付款成功或失敗)
+//	@Override
+//	public ResultDTO selectByOrderId(Session session, int orderId) {
+//
+//		String hql = "SELECT new web.checkout.vo.ResultDTO("
+//				+ "  o.orderId, o.paymentStatus, o.totalAmount, o.paymentTime, o.paymentMethod, o.failureReason" + ") "
+//				+ "FROM Orders o " + "WHERE o.orderId = :orderId";
+//
+//		Query<ResultDTO> query = session.createQuery(hql, ResultDTO.class);
+//
+//		query.setParameter("orderId", orderId);
+//
+//		ResultDTO result = query.uniqueResult();
+//
+//		return result;
+
+	@Override
+	public ResultDTO selectByOrderId(Session session, int orderId) {
+
+		Orders o = session.get(Orders.class, orderId);
+
+		if (o == null) {
+			return null;
+		}
+
+		return new ResultDTO(o.getOrderId(), o.getPaymentStatus(), o.getTotalAmount(), o.getPaymentTime(),
+				o.getPaymentMethod(), o.getFailureReason());
+	}
 }
