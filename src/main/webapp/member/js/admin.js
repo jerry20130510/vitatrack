@@ -15,25 +15,25 @@ document.addEventListener("DOMContentLoaded", function () {
             </div>
         `;
 
-    //綁定搜尋事件
+        //綁定搜尋事件
         document.getElementById("searchBtn").addEventListener("click", searchMember);
     });
-    
+
 
 });
 // 會員列表功能
 function memberInfo(e, page = 1) {
-        e.preventDefault();
+    e.preventDefault();
 
-        fetch(`memberList?page=${page}`)
-            .then(response => response.json())
-            .then(pageResult => {
-                console.log("後端回傳：", pageResult);
-                const members = pageResult.content;
-                const totalPages = pageResult.totalPages;
-                const currentPage = pageResult.currentPage;
-                
-                let tableHtml = `
+    fetch(`memberList?page=${page}`)
+        .then(response => response.json())
+        .then(pageResult => {
+            console.log("後端回傳：", pageResult);
+            const members = pageResult.content;
+            const totalPages = pageResult.totalPages;
+            const currentPage = pageResult.currentPage;
+
+            let tableHtml = `
                 <table id="memberTable" class="table table-hover align-middle">
                     <thead>
                         <tr>
@@ -48,8 +48,8 @@ function memberInfo(e, page = 1) {
                         </tr>
                     </thead>
                 <tbody>`;
-                members.forEach(m => {
-                    tableHtml += `
+            members.forEach(m => {
+                tableHtml += `
                         <tr>
                             <td>${m.memberId}</td>
                             <td>${m.name}</td>
@@ -63,11 +63,11 @@ function memberInfo(e, page = 1) {
                             </td>
                         </tr>`;
 
-                });
+            });
 
-                tableHtml += `</tbody></table>`;
+            tableHtml += `</tbody></table>`;
 
-               //動態產生分頁按鈕
+            //動態產生分頁按鈕
             let paginationHtml = `
                 <nav class="d-flex justify-content-center m-t-30">
                     <ul class="pagination">
@@ -89,24 +89,24 @@ function memberInfo(e, page = 1) {
                     </ul>
                 </nav>`;
 
-                
-                contentArea.innerHTML = tableHtml + paginationHtml;
-            })
-            .catch(error => {
-                console.error('Error fetching member list:', error);
-            });
 
-    }
+            contentArea.innerHTML = tableHtml + paginationHtml;
+        })
+        .catch(error => {
+            console.error('Error fetching member list:', error);
+        });
 
-    //點擊會員查詢
-    
+}
 
-    // 會員關鍵字查詢功能
-    function searchMember(e) {
+//點擊會員查詢
+
+
+// 會員關鍵字查詢功能
+function searchMember(e) {
     e.preventDefault();
-    const keyword = document.getElementById('keyword').value.trim();      
+    const keyword = document.getElementById('keyword').value.trim();
 
-    if (!keyword || keyword === "" ) {
+    if (!keyword || keyword === "") {
         alert("請輸入搜尋關鍵字");
         return;
     }
@@ -120,16 +120,16 @@ function memberInfo(e, page = 1) {
         .catch(error => {
             console.error("錯誤:", error);
         });;
-    }
-            
+}
 
-    function renderResult(members) {
-        const searchResult = document.getElementById('searchResult');
-        if (!members || members.length === 0) {
-            searchResult.innerHTML = "<p>沒有找到符合條件的會員。</p>";
-            return;
-        }
-        let tableHtml = `
+
+function renderResult(members) {
+    const searchResult = document.getElementById('searchResult');
+    if (!members || members.length === 0) {
+        searchResult.innerHTML = "<p>沒有找到符合條件的會員。</p>";
+        return;
+    }
+    let tableHtml = `
             <table id="searchResultTable" class="table table-hover align-middle">
                   <thead>
                         <tr>
@@ -142,9 +142,9 @@ function memberInfo(e, page = 1) {
                             <th>註冊日期</th>
                         </tr>
                     </thead>
-                <tbody>`;       
-        members.forEach(m => {
-            tableHtml += `
+                <tbody>`;
+    members.forEach(m => {
+        tableHtml += `
                         <tr>
                             <td>${m.memberId}</td>
                             <td>${m.name}</td>
@@ -155,7 +155,7 @@ function memberInfo(e, page = 1) {
                             <td>${m.registrationTime}</td>
                             
                         </tr>`;
-        });
-        tableHtml += `</tbody></table>`;
-        searchResult.innerHTML = tableHtml;
-    }
+    });
+    tableHtml += `</tbody></table>`;
+    searchResult.innerHTML = tableHtml;
+}
