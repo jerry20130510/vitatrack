@@ -42,7 +42,6 @@ document.addEventListener("DOMContentLoaded", function () {
                             <div class="form-row" data-editable="false"><label>使用者帳號</label><p class="readonly">${member.email}</p></div>
                             <div class="form-row" data-field="name"><label>姓名</label><p class="readonly">${member.name}</p></div>
                             <div class="form-row" data-editable="false"><label>Email</label><p class="readonly">${member.email}</p></div>
-                            <div class="form-row" data-field="password"><label>密碼</label><p class="readonly">${member.password}</p></div>
                             <div class="form-row" data-field="address"><label>地址</label><p class="readonly">${member.address}</p></div>
                             <div class="form-row" data-field="phone"><label>手機號碼</label><p class="readonly">${member.phone}</p></div>
 

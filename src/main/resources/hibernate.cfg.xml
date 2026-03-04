@@ -15,6 +15,7 @@
 		<mapping class="web.checkout.vo.Orders" />
 		<mapping class="web.checkout.vo.CartItem" />
 		<mapping class="web.checkout.vo.OrderItem" />
+		<mapping class="web.member.vo.Admin" />
 	</session-factory>
 </hibernate-configuration>
 
