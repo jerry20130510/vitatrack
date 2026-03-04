@@ -4,6 +4,8 @@ import javax.naming.NamingException;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import core.util.HibernateUtil;
 import web.member.dao.MemberDao;
@@ -14,10 +16,11 @@ import web.member.dto.UpdateMemberRequest;
 
 public class MemberServiceImpl implements MemberService {
 	private MemberDao memberDao;
+	private  PasswordEncoder passwordEncoder;
 
 	public MemberServiceImpl() throws NamingException {
-		memberDao = new MemberDaoImpl();
-
+	    memberDao = new MemberDaoImpl();
+	    passwordEncoder = new BCryptPasswordEncoder();
 	}
 
 	@Override
@@ -37,6 +40,9 @@ public class MemberServiceImpl implements MemberService {
 			// 5 密碼 密碼至少為 8 個字元，且至少包含 1 個英文字母(大小寫皆可)與 1 個數字
 			// 6 重新輸入密碼 和密碼 必須一致
 			validatePassword(member.getPassword(), member.getConfirmPassword());
+			//加密
+			String encoded = passwordEncoder.encode(member.getPassword());
+			member.setPassword(encoded);
 			// 7 判斷帳號是否有重複，資料庫的email不能等於新註冊的email
 			// 邏輯觀念錯誤 以及 語法回傳值不符。
 			// 正確邏輯應該是:檢查資料庫裡「是否已經存在這個會員物件」。如果查出來的結果 不是 null，代表這個Email已經被註冊過了。
@@ -52,6 +58,7 @@ public class MemberServiceImpl implements MemberService {
 			if (tx != null) {
 				tx.rollback();
 			}
+			e.printStackTrace();
 			throw new IllegalArgumentException("系統錯誤，註冊失敗!", e);
 		}
 	}
@@ -64,28 +71,25 @@ public class MemberServiceImpl implements MemberService {
 		try {
 			tx = session.beginTransaction();
 
-			Member dbMember = session.createQuery("FROM Member WHERE email = :email", Member.class)
-					.setParameter("email", member.getEmail()).uniqueResult();
-
+			String email = member.getEmail();
+			String password = member.getPassword();
+			if (email == null || email.isEmpty() || password == null || password.isEmpty()) {
+				return null;
+			}		
+			Member dbMember = memberDao.selectByEmail(email);
 			if (dbMember == null) {
 				tx.commit();
 				return null;
 			}
-
-			if (!dbMember.getPassword().equals(member.getPassword())) {
+			//資料庫儲存的雜湊值」不匹配時，判定登入失敗。
+			                          //(使用者輸入的明碼,資料庫中儲存的BCrypt hash)
+			if (!passwordEncoder.matches(password,dbMember.getPassword())) {
 				tx.commit();
-				return null;
-			}
-			String email = member.getEmail();
-			String password = member.getPassword();
-			if (email == null || email.isEmpty()) {
-				return null;
-			}
-			if (password == null || password.isEmpty()) {
 				return null;
 			}
 			tx.commit();
 			return dbMember;
+			
 		} catch (Exception e) {
 			if (tx != null) {
 				tx.rollback();
@@ -142,7 +146,8 @@ public class MemberServiceImpl implements MemberService {
 			}
 			if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
 				if (dto.getPassword().matches("^(?=.*[A-Za-z])(?=.*\\d).{8,}$")) {
-					member.setPassword(dto.getPassword());
+					String encoded = passwordEncoder.encode(dto.getPassword());
+					member.setPassword(encoded);
 				} else {
 					throw new IllegalArgumentException("密碼格式錯誤或未填寫!");
 				}

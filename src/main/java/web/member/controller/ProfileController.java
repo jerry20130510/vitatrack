@@ -12,6 +12,7 @@ import javax.servlet.http.HttpSession;
 import web.member.service.MemberService;
 import web.member.service.impl.MemberServiceImpl;
 import web.member.vo.Member;
+import web.member.dto.MemberProfileResponse;
 import web.member.dto.UpdateMemberRequest;
 
 import com.google.gson.Gson;
@@ -40,8 +41,9 @@ public class ProfileController extends HttpServlet {
 		System.out.println("Profile Member: " + profileMember);
 		resp.setContentType("application/json");
 		Gson gson = new Gson();
-		// 再轉 Member 物件
-		resp.getWriter().write(gson.toJson(profileMember));
+		
+		MemberProfileResponse result = new MemberProfileResponse(profileMember);
+		resp.getWriter().write(gson.toJson(result));
 	}
 
 	// 修改會員資料
