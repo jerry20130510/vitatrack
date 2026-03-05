@@ -1,6 +1,5 @@
 package web.member_admin.dto;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -18,4 +17,6 @@ public class MemberListResponse {
 	private String address;
 	private Integer memberStatus;
 	private java.util.Date registrationTime;
+
+	
 }

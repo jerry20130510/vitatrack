@@ -3,7 +3,7 @@ package web.member.dao;
 
 import java.util.List;
 
-import web.member.vo.Admin;
+import web.checkout.vo.Orders;
 import web.member.vo.Member;
 import web.member_admin.dto.MemberListResponse;
 
@@ -26,5 +26,9 @@ public interface MemberDao {
 	List<MemberListResponse> searchMemberWithPagination(String keyword, int offset, int size);
 	
 	long countMemberByKeyword(String keyword);
+	
+	List<Orders> selectAllOrdersWithPagination(Integer memberId,int offset, int size);
+	
+	long countAllOrdersById(Integer memberId);
 	
 }
