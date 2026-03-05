@@ -1,16 +1,15 @@
 package web.member_admin.controller;
 
 import java.io.IOException;
-import java.util.List;
+
 
 import javax.naming.NamingException;
-import javax.naming.ldap.PagedResultsResponseControl;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import web.member_admin.dto.MemberListResponse;
 import web.member_admin.dto.PageResultResponse;
 import web.member_admin.service.MemberAdminService;
@@ -36,7 +35,7 @@ public class MemberListController extends HttpServlet {
 		int size = 10;
 		try {
 			// PageResultResponse
-			PageResultResponse<MemberListResponse> result = memberAdminService.getMemberInfo(page, size);
+			PageResultResponse<MemberListResponse> result= memberAdminService.getMemberInfo(page, size);
 			resp.getWriter().write(gson.toJson(result));
 		} catch (Exception e) {
 			e.printStackTrace();

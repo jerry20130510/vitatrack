@@ -5,8 +5,8 @@ import java.util.List;
 import org.hibernate.Session;
 
 import core.util.HibernateUtil;
+import web.checkout.vo.Orders;
 import web.member.dao.MemberDao;
-import web.member.vo.Admin;
 import web.member.vo.Member;
 import web.member_admin.dto.MemberListResponse;
 
@@ -112,6 +112,27 @@ public class MemberDaoImpl implements MemberDao {
 				 .setParameter("keyword", "%" + keyword + "%")
 				 .getSingleResult();
 	}
-	
+
+
+	public List<Orders> selectAllOrdersWithPagination(Integer memberId, int offset, int size) {
+
+	    final String hql = "FROM Orders o WHERE o.memberId = :memberId ORDER BY o.orderId ASC";
+
+	    return getSession().createQuery(hql, Orders.class)
+	            .setParameter("memberId", memberId)
+	            .setFirstResult(offset)
+	            .setMaxResults(size)
+	            .getResultList();
+	}
+
+	@Override
+	public long countAllOrdersById(Integer memberId){
+
+	    return getSession().createQuery(
+	            "SELECT COUNT(o) FROM Orders o WHERE o.memberId = :memberId",
+	            Long.class)
+	            .setParameter("memberId", memberId)
+	            .getSingleResult();
+	}
 
 }

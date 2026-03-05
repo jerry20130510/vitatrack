@@ -1,9 +1,7 @@
 package web.member_admin.service.impl;
 
 import java.util.List;
-
 import javax.naming.NamingException;
-
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import core.util.HibernateUtil;
@@ -12,7 +10,6 @@ import web.member.dao.MemberDao;
 import web.member.dao.impl.AdminDaoImpl;
 import web.member.dao.impl.MemberDaoImpl;
 import web.member.vo.Admin;
-import web.member.vo.Member;
 import web.member_admin.dto.MemberListResponse;
 import web.member_admin.dto.PageResultResponse;
 import web.member_admin.service.MemberAdminService;
@@ -32,12 +29,12 @@ public class MemberAdminServiceImpl implements MemberAdminService {
 		Transaction tx = null;
 		try {
 			tx = session.beginTransaction();
-			// 取得分頁
+			//計算分頁起始位置。
 			int offset = (page - 1) * size;
 			List<MemberListResponse> members =  memberDao.selectAllWithPagination(offset, size);
-			// 計算總會員數
+			//計算總會員數
 			long totalNumber = memberDao.countAllMembers();
-			// 計算共需要幾頁
+			//計算共需要幾頁
 			int totalPages = (int) Math.ceil((double) totalNumber / size);
 			tx.commit();
 			return new PageResultResponse<>(members, totalNumber, totalPages, page);
