@@ -1,7 +1,12 @@
 package web.member.service;
 
 import web.member.vo.Member;
-import web.member.vo.PasswordResetTokens;
+import web.member_admin.dto.MemberListResponse;
+import web.member_admin.dto.PageResultResponse;
+
+import java.util.List;
+
+import web.checkout.vo.Orders;
 import web.member.dto.UpdateMemberRequest;
 
 public interface MemberService {
@@ -51,5 +56,7 @@ public interface MemberService {
     Member updateProfile(Integer memberID,UpdateMemberRequest dto);
     
     boolean remove(String email);
+    
+    PageResultResponse<Orders> getMyOrder(Integer memberId,int page, int size);
     
 }

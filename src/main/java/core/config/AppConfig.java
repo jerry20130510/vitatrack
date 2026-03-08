@@ -23,7 +23,7 @@ public class AppConfig {
 		
 		JndiObjectFactoryBean bean = new JndiObjectFactoryBean();
 		bean.setResourceRef(true);
-		bean.setJndiName("jdbc/javaFramework");
+		bean.setJndiName("jdbc/vitatrack");
 		bean.afterPropertiesSet();
 		return (DataSource) bean.getObject();
 	}

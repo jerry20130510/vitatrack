@@ -9,11 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import web.member.service.MemberService;
-import web.member.service.PasswordResetTokensService;
 import web.member.service.impl.MemberServiceImpl;
-import web.member.service.impl.PasswordResetTokensServiceImpl;
 import web.member.vo.Member;
-import web.member.dto.ForgetPasswordRequest;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 

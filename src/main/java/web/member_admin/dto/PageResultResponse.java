@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class PageResultResponse<T> {
 	private List<T> content;
-    private long totaLNumber;
+    private long totalNumber;
     private int totalPages;
     private int currentPage;
 }
