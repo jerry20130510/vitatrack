@@ -31,4 +31,6 @@ public interface MemberDao {
 	
 	long countAllOrdersById(Integer memberId);
 	
+	List<Object[]> selectAllCartItems(Integer memberId);
+	
 }
