@@ -84,7 +84,6 @@ public class MemberDaoImpl implements MemberDao {
 	public List<MemberListResponse> searchMemberWithPagination(String keyword, int offset, int size) {
 		
 		 return getSession().createQuery(
-
 				"SELECT new web.member_admin.dto.MemberListResponse("
 						+ "m.memberId, m.name, m.email, m.phone, m.address, m.memberStatus, m.registrationTime) "
 						+ "FROM Member m "
@@ -113,7 +112,6 @@ public class MemberDaoImpl implements MemberDao {
 				 .getSingleResult();
 	}
 
-
 	public List<Orders> selectAllOrdersWithPagination(Integer memberId, int offset, int size) {
 
 	    final String hql = "FROM Orders o WHERE o.memberId = :memberId ORDER BY o.orderId ASC";
@@ -133,6 +131,16 @@ public class MemberDaoImpl implements MemberDao {
 	            Long.class)
 	            .setParameter("memberId", memberId)
 	            .getSingleResult();
+	}
+
+	@Override
+	public List<Object[]> selectAllCartItems(Integer memberId) {
+	    final String hql = "SELECT c, p FROM CartItem c "
+	    		+ "JOIN Product p ON c.sku = p.sku "
+	    		+ "WHERE c.memberId = :memberId ORDER BY c.cartItemId ASC";
+	    return getSession().createQuery(hql,Object[].class)
+	    		.setParameter("memberId", memberId)
+	    		.getResultList();
 	}
 
 }
