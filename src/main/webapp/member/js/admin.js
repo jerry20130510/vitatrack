@@ -21,6 +21,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 });
+//--------------------------------------------------------------------------------------------------
 // 會員列表功能
 function memberInfo(e, page = 1) {
     e.preventDefault();
@@ -44,11 +45,12 @@ function memberInfo(e, page = 1) {
                             <th>地址</th>
                             <th>狀態</th>
                             <th>註冊日期</th>
-                            <th>操作</th>
+                            
                         </tr>
                     </thead>
                 <tbody>`;
             members.forEach(m => {
+               
                 tableHtml += `
                         <tr>
                             <td>${m.memberId}</td>
@@ -56,11 +58,13 @@ function memberInfo(e, page = 1) {
                             <td>${m.email}</td>
                             <td>${m.phone}</td>
                             <td>${m.address}</td>
-                            <td>${m.memberStatus}</td>
-                            <td>${m.registrationTime}</td>
                             <td>
-                                <button class="btn btn-sm btn-primary">編輯</button>
+                                <select class="form-select form-select-sm"  id="status-${m.memberId}" onchange="saveStatus('${m.email}',  this.value )">
+                                    <option value="1" ${m.memberStatus === 1 ? "selected" : ""} class="text-success">啟用</option>
+                                    <option value="0" ${m.memberStatus === 0 ? "selected" : ""} class="text-danger">停用</option>
+                                </select>
                             </td>
+                            <td>${m.registrationTime}</td>
                         </tr>`;
 
             });
@@ -97,9 +101,33 @@ function memberInfo(e, page = 1) {
         });
 
 }
+//--------------------------------------------------------------------------------------------------
 
-//點擊會員查詢
+//儲存會員狀態變更
+function saveStatus(email,newStatus) {
+    fetch('editStatus', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ 
+           email: email, 
+           memberStatus: newStatus})
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            alert(result.message);
+        } else {
+            alert(result.message);
+        }
+    })
+    .catch(error => {
+        console.error('會員狀態變更:', error.message);
+    });
+}
 
+//點擊編輯按鈕後，切換會員狀態
 
 // 會員關鍵字查詢功能
 function searchMember(e) {
@@ -122,7 +150,7 @@ function searchMember(e) {
         });;
 }
 
-
+//--------------------------------------------------------------------------------------------------
 function renderResult(members) {
     const searchResult = document.getElementById('searchResult');
     if (!members || members.length === 0) {
@@ -144,6 +172,7 @@ function renderResult(members) {
                     </thead>
                 <tbody>`;
     members.forEach(m => {
+      
         tableHtml += `
                         <tr>
                             <td>${m.memberId}</td>
@@ -151,7 +180,12 @@ function renderResult(members) {
                             <td>${m.email}</td>
                             <td>${m.phone}</td>
                             <td>${m.address}</td>
-                            <td>${m.memberStatus}</td>
+                            <td>
+                                <select class="form-select form-select-sm" id="status-${m.memberId}" onchange="saveStatus('${m.email}',  this.value )>
+                                    <option value="1" ${m.memberStatus === 1 ? "selected" : ""} class="text-success">啟用</option>
+                                    <option value="0" ${m.memberStatus === 0 ? "selected" : ""} class="text-danger">停用</option>
+                                </select>
+                            </td>
                             <td>${m.registrationTime}</td>
                             
                         </tr>`;
