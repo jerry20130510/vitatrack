@@ -11,11 +11,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jndi.JndiObjectFactoryBean;
+import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBuilder;
 import org.springframework.orm.hibernate5.SpringSessionContext;
+import org.springframework.transaction.TransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
 @ComponentScan("web.*.*.impl")
+@EnableTransactionManagement
 public class AppConfig {
 	
 	@Bean
@@ -48,4 +52,10 @@ public class AppConfig {
 		SpringSessionContext.class.getName());
 		return properties;
 		}
+	
+	@Bean
+	public TransactionManager transactionManager() throws IllegalArgumentException, 
+	NamingException {
+	return new HibernateTransactionManager(sessionFactory());
+	}
 }

@@ -1,16 +1,17 @@
 package web.member.controller;
 
 import java.io.IOException;
-import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import web.member.service.MemberService;
-import web.member.service.impl.MemberServiceImpl;
 import web.member.vo.Member;
 
 @WebServlet("/register")
@@ -18,21 +19,19 @@ public class RegisterController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private MemberService memberService;
 
-	@Override
-	public void init() throws ServletException {
-		try {
-			memberService = new MemberServiceImpl();
-		} catch (NamingException e) {
-
-			e.printStackTrace();
+	//取得memberService物件
+		@Override
+		public void init() {
+		ApplicationContext applicationContext =
+		WebApplicationContextUtils
+		.getWebApplicationContext(getServletContext());
+		memberService = applicationContext.getBean(MemberService.class);
 		}
-	}
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
 		// 設定回應資料格式為JSON
 		resp.setContentType("application/json;charset=utf-8");
-
 		// 接收Json物件
 		Gson gson = new Gson();
 		JsonObject result = new JsonObject();

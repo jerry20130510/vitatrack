@@ -1,28 +1,45 @@
 package web.member.service.impl;
 
+import java.util.List;
+
+import java.util.stream.Collectors;
+
 import javax.naming.NamingException;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import core.util.HibernateUtil;
+import web.checkout.vo.CartItem;
+import web.checkout.vo.Orders;
 import web.member.dao.MemberDao;
-import web.member.dao.impl.MemberDaoImpl;
+
 import web.member.service.MemberService;
 import web.member.vo.Member;
+import web.member_admin.dto.PageResultResponse;
+import web.product.vo.Product;
+import web.member.dto.CartItemResponse;
 import web.member.dto.UpdateMemberRequest;
 
+
+@Service
 public class MemberServiceImpl implements MemberService {
+	@Autowired
 	private MemberDao memberDao;
-	private  PasswordEncoder passwordEncoder;
+	
+	private PasswordEncoder passwordEncoder;
 
 	public MemberServiceImpl() throws NamingException {
-	    memberDao = new MemberDaoImpl();
-	    passwordEncoder = new BCryptPasswordEncoder();
+		
+		passwordEncoder = new BCryptPasswordEncoder();
 	}
-
+	
+	@Transactional
 	@Override
 	public String register(Member member) {
 		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
@@ -40,7 +57,7 @@ public class MemberServiceImpl implements MemberService {
 			// 5 密碼 密碼至少為 8 個字元，且至少包含 1 個英文字母(大小寫皆可)與 1 個數字
 			// 6 重新輸入密碼 和密碼 必須一致
 			validatePassword(member.getPassword(), member.getConfirmPassword());
-			//加密
+			// 加密
 			String encoded = passwordEncoder.encode(member.getPassword());
 			member.setPassword(encoded);
 			// 7 判斷帳號是否有重複，資料庫的email不能等於新註冊的email
@@ -62,7 +79,8 @@ public class MemberServiceImpl implements MemberService {
 			throw new IllegalArgumentException("系統錯誤，註冊失敗!", e);
 		}
 	}
-
+	
+	@Transactional
 	@Override
 	public Member login(Member member) {
 		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
@@ -75,21 +93,39 @@ public class MemberServiceImpl implements MemberService {
 			String password = member.getPassword();
 			if (email == null || email.isEmpty() || password == null || password.isEmpty()) {
 				return null;
-			}		
+			}
 			Member dbMember = memberDao.selectByEmail(email);
 			if (dbMember == null) {
 				tx.commit();
 				return null;
 			}
-			//資料庫儲存的雜湊值」不匹配時，判定登入失敗。
-			                          //(使用者輸入的明碼,資料庫中儲存的BCrypt hash)
-			if (!passwordEncoder.matches(password,dbMember.getPassword())) {
-				tx.commit();
-				return null;
+			String dbPassword = dbMember.getPassword();
+		    boolean isBcrypt = dbPassword != null && dbPassword.startsWith("$2");
+		    if (isBcrypt) {
+		    	if (!passwordEncoder.matches(password, dbPassword)) {
+	                tx.commit();
+	                return null;
+	            }else {
+	            	if (!password.equals(dbPassword)) {
+	                    tx.commit();
+	                    return null;
+	                }
+				}
+		    	  String newHash = passwordEncoder.encode(password);
+		          dbMember.setPassword(newHash);
+		          memberDao.updateByEmail(dbMember);
 			}
+			
+
+			// 資料庫儲存的雜湊值」不匹配時，判定登入失敗。
+			// (使用者輸入的明碼,資料庫中儲存的BCrypt hash)
+//			if (!passwordEncoder.matches(password,dbMember.getPassword())) {
+//				tx.commit();
+//				return null;
+//			}
 			tx.commit();
 			return dbMember;
-			
+
 		} catch (Exception e) {
 			if (tx != null) {
 				tx.rollback();
@@ -98,6 +134,7 @@ public class MemberServiceImpl implements MemberService {
 		}
 	}
 
+	@Transactional
 	@Override
 	public Member profile(Member member) {
 		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
@@ -116,7 +153,8 @@ public class MemberServiceImpl implements MemberService {
 			throw e;
 		}
 	}
-
+	
+	@Transactional
 	@Override
 	public Member updateProfile(Integer memberId, UpdateMemberRequest dto) {
 		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
@@ -161,7 +199,52 @@ public class MemberServiceImpl implements MemberService {
 			throw e;
 		}
 	}
+	
+	@Transactional
+	@Override
+	public Boolean changePassword(String email, String oldPassword, String newPassword) {
+		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+		Transaction tx = null;
+		try {
+			tx = session.beginTransaction();
+			Member memberDb = memberDao.selectByEmail(email);
+			if (memberDb == null) {
+	            return false;
+	        }
 
+			
+			  String dbPassword = memberDb.getPassword();
+		      boolean isBcrypt = dbPassword != null && dbPassword.startsWith("$2");
+		      if (isBcrypt) {
+				if (!passwordEncoder.matches(oldPassword, dbPassword)) {
+					tx.commit();
+	                return false;
+				}	
+			}else {
+				if (!oldPassword.equals(dbPassword)) {
+					tx.commit();
+	                return false;
+				}
+			}
+			
+			String newPasswordHash = passwordEncoder.encode(newPassword);
+			memberDb.setPassword(newPasswordHash);
+			memberDao.updateByEmail(memberDb); 
+			System.out.println("User input oldPassword: " + oldPassword);
+			System.out.println("DB stored password hash: " + memberDb.getPassword());
+			System.out.println("Password match result: " + passwordEncoder.matches(oldPassword, memberDb.getPassword()));
+			tx.commit();
+			return true;
+		} catch (Exception e) {
+			if (tx != null) {
+				tx.rollback();
+				e.printStackTrace();
+			}
+			throw new IllegalArgumentException("密碼變更失敗!",e);
+		}
+	}
+	
+	@Transactional
 	@Override
 	public boolean remove(String email) {
 		if (email == null || email.trim().isEmpty()) {
@@ -180,6 +263,58 @@ public class MemberServiceImpl implements MemberService {
 			}
 			throw new IllegalArgumentException("刪除失敗", e);
 		}
+	}
+
+	@Transactional
+	@Override
+	public PageResultResponse<Orders> viewMyOrder(Integer memberId, int page, int size) {
+		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+		Transaction tx = null;
+		try {
+			tx = session.beginTransaction();
+			// 取得分頁
+			int offset = (page - 1) * size;
+			// 當頁訂單資料
+			List<Orders> orders = memberDao.selectAllOrdersWithPagination(memberId, offset, size);
+			// 總訂單數
+			long totalOrders = memberDao.countAllOrdersById(memberId);
+			// 總頁數
+			int totalPages = (int) Math.ceil((float) totalOrders / size);
+			tx.commit();
+			return new PageResultResponse<>(orders, totalOrders, totalPages, page);
+
+		} catch (Exception e) {
+			if (tx != null) {
+				tx.rollback();
+			}
+			e.printStackTrace();
+			throw new IllegalArgumentException("取得訂單資料失敗", e);
+		}
+	}
+
+	@Transactional
+	@Override
+	public List<CartItemResponse> viewMyCartItem(Member member) {
+		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+		Transaction tx = null;
+		try {
+			tx = session.beginTransaction();
+			List<Object[]> items = memberDao.selectAllCartItems(member.getMemberId());
+			List<CartItemResponse> result = items.stream().map(obj -> {
+				CartItem cartItem = (CartItem) obj[0];
+				Product product = (Product) obj[1];
+				return new CartItemResponse(cartItem, product);
+			}).collect(Collectors.toList());
+			tx.commit();
+			return result;
+		} catch (Exception e) {
+			if (tx != null) {
+				tx.rollback();
+			}
+			e.printStackTrace();
+			throw new IllegalArgumentException("取得購物車資料失敗", e);
+		}
+
 	}
 
 }

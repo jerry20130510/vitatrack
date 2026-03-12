@@ -1,6 +1,7 @@
 package web.member.controller;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -12,13 +13,14 @@ import javax.servlet.http.HttpSession;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import web.member.dto.CartItemResponse;
 import web.member.service.MemberService;
 import web.member.vo.Member;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
-@WebServlet("/login")
-public class LoginController extends HttpServlet {
+
+@WebServlet("/myCartItem")
+public class MyCartItemController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private MemberService memberService;
 
@@ -30,24 +32,16 @@ public class LoginController extends HttpServlet {
 		.getWebApplicationContext(getServletContext());
 		memberService = applicationContext.getBean(MemberService.class);
 		}
-
+		
+	// 查看訂單資料
 	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+		HttpSession session = req.getSession();
+		Member member = (Member) session.getAttribute("member");
+		List<CartItemResponse> cartDb = memberService.viewMyCartItem(member);
 		resp.setContentType("application/json");
 		Gson gson = new Gson();
-		Member member = gson.fromJson(req.getReader(), Member.class);
-		JsonObject result = new JsonObject();
-		Member loginMember = memberService.login(member);
-
-		if (loginMember == null) {
-			result.addProperty("success", false);
-			result.addProperty("message", "帳號或密碼錯誤，請重新登入!");
-		} else {
-			HttpSession session = req.getSession();
-			session.setAttribute("member", loginMember);
-			result.addProperty("success", true);
-			result.addProperty("message", "登入成功!");
-		}
-		resp.getWriter().write(result.toString());
+		resp.getWriter().write(gson.toJson(cartDb));
 	}
+
 }

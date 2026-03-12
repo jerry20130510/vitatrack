@@ -31,4 +31,9 @@ public interface MemberDao {
 	
 	long countAllOrdersById(Integer memberId);
 	
+	List<Object[]> selectAllCartItems(Integer memberId);
+	
+	int updateStatusByEmail(Integer memberStatus,String email);
+	
+	
 }

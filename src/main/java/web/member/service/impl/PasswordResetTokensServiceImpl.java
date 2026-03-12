@@ -6,26 +6,28 @@ import java.util.UUID;
 import javax.naming.NamingException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import core.util.HibernateUtil;
 import web.member.dao.MemberDao;
 import web.member.dao.PasswordResetTokensDao;
-import web.member.dao.impl.MemberDaoImpl;
-import web.member.dao.impl.PasswordResetTokensDaoImpl;
-
 import web.member.service.PasswordResetTokensService;
 import web.member.util.EmailUtil;
 import web.member.vo.Member;
 import web.member.vo.PasswordResetTokens;
 
+
+@Service
 public class PasswordResetTokensServiceImpl implements PasswordResetTokensService {
+	@Autowired
 	private MemberDao memberDao;
+	@Autowired
 	private PasswordResetTokensDao passwordResetTokenDao;
 	private EmailUtil emailUtil;
 
 	public PasswordResetTokensServiceImpl() throws NamingException {
-		memberDao = new MemberDaoImpl();
-		passwordResetTokenDao = new PasswordResetTokensDaoImpl();
+		
 		emailUtil = new EmailUtil(); // 初始化 EmailUtil
 	}
 

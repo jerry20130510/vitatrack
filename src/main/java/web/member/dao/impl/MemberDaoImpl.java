@@ -2,24 +2,28 @@ package web.member.dao.impl;
 
 import java.util.List;
 
-import org.hibernate.Session;
+import javax.persistence.PersistenceContext;
 
-import core.util.HibernateUtil;
+import org.hibernate.Session;
+import org.springframework.stereotype.Repository;
+
+
 import web.checkout.vo.Orders;
 import web.member.dao.MemberDao;
 import web.member.vo.Member;
 import web.member_admin.dto.MemberListResponse;
 
-public class MemberDaoImpl implements MemberDao {
 
-	private Session getSession() {
-		return HibernateUtil.getSessionFactory().getCurrentSession();
-	}
+@Repository
+public class MemberDaoImpl implements MemberDao {
+	@PersistenceContext
+	private Session session;
+	
 
 	@Override
 	public int insert(Member member) {
 
-		getSession().persist(member);
+		session.persist(member);
 		return 1;
 	}
 
@@ -27,7 +31,7 @@ public class MemberDaoImpl implements MemberDao {
 	public int deleteByEmail(String email) {
 		final String hql = "DELETE FROM Member m WHERE m.email = :email";
 
-		return getSession().createQuery(hql).setParameter("email", email).executeUpdate();
+		return session.createQuery(hql).setParameter("email", email).executeUpdate();
 
 	}
 
@@ -35,7 +39,7 @@ public class MemberDaoImpl implements MemberDao {
 	@Override
 	public int updateByEmail(Member member) {
 
-		getSession().merge(member);
+		session.merge(member);
 		return 1;
 	}
 
@@ -43,14 +47,14 @@ public class MemberDaoImpl implements MemberDao {
 	public Member selectByEmail(String email) {
 		final String hql = "FROM Member m WHERE m.email = :email";
 
-		return (Member) getSession().createQuery(hql).setParameter("email", email).uniqueResult();
+		return (Member) session.createQuery(hql).setParameter("email", email).uniqueResult();
 	}
 
 	@Override
 	public Member selectByEmailandPassword(String email, String password) {
 		final String hql = "FROM Member m WHERE m.email = :email AND m.password= :password";
 
-		Member member = getSession().createQuery(hql, Member.class).setParameter("email", email)
+		Member member = session.createQuery(hql, Member.class).setParameter("email", email)
 				.setParameter("password", password).uniqueResult();
 		return member;
 
@@ -58,7 +62,7 @@ public class MemberDaoImpl implements MemberDao {
 
 	@Override
 	public List<MemberListResponse> selectAllWithPagination(int offset, int size) {
-		return getSession().createQuery(
+		return session.createQuery(
 
 				"SELECT new web.member_admin.dto.MemberListResponse("
 						+ "m.memberId, m.name, m.email, m.phone, m.address, m.memberStatus, m.registrationTime) "
@@ -74,7 +78,7 @@ public class MemberDaoImpl implements MemberDao {
 	@Override
 	public long countAllMembers() {
 		
-		 return getSession().createQuery(
+		 return session.createQuery(
 		        "SELECT COUNT(m) FROM Member m", 
 		        Long.class)
 		        .getSingleResult();
@@ -83,8 +87,7 @@ public class MemberDaoImpl implements MemberDao {
 	@Override
 	public List<MemberListResponse> searchMemberWithPagination(String keyword, int offset, int size) {
 		
-		 return getSession().createQuery(
-
+		 return session.createQuery(
 				"SELECT new web.member_admin.dto.MemberListResponse("
 						+ "m.memberId, m.name, m.email, m.phone, m.address, m.memberStatus, m.registrationTime) "
 						+ "FROM Member m "
@@ -103,7 +106,7 @@ public class MemberDaoImpl implements MemberDao {
 	@Override
 	public long countMemberByKeyword(String keyword) {
 		
-		 return getSession().createQuery(
+		 return session.createQuery(
 		        "SELECT COUNT(m) FROM Member m "
 				+ "WHERE m.name LIKE :keyword " 
 				+ "OR m.phone LIKE :keyword "
@@ -113,12 +116,11 @@ public class MemberDaoImpl implements MemberDao {
 				 .getSingleResult();
 	}
 
-
 	public List<Orders> selectAllOrdersWithPagination(Integer memberId, int offset, int size) {
 
 	    final String hql = "FROM Orders o WHERE o.memberId = :memberId ORDER BY o.orderId ASC";
 
-	    return getSession().createQuery(hql, Orders.class)
+	    return session.createQuery(hql, Orders.class)
 	            .setParameter("memberId", memberId)
 	            .setFirstResult(offset)
 	            .setMaxResults(size)
@@ -128,11 +130,31 @@ public class MemberDaoImpl implements MemberDao {
 	@Override
 	public long countAllOrdersById(Integer memberId){
 
-	    return getSession().createQuery(
+	    return session.createQuery(
 	            "SELECT COUNT(o) FROM Orders o WHERE o.memberId = :memberId",
 	            Long.class)
 	            .setParameter("memberId", memberId)
 	            .getSingleResult();
+	}
+
+	@Override
+	public List<Object[]> selectAllCartItems(Integer memberId) {
+	    final String hql = "SELECT c, p FROM CartItem c "
+	    		+ "JOIN Product p ON c.sku = p.sku "
+	    		+ "WHERE c.memberId = :memberId ORDER BY c.cartItemId ASC";
+	    return session.createQuery(hql,Object[].class)
+	    		.setParameter("memberId", memberId)
+	    		.getResultList();
+	}
+
+	@Override
+	public int updateStatusByEmail(Integer memberStatus, String email) {
+		return session.createQuery("UPDATE Member m "
+				+ "SET m.memberStatus = :memberStatus " 
+				+ "where m.email = :email ") 
+				.setParameter("memberStatus", memberStatus) 
+				.setParameter("email", email)
+				.executeUpdate();
 	}
 
 }
