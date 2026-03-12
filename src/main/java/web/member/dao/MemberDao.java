@@ -33,4 +33,7 @@ public interface MemberDao {
 	
 	List<Object[]> selectAllCartItems(Integer memberId);
 	
+	int updateStatusByEmail(Integer memberStatus,String email);
+	
+	
 }

@@ -1,20 +1,24 @@
 package web.member.service.impl;
 
 import java.util.List;
+
 import java.util.stream.Collectors;
 
 import javax.naming.NamingException;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import core.util.HibernateUtil;
 import web.checkout.vo.CartItem;
 import web.checkout.vo.Orders;
 import web.member.dao.MemberDao;
-import web.member.dao.impl.MemberDaoImpl;
+
 import web.member.service.MemberService;
 import web.member.vo.Member;
 import web.member_admin.dto.PageResultResponse;
@@ -22,16 +26,20 @@ import web.product.vo.Product;
 import web.member.dto.CartItemResponse;
 import web.member.dto.UpdateMemberRequest;
 
+
+@Service
 public class MemberServiceImpl implements MemberService {
+	@Autowired
 	private MemberDao memberDao;
+	
 	private PasswordEncoder passwordEncoder;
 
 	public MemberServiceImpl() throws NamingException {
-		memberDao = new MemberDaoImpl();
+		
 		passwordEncoder = new BCryptPasswordEncoder();
-
 	}
-
+	
+	@Transactional
 	@Override
 	public String register(Member member) {
 		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
@@ -71,7 +79,8 @@ public class MemberServiceImpl implements MemberService {
 			throw new IllegalArgumentException("系統錯誤，註冊失敗!", e);
 		}
 	}
-
+	
+	@Transactional
 	@Override
 	public Member login(Member member) {
 		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
@@ -125,6 +134,7 @@ public class MemberServiceImpl implements MemberService {
 		}
 	}
 
+	@Transactional
 	@Override
 	public Member profile(Member member) {
 		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
@@ -143,7 +153,8 @@ public class MemberServiceImpl implements MemberService {
 			throw e;
 		}
 	}
-
+	
+	@Transactional
 	@Override
 	public Member updateProfile(Integer memberId, UpdateMemberRequest dto) {
 		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
@@ -188,7 +199,8 @@ public class MemberServiceImpl implements MemberService {
 			throw e;
 		}
 	}
-
+	
+	@Transactional
 	@Override
 	public Boolean changePassword(String email, String oldPassword, String newPassword) {
 		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
@@ -231,7 +243,8 @@ public class MemberServiceImpl implements MemberService {
 			throw new IllegalArgumentException("密碼變更失敗!",e);
 		}
 	}
-
+	
+	@Transactional
 	@Override
 	public boolean remove(String email) {
 		if (email == null || email.trim().isEmpty()) {
@@ -252,6 +265,7 @@ public class MemberServiceImpl implements MemberService {
 		}
 	}
 
+	@Transactional
 	@Override
 	public PageResultResponse<Orders> viewMyOrder(Integer memberId, int page, int size) {
 		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
@@ -278,6 +292,7 @@ public class MemberServiceImpl implements MemberService {
 		}
 	}
 
+	@Transactional
 	@Override
 	public List<CartItemResponse> viewMyCartItem(Member member) {
 		Session session = HibernateUtil.getSessionFactory().getCurrentSession();

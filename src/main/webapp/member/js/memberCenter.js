@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function () {
     password.addEventListener("click", showPasswordChangeBtn);
     privacy.addEventListener("click", showDeleteBtn);
 
-
+//--------------------------------------------------------------------------------------------------
     function loadMember() {
         fetch('profile')
             .then(res => res.json())
@@ -37,7 +37,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 }
             });
     }
-
+//--------------------------------------------------------------------------------------------------
     function info(e) {
         e.preventDefault();
 
@@ -98,7 +98,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 
-
+//--------------------------------------------------------------------------------------------------
     function enableEdit() {
         const rows = document.querySelectorAll('.form-row');
         rows.forEach(row => {
@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded", function () {
             row.replaceChild(input, p);
         });
     }
-
+//--------------------------------------------------------------------------------------------------
     function saveChanges() {
 
         const updatedData = {};
@@ -150,7 +150,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 alert("更新過程中發生錯誤，請稍後再試。");
             });
     }
-
+//--------------------------------------------------------------------------------------------------
     function showPasswordChangeBtn() {
         contentArea.innerHTML = `
         <main class="member-main">
@@ -176,7 +176,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 `;
     }
-
+//--------------------------------------------------------------------------------------------------
     function showDeleteBtn() {
         contentArea.innerHTML = `
         <main class="member-main">
@@ -202,7 +202,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 `;
     }
-
+//--------------------------------------------------------------------------------------------------
     function passwordChange() {
         contentArea.innerHTML = `
          
@@ -228,9 +228,7 @@ document.addEventListener("DOMContentLoaded", function () {
 											</button>
 										</span>
 									</form>
-
-         
-         `
+                                `
         const oldPassword = document.getElementById("oldPassword");
         const newPassword = document.getElementById("newPassword");
         const confirmPassword = document.getElementById("confirmPassword");
@@ -276,7 +274,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
     }
-
+//--------------------------------------------------------------------------------------------------
     function submitChangePassword() {
 
         const oldPassword = document.querySelector('#oldPassword').value.trim();
@@ -316,10 +314,10 @@ document.addEventListener("DOMContentLoaded", function () {
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert("更新密碼過程中發生錯誤，請稍後再試。");
+                alert("系統發生錯誤，"+error.message);
             });
     }
-
+//--------------------------------------------------------------------------------------------------
     function deleteAccount() {
         if (!confirm("確定要刪除帳號嗎？此操作無法復原！")) {
             return;
@@ -347,7 +345,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 
-
+//--------------------------------------------------------------------------------------------------
     window.orderInfo = function (e, page = 1) {
         e.preventDefault();
 
@@ -451,6 +449,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
 
     }
+    //--------------------------------------------------------------------------------------------------
     function loadCartItems() {
         fetch('myCartItem')
             .then(res => res.json())
@@ -524,7 +523,7 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 
-
+//--------------------------------------------------------------------------------------------------
     logoutBtn.addEventListener('click', function (e) {
         e.preventDefault();
         fetch('logout', {
