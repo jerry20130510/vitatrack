@@ -130,6 +130,8 @@ document.addEventListener("DOMContentLoaded", function () {
                     //如果後端顯示true，要顯示註冊成功 
                     // 顯示自訂彈窗
                     // 使用 flex 才能觸發 CSS 裡的置中效果
+                    const alertTitle = document.querySelector(".alert-title");
+                    alertTitle.textContent = result.message;
                     const customAlert = document.getElementById("customAlert");
                     customAlert.style.display = "flex"; //彈窗顯示
                     // 清空表單
@@ -137,12 +139,12 @@ document.addEventListener("DOMContentLoaded", function () {
                 } else {
                     //如果後端顯示false，要顯示註冊失敗
                     // result.message 就是在 Service 層調用String register(Member member) 回傳的 errMsg 內容
-                    alert("註冊失敗: " + result.errMsg);
+                    alert("註冊失敗: " + result.message);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert("註冊過程中發生錯誤，請稍後再試。");
+                alert("發生系統錯誤，請稍後再試。");
             })
     });
     // 彈窗按鈕 → 前往登入頁面 

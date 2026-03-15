@@ -45,9 +45,10 @@ public class MemberDaoImpl implements MemberDao {
 
 	@Override
 	public Member selectByEmail(String email) {
-		final String hql = "FROM Member m WHERE m.email = :email";
-
-		return (Member) session.createQuery(hql).setParameter("email", email).uniqueResult();
+	    final String hql = "FROM Member m WHERE m.email = :email"; 
+	    return session.createQuery(hql, Member.class)
+	                  .setParameter("email", email)
+	                  .uniqueResult();
 	}
 
 	@Override
@@ -66,7 +67,7 @@ public class MemberDaoImpl implements MemberDao {
 
 				"SELECT new web.member_admin.dto.MemberListResponse("
 						+ "m.memberId, m.name, m.email, m.phone, m.address, m.memberStatus, m.registrationTime) "
-						+ "FROM Member m " 
+						+ "FROM Member m "
 						+ "ORDER BY m.memberId ASC",
 				MemberListResponse.class)
 				.setFirstResult(offset)

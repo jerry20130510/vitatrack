@@ -45,10 +45,10 @@ public class RegisterController extends HttpServlet {
 			result.addProperty("message", "註冊成功");
 		} catch (IllegalArgumentException e) {
 			result.addProperty("success", false);
-			result.addProperty("message", e.getMessage());
+			result.addProperty("message", e.getMessage() );
 		} catch (Exception e) {
 			result.addProperty("success", false);
-			result.addProperty("message", "系統發生問題，註冊失敗!");
+			result.addProperty("message", "系統忙碌中，請稍後再試");
 		}
 		// 輸出純文字的json格式
 		resp.getWriter().write(result.toString());

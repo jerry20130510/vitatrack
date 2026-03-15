@@ -142,12 +142,10 @@
 		</dependency>
 		<!-- BCryptPasswordEncoder -->
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-			<version>2.7.18</version>
-			<scope>compile</scope>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-crypto</artifactId>
+			<version>5.7.11</version>
 		</dependency>
-		
 	</dependencies>
 
 	<build>
