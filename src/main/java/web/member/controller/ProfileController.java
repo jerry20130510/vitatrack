@@ -64,7 +64,7 @@ public class ProfileController extends HttpServlet {
 		System.out.println("session 內 memberId = " + loginMember.getMemberId());
 		JsonObject result = new JsonObject();
 		try {
-			memberService.updateProfile(loginMember.getMemberId(), memberDTO);
+			memberService.updateProfile(loginMember.getEmail(), memberDTO);
 			result.addProperty("success", true);
 			result.addProperty("message", "資料更新成功");
 		} catch (IllegalArgumentException e) {

@@ -53,7 +53,7 @@ public interface MemberService {
 
 	Member profile(Member member);
 
-    Member updateProfile(Integer memberID, UpdateMemberRequest dto);
+    Member updateProfile(String email, UpdateMemberRequest dto);
     
     Boolean changePassword(String email,String oldPassword, String newPassword);
     
