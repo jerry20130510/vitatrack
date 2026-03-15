@@ -4711,16 +4711,16 @@ button.btn-close.qty_close {
   overflow-y: hidden;
 }
 .mn-hero .slide-1 {
-  background-image: url("../img/hero/1.jpg");
+  background-image: url("../img/hero/1.png");
 }
 .mn-hero .slide-2 {
-  background-image: url("../img/hero/2.jpg");
+  background-image: url("../img/hero/2.png");
 }
 .mn-hero .slide-3 {
-  background-image: url("../img/hero/3.jpg");
+  background-image: url("../img/hero/3.png");
 }
 .mn-hero .slide-4 {
-  background-image: url("../img/hero/4.jpg");
+  background-image: url("../img/hero/4.png");
 }
 .mn-hero .mn-hero-slider .mn-hero-slide {
   display: -webkit-box;
@@ -4749,12 +4749,17 @@ button.btn-close.qty_close {
 }
 .mn-hero .mn-hero-slider .mn-hero-slide .mn-hero-detail h1, .mn-hero .mn-hero-slider .mn-hero-slide .mn-hero-detail h2 {
   font-size: 65px;
-  color: #fff;
+  color: black;
   font-weight: 600;
+  text-shadow:
+      -2px -2px 0 #fff,
+       2px -2px 0 #fff,
+      -2px  2px 0 #fff,
+       2px  2px 0 #fff;
 }
 .mn-hero .mn-hero-slider .mn-hero-slide .mn-hero-detail p {
   font-size: 15px;
-  color: #fff;
+  color: black;
 }
 .mn-hero .mn-hero-slider .mn-hero-slide .mn-hero-detail .label {
   height: 60px;
