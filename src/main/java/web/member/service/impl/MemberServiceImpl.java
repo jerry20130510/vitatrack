@@ -4,10 +4,9 @@ import java.util.List;
 
 import java.util.stream.Collectors;
 
-import javax.naming.NamingException;
+
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,64 +22,43 @@ import web.product.vo.Product;
 import web.member.dto.CartItemResponse;
 import web.member.dto.UpdateMemberRequest;
 
-
 @Service
 public class MemberServiceImpl implements MemberService {
 	@Autowired
 	private MemberDao memberDao;
-	
+	@Autowired
 	private PasswordEncoder passwordEncoder;
 
-	public MemberServiceImpl() throws NamingException {
-		
-		passwordEncoder = new BCryptPasswordEncoder();
-	}
 	
 	@Transactional
-	@Override
+	@Override	
 	public String register(Member member) {
-		
-		try {
-			
-			// 1 姓名不能空白
+			//基礎驗證
 			validateName(member.getName());
-			// 2 電子郵件 必須為^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$
 			validateEmail(member.getEmail());
-			// 3 手機 必須是09開頭且共10位數字("^09[0-9]{8}$")
 			validatePhone(member.getPhone());
-			// 4處理地址 (因為是非必填，先處理空值)
-			member.setAddress(validateAddress(member.getAddress()));
-			// 5 密碼 密碼至少為 8 個字元，且至少包含 1 個英文字母(大小寫皆可)與 1 個數字
-			// 6 重新輸入密碼 和密碼 必須一致
 			validatePassword(member.getPassword(), member.getConfirmPassword());
-			// 加密
-			String encoded = passwordEncoder.encode(member.getPassword());
-			member.setPassword(encoded);
-			// 7 判斷帳號是否有重複，資料庫的email不能等於新註冊的email
-			// 邏輯觀念錯誤 以及 語法回傳值不符。
-			// 正確邏輯應該是:檢查資料庫裡「是否已經存在這個會員物件」。如果查出來的結果 不是 null，代表這個Email已經被註冊過了。
+			
 			if (memberDao.selectByEmail(member.getEmail()) != null) {
 				throw new IllegalArgumentException("此帳號已經被註冊了");
 			}
-			// 8註冊方法在通過所有驗證後，呼叫 memberDao.insert(member)，新增資料。
+			member.setAddress(validateAddress(member.getAddress()));
+			String encoded = passwordEncoder.encode(member.getPassword());
+			member.setPassword(encoded);
+			//註冊方法在通過所有驗證後，呼叫 memberDao.insert(member)，新增資料。
 			memberDao.insert(member);
-			
-			// 9全部成功，回傳 null 代表沒有錯誤訊息或 代表的是錯誤訊息為空」。
+
+			//全部成功，回傳 null 代表沒有錯誤訊息或 代表的是錯誤訊息為空」。
 			return null;
-		} catch (Exception e) {
-			
-			e.printStackTrace();
-			throw new IllegalArgumentException("系統錯誤，註冊失敗!", e);
-		}
 	}
-	
+
 	@Transactional
 	@Override
 	public Member login(Member member) {
-		
+
 		// 驗證帳號和密碼
 		try {
-			
+
 			String email = member.getEmail();
 			String password = member.getPassword();
 			if (email == null || email.isEmpty() || password == null || password.isEmpty()) {
@@ -88,35 +66,20 @@ public class MemberServiceImpl implements MemberService {
 			}
 			Member dbMember = memberDao.selectByEmail(email);
 			if (dbMember == null) {
-				
 				return null;
 			}
 			String dbPassword = dbMember.getPassword();
-		    boolean isBcrypt = dbPassword != null && dbPassword.startsWith("$2");
-		    if (isBcrypt) {
-		    	if (!passwordEncoder.matches(password, dbPassword)) {
-	                return null;
-	            }else {
-	            	if (!password.equals(dbPassword)) {
-	                    return null;
-	                }
-				}
-		    	  String newHash = passwordEncoder.encode(password);
-		          dbMember.setPassword(newHash);
-		          memberDao.updateByEmail(dbMember);
-			}
-			
-
 			// 資料庫儲存的雜湊值」不匹配時，判定登入失敗。
-			// (使用者輸入的明碼,資料庫中儲存的BCrypt hash)
-//			if (!passwordEncoder.matches(password,dbMember.getPassword())) {
-//				tx.commit();
-//				return null;
-//			}
+						            //(使用者輸入的明碼,資料庫中儲存的BCrypt hash)
+			if (!passwordEncoder.matches(password, dbPassword)) {
+				return null;
+			}
+			String newHash = passwordEncoder.encode(password);
+			dbMember.setPassword(newHash);
+			memberDao.updateByEmail(dbMember);
 			return dbMember;
 
 		} catch (Exception e) {
-			
 			throw new IllegalArgumentException("系統錯誤，登入失敗!", e);
 		}
 	}
@@ -124,20 +87,19 @@ public class MemberServiceImpl implements MemberService {
 	@Transactional
 	@Override
 	public Member profile(Member member) {
-	
+
 		// 顯示當前會員資料
 		try {
-			
+
 			String email = member.getEmail();
 			Member dbEmail = memberDao.selectByEmail(email);
-			
 			return dbEmail;
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;
 		}
 	}
-	
+
 	@Transactional
 	@Override
 	public Member updateProfile(String email, UpdateMemberRequest dto) {
@@ -171,55 +133,56 @@ public class MemberServiceImpl implements MemberService {
 					throw new IllegalArgumentException("密碼格式錯誤或未填寫!");
 				}
 			}
-		
+
 			return member;
 		} catch (Exception e) {
 			e.printStackTrace();
 			throw e;
 		}
 	}
-	
+
 	@Transactional
 	@Override
 	public Boolean changePassword(String email, String oldPassword, String newPassword) {
-		
+
 		try {
 			Member memberDb = memberDao.selectByEmail(email);
 			if (memberDb == null) {
-	            return false;
-	        }
-			  String dbPassword = memberDb.getPassword();
-		      boolean isBcrypt = dbPassword != null && dbPassword.startsWith("$2");
-		      if (isBcrypt) {
+				return false;
+			}
+			String dbPassword = memberDb.getPassword();
+			boolean isBcrypt = dbPassword != null && dbPassword.startsWith("$2");
+			if (isBcrypt) {
 				if (!passwordEncoder.matches(oldPassword, dbPassword)) {
-	                return false;
-				}	
-			}else {
+					return false;
+				}
+			} else {
 				if (!oldPassword.equals(dbPassword)) {
-	                return false;
+					return false;
 				}
 			}
-			
+
 			String newPasswordHash = passwordEncoder.encode(newPassword);
 			memberDb.setPassword(newPasswordHash);
-			memberDao.updateByEmail(memberDb); 
+			memberDao.updateByEmail(memberDb);
 			System.out.println("User input oldPassword: " + oldPassword);
 			System.out.println("DB stored password hash: " + memberDb.getPassword());
-			System.out.println("Password match result: " + passwordEncoder.matches(oldPassword, memberDb.getPassword()));
+			System.out
+					.println("Password match result: " + passwordEncoder.matches(oldPassword, memberDb.getPassword()));
 			return true;
 		} catch (Exception e) {
-				e.printStackTrace();
-			throw new IllegalArgumentException("密碼變更失敗!",e);
+			e.printStackTrace();
+			throw new IllegalArgumentException("密碼變更失敗!", e);
 		}
 	}
-	
+
 	@Transactional
 	@Override
 	public boolean remove(String email) {
 		if (email == null || email.trim().isEmpty()) {
 			return false;
 		}
-		
+
 		try {
 			int count = memberDao.deleteByEmail(email);
 			return count > 0;
@@ -232,7 +195,7 @@ public class MemberServiceImpl implements MemberService {
 	@Transactional
 	@Override
 	public PageResultResponse<Orders> viewMyOrder(Integer memberId, int page, int size) {
-		
+
 		try {
 			// 取得分頁
 			int offset = (page - 1) * size;
@@ -253,9 +216,9 @@ public class MemberServiceImpl implements MemberService {
 	@Transactional
 	@Override
 	public List<CartItemResponse> viewMyCartItem(Member member) {
-		
+
 		try {
-			
+
 			List<Object[]> items = memberDao.selectAllCartItems(member.getMemberId());
 			List<CartItemResponse> result = items.stream().map(obj -> {
 				CartItem cartItem = (CartItem) obj[0];
