@@ -1,7 +1,6 @@
 package web.member.controller;
 
 import java.io.IOException;
-import javax.naming.NamingException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -9,9 +8,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
 import web.member.service.MemberService;
-import web.member.service.impl.MemberServiceImpl;
 import web.member.vo.Member;
+import web.member.dto.MemberProfileResponse;
 import web.member.dto.UpdateMemberRequest;
 
 import com.google.gson.Gson;
@@ -22,11 +24,14 @@ public class ProfileController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private MemberService memberService;
 
-	public ProfileController() throws NamingException {
-
-		memberService = new MemberServiceImpl();
-	}
-
+	//取得memberService物件
+		@Override
+		public void init() {
+		ApplicationContext applicationContext =
+		WebApplicationContextUtils
+		.getWebApplicationContext(getServletContext());
+		memberService = applicationContext.getBean(MemberService.class);
+		}
 	// 查看會員資料
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -40,8 +45,9 @@ public class ProfileController extends HttpServlet {
 		System.out.println("Profile Member: " + profileMember);
 		resp.setContentType("application/json");
 		Gson gson = new Gson();
-		// 再轉 Member 物件
-		resp.getWriter().write(gson.toJson(profileMember));
+		
+		MemberProfileResponse result = new MemberProfileResponse(profileMember);
+		resp.getWriter().write(gson.toJson(result));
 	}
 
 	// 修改會員資料
@@ -58,7 +64,7 @@ public class ProfileController extends HttpServlet {
 		System.out.println("session 內 memberId = " + loginMember.getMemberId());
 		JsonObject result = new JsonObject();
 		try {
-			memberService.updateProfile(loginMember.getMemberId(), memberDTO);
+			memberService.updateProfile(loginMember.getEmail(), memberDTO);
 			result.addProperty("success", true);
 			result.addProperty("message", "資料更新成功");
 		} catch (IllegalArgumentException e) {

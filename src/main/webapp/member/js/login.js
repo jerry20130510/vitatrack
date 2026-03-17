@@ -4,6 +4,15 @@ document.addEventListener("DOMContentLoaded", function () {
     const password = document.getElementById("password");
     const loginForm = document.getElementById("loginForm");
     const loginBtn = document.getElementById("loginBtn");
+    const rememberMeCheck = document.getElementById("rememberMe");
+
+    //頁面載入讀取帳號
+    const savedAccount = localStorage.getItem("account");
+    if (savedAccount) {
+        email.value = savedAccount;
+        rememberMeCheck.checked = true;
+    }
+
 
     // 忘記密碼相關
     const fpLink = document.getElementById("forgotPasswordLink");
@@ -35,10 +44,18 @@ document.addEventListener("DOMContentLoaded", function () {
         return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
     }
 
+    //記住帳號相關
+    rememberMeCheck.addEventListener("change", function () {
 
+        if (this.checked) {
+            localStorage.setItem("account", email.value);
+        } else {
+            localStorage.removeItem("account");
+        }
+    })
 
     loginBtn.addEventListener("click", function (event) {
-
+        event.preventDefault();
         //帳號和密碼一起做驗證
         //不驗證「這個 email 是否存在」
         //不提示「密碼錯誤」
@@ -55,6 +72,13 @@ document.addEventListener("DOMContentLoaded", function () {
         if (!isValidEmail(email.value.trim())) {
             alert("請輸入正確的 Email 格式");
             return;
+        }
+        //---------------------------------------------
+        //登入時記住帳號
+        if (rememberMeCheck.checked) {
+            localStorage.setItem("account", email.value);
+        } else {
+            localStorage.removeItem("account");
         }
 
         //利用ajax 發出請求，接回應

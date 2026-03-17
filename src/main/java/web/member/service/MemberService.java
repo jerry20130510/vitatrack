@@ -1,7 +1,12 @@
 package web.member.service;
 
 import web.member.vo.Member;
-import web.member.vo.PasswordResetTokens;
+import web.member_admin.dto.PageResultResponse;
+
+import java.util.List;
+
+import web.checkout.vo.Orders;
+import web.member.dto.CartItemResponse;
 import web.member.dto.UpdateMemberRequest;
 
 public interface MemberService {
@@ -48,8 +53,13 @@ public interface MemberService {
 
 	Member profile(Member member);
 
-    Member updateProfile(Integer memberID,UpdateMemberRequest dto);
+    Member updateProfile(String email, UpdateMemberRequest dto);
+    
+    Boolean changePassword(String email,String oldPassword, String newPassword);
     
     boolean remove(String email);
     
+    PageResultResponse<Orders> viewMyOrder(Integer memberId,int page, int size);
+    
+    List<CartItemResponse> viewMyCartItem (Member member);
 }

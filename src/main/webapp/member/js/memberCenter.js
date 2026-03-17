@@ -5,28 +5,39 @@ document.addEventListener("DOMContentLoaded", function () {
     const contentArea = document.getElementById('content-area');
     const menuLinks = document.querySelectorAll('.menu-link');
     const profile = menuLinks[0];
-    const logoutBtn = document.getElementById('logoutBtn');
+    const password = menuLinks[1];
     const memberInfo = document.getElementById('memberInfo');
-    const privacy = menuLinks[1];
+    const orderInfoBtn = document.getElementById('orderInfo');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const cartIcon = document.getElementById('cartIcon');
+    const privacy = menuLinks[2];
+    const order = menuLinks[3];
 
     loadMember();
 
     memberInfo.addEventListener("click", info);
     profile.addEventListener("click", info);
+    orderInfoBtn.addEventListener("click", (e) => orderInfo(e));
+    order.addEventListener("click", (e) => orderInfo(e));
+    cartIcon.addEventListener("click", loadCartItems);
+
+    password.addEventListener("click", showPasswordChangeBtn);
     privacy.addEventListener("click", showDeleteBtn);
 
+//--------------------------------------------------------------------------------------------------
     function loadMember() {
-    fetch('profile')
-        .then(res => res.json())
-        .then(member => {
-            currentMember = member;
-            console.log("這是會員中心拿到的會員資料：", member);
-            const welcomeText = document.getElementById('welcomeText');
-            if (welcomeText) {
-                welcomeText.textContent = `${member.name}，歡迎回來`;
-            }
-        });
-}
+        fetch('profile')
+            .then(res => res.json())
+            .then(member => {
+                currentMember = member;
+                console.log("這是會員中心拿到的會員資料：", member);
+                const welcomeText = document.getElementById('welcomeText');
+                if (welcomeText) {
+                    welcomeText.textContent = `${member.name}，歡迎回來`;
+                }
+            });
+    }
+//--------------------------------------------------------------------------------------------------
     function info(e) {
         e.preventDefault();
 
@@ -42,7 +53,6 @@ document.addEventListener("DOMContentLoaded", function () {
                             <div class="form-row" data-editable="false"><label>使用者帳號</label><p class="readonly">${member.email}</p></div>
                             <div class="form-row" data-field="name"><label>姓名</label><p class="readonly">${member.name}</p></div>
                             <div class="form-row" data-editable="false"><label>Email</label><p class="readonly">${member.email}</p></div>
-                            <div class="form-row" data-field="password"><label>密碼</label><p class="readonly">${member.password}</p></div>
                             <div class="form-row" data-field="address"><label>地址</label><p class="readonly">${member.address}</p></div>
                             <div class="form-row" data-field="phone"><label>手機號碼</label><p class="readonly">${member.phone}</p></div>
 
@@ -72,14 +82,23 @@ document.addEventListener("DOMContentLoaded", function () {
             console.dir(btn);
             enableEdit('editBtn');
         }
+        if (btn && btn.id === 'passwordChangeBtn') {
+            passwordChange();
+        }
+        if (btn && btn.id === 'submitChangePasswordBtn') {
+            console.log("submitChangePassword loaded");
+            submitChangePassword();
+        }
+
         if (btn && btn.id === 'deleteBtn') {
             deleteAccount();
         }
+
     });
 
 
 
-
+//--------------------------------------------------------------------------------------------------
     function enableEdit() {
         const rows = document.querySelectorAll('.form-row');
         rows.forEach(row => {
@@ -93,7 +112,7 @@ document.addEventListener("DOMContentLoaded", function () {
             row.replaceChild(input, p);
         });
     }
-
+//--------------------------------------------------------------------------------------------------
     function saveChanges() {
 
         const updatedData = {};
@@ -131,9 +150,34 @@ document.addEventListener("DOMContentLoaded", function () {
                 alert("更新過程中發生錯誤，請稍後再試。");
             });
     }
+//--------------------------------------------------------------------------------------------------
+    function showPasswordChangeBtn() {
+        contentArea.innerHTML = `
+        <main class="member-main">
+						<div class="member-card">
+							<header class="member-card-header">
+								變更密碼
+							</header>
+							<div class="member-card-body">
+								<!-- 左：表單 -->
+								<div class="member-form">
 
+									<div class="form-row">
+										<label>變更密碼</label>
+										<p class="readonly"></p>
+										<button class="mn-btn-1 btn" id="passwordChangeBtn"
+											type="button"><span>變更</span></button>
+									</div>
+								</div>
+							</div>
+						</div>
 
-    function showDeleteBtn(){
+					</main>
+
+                `;
+    }
+//--------------------------------------------------------------------------------------------------
+    function showDeleteBtn() {
         contentArea.innerHTML = `
         <main class="member-main">
 						<div class="member-card">
@@ -158,38 +202,328 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 `;
     }
+//--------------------------------------------------------------------------------------------------
+    function passwordChange() {
+        contentArea.innerHTML = `
+         
+                                 <form method="post" id="resetForm">
+                                    	<span class="mn-login-wrap">
+											<label for="oldPassword">原密碼*</label><span id="oldPasswordHint" class="hint-text"></span>
+											<input type="password" id="oldPassword" name="oldPassword"
+												placeholder="請輸入原密碼" required>
+										</span>
+										<span class="mn-login-wrap">
+											<label for="newPassword">新密碼*</label><span id="newPasswordHint" class="hint-text"></span>
+											<input type="password" id="newPassword" name="newPassword"
+												placeholder="請輸入新密碼" required>
+										</span>
+										<span class="mn-login-wrap">
+											<label for="confirmPassword">確認密碼*</label><span id="confirmPasswordHint" class="hint-text"></span>
+											<input type="password" id="confirmPassword" name="confirmPassword"
+												placeholder="請再次輸入新密碼" required>
+										</span>
+										<span class="mn-login-wrap mn-login-btn">
+											<button class="mn-btn-1 btn" type="button" id="submitChangePasswordBtn">
+												<span>重設密碼</span>
+											</button>
+										</span>
+									</form>
+                                `
+        const oldPassword = document.getElementById("oldPassword");
+        const newPassword = document.getElementById("newPassword");
+        const confirmPassword = document.getElementById("confirmPassword");
+        // 驗證原密碼是否為空
+        oldPassword.addEventListener("blur", function () {
+            const pwd = oldPassword.value.trim();
+            const hint = document.getElementById("oldPasswordHint");
+            if (!pwd) {
+                hint.textContent = "請輸入原密碼以驗證身份";
+                hint.style.color = "red";
+            } else {
+                hint.textContent = "";
+                hint.style.color = "green";
+            }
+        });
+        // 驗證新密碼格式
+        newPassword.addEventListener("blur", function () {
+            const pwd = newPassword.value.trim();
+            const hint = document.getElementById("newPasswordHint");
+            const rule = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
+            if (pwd === "") return;
+            if (!pwd.match(rule)) {
+                hint.textContent = "密碼至少為8個字元，且至少包含1個英文字母(大小寫皆可)與1個數字";
+                hint.style.color = "red";
+            } else {
+                hint.textContent = "格式正確";
+                hint.style.color = "green";
+            }
+        });
 
+        // 驗證確認密碼
+        confirmPassword.addEventListener("blur", function () {
+            const pwd = newPassword.value.trim();
+            const confirmPwd = confirmPassword.value.trim();
+            const hint = document.getElementById("confirmPasswordHint");
+
+            if (confirmPwd !== pwd || confirmPwd === "") {
+                hint.textContent = "與設定密碼不一致";
+                hint.style.color = "red";
+            } else {
+                hint.textContent = "與設定密碼一致";
+                hint.style.color = "green";
+            }
+        });
+    }
+//--------------------------------------------------------------------------------------------------
+    function submitChangePassword() {
+
+        const oldPassword = document.querySelector('#oldPassword').value.trim();
+        const newPassword = document.querySelector('#newPassword').value.trim();
+        const confirmPassword = document.querySelector('#confirmPassword').value.trim();
+
+        // 基本檢查
+        if (!oldPassword) {
+            return alert("請輸入原密碼以驗證身份");
+        }
+
+        if (!newPassword || newPassword.length < 8) {
+            return alert("新密碼格式不符!");
+        }
+        if (newPassword !== confirmPassword) {
+            return alert("確認密碼與新密碼不一致!");
+        }
+
+        fetch('changePassword', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+
+                oldPassword: document.querySelector('#oldPassword').value,
+                newPassword: document.querySelector('#newPassword').value,
+                confirmPassword: document.querySelector('#confirmPassword').value
+            })
+        })
+            .then(result => result.json())
+            .then(result => {
+                if (result.success) {
+                    alert(result.message);
+                    location.reload();
+                } else {
+                    alert(result.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("系統發生錯誤，"+error.message);
+            });
+    }
+//--------------------------------------------------------------------------------------------------
     function deleteAccount() {
         if (!confirm("確定要刪除帳號嗎？此操作無法復原！")) {
             return;
         }
 
-        fetch('deleteAccount',{
+        fetch('deleteAccount', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({                                  
-              email: currentMember.email
+            body: JSON.stringify({
+                email: currentMember.email
             })
         })
-        .then(result => result.json())
-        .then(result =>{
-            if(result.success) {
-                alert(result.message);
-                window.location.href = 'index.html';
-            } else {
-                alert("刪除帳號失敗：" + result.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert("刪除帳號過程中發生錯誤，請稍後再試。");
-        });
+            .then(result => result.json())
+            .then(result => {
+                if (result.success) {
+                    alert(result.message);
+                    window.location.href = 'index.html';
+                } else {
+                    alert("刪除帳號失敗：" + result.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("刪除帳號過程中發生錯誤，請稍後再試。");
+            });
     }
 
+//--------------------------------------------------------------------------------------------------
+    window.orderInfo = function (e, page = 1) {
+        e.preventDefault();
+
+        fetch(`myOrder?page=${page}`)
+            .then(res => res.json())
+            .then(result => {
+                console.log("後端回傳：", result);
+                const orders = result.content;
+                const totalPages = result.totalPages;
+                const currentPage = result.currentPage;
+
+                if (!orders || orders.length === 0) {
+                    contentArea.innerHTML = `
+                    <div class="member-card">
+                        <header class="member-card-header">我的訂單</header>
+                        <div class="member-card-body">
+                            <p>目前沒有訂單紀錄</p>
+                        </div>
+                    </div>
+                `;
+                    return;
+                }
+
+                let rows = "";
+
+                orders.forEach(order => {
+
+                    rows += `
+                    <tr>
+                        <td>${order.orderId}</td>
+                        <td>${order.createdAt}</td>
+                        <td>${order.totalAmount}</td>
+                        <td>${order.paymentMethod}</td>
+                        <td>${order.status}</td>
+                        <td>${order.paymentStatus}</td>
+                    </tr>
+                `;
+
+                });
+
+                let tablehtml = `
+                <div class="member-card">
+
+                    <header class="member-card-header" >
+                        我的訂單
+                    </header>
+
+                    <div class="member-card-body">
+
+                        <table id="orderTable" class="table table-hover align-middle">
+
+                            <thead>
+                                <tr>
+                                    <th>訂單編號</th>
+                                    <th>訂單時間</th>
+                                    <th>金額</th>
+                                    <th>付款方式</th>
+                                    <th>訂單狀態</th>
+                                    <th>付款狀態</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                ${rows}
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+            `;
 
 
+                let paginationHtml = `
+                <nav class="d-flex justify-content-center m-t-30">
+                    <ul class="pagination">
+                        <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                            <a class="page-link" href="javascript:void(0)" onclick="orderInfo(event, ${currentPage - 1})">上一頁</a>
+                        </li>`;
+
+                for (let i = 1; i <= totalPages; i++) {
+                    paginationHtml += `
+                    <li class="page-item ${i === currentPage ? 'active' : ''}">
+                        <a class="page-link" href="javascript:void(0)" onclick="orderInfo(event, ${i})">${i}</a>
+                    </li>`;
+                }
+
+                paginationHtml += `
+                        <li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                            <a class="page-link" href="javascript:void(0)" onclick="orderInfo(event, ${currentPage + 1})">下一頁</a>
+                        </li>
+                    </ul>
+                </nav>`;
+
+                contentArea.innerHTML = tablehtml + paginationHtml;
+            })
+            .catch(error => {
+                console.error(error);
+                alert("取得訂單資料失敗");
+            });
+
+    }
+    //--------------------------------------------------------------------------------------------------
+    function loadCartItems() {
+        fetch('myCartItem')
+            .then(res => res.json())
+            .then(cartItems => {
+                console.log("這是後端回傳:" + cartItems);
+
+              
+
+                if (cartItems.length === 0) {
+                    cartDropdown.innerHTML = "<p style='padding:10px'>購物車沒有商品</p>";
+                    return;
+                }
+
+                let rows = ` `;
+
+                cartItems.forEach(item => {
+                    rows += `
+                    <tr>
+                        <td>${item.productName}</td>
+                        <td>${item.sku}</td>
+                        <td>${item.size}</td>
+                        <td>${item.price}</td>
+                        <td>${item.quantity}</td>
+                        <td>${item.subtotal}</td>
+                        <td>${item.stockQuantity}</td>
+                    </tr>
+                `;
+                });
+
+                let tablehtml = `
+                <div class="member-card">
+
+                    <header class="member-card-header" >
+                        我的購物車
+                    </header>
+
+                    <div class="member-card-body">
+
+                        <table id="orderTable" class="table table-hover align-middle">
+
+                            <thead>
+                                <tr>
+                                    <th>商品名稱</th>
+                                    <th>商品編號</th>
+                                    <th>規格/尺寸</th>
+                                    <th>價格</th>
+                                    <th>數量</th>
+                                    <th>小計</th>
+                                    <th>庫存量</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                ${rows}
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+            `;
+                // 渲染購物車清單
+                contentArea.innerHTML = tablehtml;
 
 
+            })
+            .catch(err => {
+                console.error("載入購物車失敗", err);
+                alert("載入購物車失敗，請稍後再試");
+            });
+    }
+
+//--------------------------------------------------------------------------------------------------
     logoutBtn.addEventListener('click', function (e) {
         e.preventDefault();
         fetch('logout', {
