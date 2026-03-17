@@ -14,6 +14,8 @@ import web.checkout.service.impl.CallbackServiceImpl;
 
 @WebServlet("/checkout/ecpay/callback")
 public class CallbackServlet extends HttpServlet {
+	
+	private static final long serialVersionUID = 1L;
 
     private final CallbackService callbackService = new CallbackServiceImpl();
 

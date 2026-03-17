@@ -16,6 +16,8 @@ import web.checkout.vo.EcpayCheckoutPayload; // ✅ 新增：回傳 actionUrl + 
 // 接收前端 orderId -> 呼叫 Service 做判斷 -> 回傳結果給前端
 @WebServlet("/api/checkout/payment")
 public class PaymentServlet extends HttpServlet {
+	
+	private static final long serialVersionUID = 1L;
 
 	// 呼叫 paymentService
 	private final PaymentService paymentService = new PaymentServiceImpl();
