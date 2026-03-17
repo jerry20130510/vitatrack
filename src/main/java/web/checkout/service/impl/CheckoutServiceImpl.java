@@ -16,8 +16,8 @@ import web.checkout.dao.impl.OrderItemDaoImpl;
 import web.checkout.service.CheckoutService;
 import web.checkout.vo.CartRow;
 import web.checkout.vo.CheckoutResult;
-import web.checkout.vo.Orders;
 import web.checkout.vo.OrderItem;
+import web.checkout.vo.Orders;
 
 public class CheckoutServiceImpl implements CheckoutService {
 
@@ -104,33 +104,34 @@ public class CheckoutServiceImpl implements CheckoutService {
 			if (updatedCount <= 0) {
 				throw new RuntimeException("attachCartItemsToOrder updated 0 rows.");
 			}
-			
+
 			// 6.提交 Transaction
 			tx.commit();
 			// 7.回傳 CheckoutResult
 			return new CheckoutResult(orderId, totalAmountInt, "PENDING");
 
 		} catch (Exception ex) {
-		    if (tx != null) {
-		        try {
-		            tx.rollback();
-		        } catch (Exception ignore) {}
-		    }
+			if (tx != null) {
+				try {
+					tx.rollback();
+				} catch (Exception ignore) {
+				}
+			}
 
-		    // 🔥 找出最底層錯誤原因
-		    Throwable root = ex;
-		    while (root.getCause() != null) {
-		        root = root.getCause();
-		    }
+			// 🔥 找出最底層錯誤原因
+			Throwable root = ex;
+			while (root.getCause() != null) {
+				root = root.getCause();
+			}
 
-		    System.out.println("=================================");
-		    System.out.println("🔥 ROOT CAUSE CLASS: " + root.getClass().getName());
-		    System.out.println("🔥 ROOT CAUSE MESSAGE: " + root.getMessage());
-		    System.out.println("=================================");
+			System.out.println("=================================");
+			System.out.println("🔥 ROOT CAUSE CLASS: " + root.getClass().getName());
+			System.out.println("🔥 ROOT CAUSE MESSAGE: " + root.getMessage());
+			System.out.println("=================================");
 
-		    ex.printStackTrace();
+			ex.printStackTrace();
 
-		    return new CheckoutResult(0, 0, "FAILED: " + root.getMessage());
+			return new CheckoutResult(0, 0, "FAILED: " + root.getMessage());
 		} finally {
 			if (session != null) {
 				try {
@@ -140,4 +141,18 @@ public class CheckoutServiceImpl implements CheckoutService {
 			}
 		}
 	}
+
+	@Override
+	public List<CartRow> getCheckoutCart(int memberId) {
+		Session session = null;
+		try {
+			session = HibernateUtil.getSessionFactory().openSession();
+			return cartDao.findOpenCartByMemberId(session, memberId);
+		} finally {
+			if (session != null) {
+				session.close();
+			}
+		}
+	}
+
 }
