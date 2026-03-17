@@ -4,7 +4,6 @@ import java.util.Properties;
 
 import javax.naming.NamingException;
 import javax.sql.DataSource;
-
 import org.hibernate.SessionFactory;
 import org.hibernate.dialect.MySQLDialect;
 import org.springframework.context.annotation.Bean;

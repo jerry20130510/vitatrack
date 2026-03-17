@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -21,6 +22,7 @@ import com.google.gson.JsonObject;
 @WebServlet("/forgetPassword")
 public class ForgetPasswordController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
+	@Autowired
 	private PasswordResetTokensService passwordResetTokensService;
 
 	//取得passwordResetTokensService物件

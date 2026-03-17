@@ -9,23 +9,18 @@ import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
-import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebMvc
-@ComponentScan("web.*.controller")
+@ComponentScan({"core.exception","web.*.controller"})
 public class MvcConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
-	registry.addResourceHandler("/**").addResourceLocations("/WEB-INF/");
+	registry.addResourceHandler("/**").addResourceLocations("/");
 	}
-	
-	@Override
-	public void addViewControllers(ViewControllerRegistry registry) {
-	registry.addViewController("/").setViewName("index.html");
-	}
+	//html 本身為靜態資源，不需要
 
 	@Override
 	public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
