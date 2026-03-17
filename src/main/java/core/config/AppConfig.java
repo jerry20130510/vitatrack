@@ -9,6 +9,7 @@ import org.hibernate.dialect.MySQLDialect;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.jndi.JndiObjectFactoryBean;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBuilder;
@@ -19,8 +20,9 @@ import org.springframework.transaction.TransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Configuration
-@ComponentScan("web.*.*.impl")
+@ComponentScan({"web.*.*.impl"," web.*.util"})
 @EnableTransactionManagement
+@Import(MailConfig.class)
 public class AppConfig {
 	
 	@Bean
