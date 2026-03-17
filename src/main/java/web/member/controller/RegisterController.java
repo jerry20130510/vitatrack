@@ -14,8 +14,6 @@ import web.member.service.MemberService;
 import web.member.vo.Member;
 
 @Controller
-
-
 public class RegisterController  {
 	@Autowired
 	private MemberService memberService;

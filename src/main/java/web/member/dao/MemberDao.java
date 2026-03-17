@@ -13,11 +13,11 @@ public interface MemberDao {
 
 	int deleteByEmail(String Email);
 
-	int updateByEmail(Member member);
+	int update(Member member);
 
 	Member selectByEmail(String email);
 
-	Member selectByEmailandPassword(String email, String password);
+	Member selectByMemberId(Integer memberId);
 	
 	List<MemberListResponse> selectAllWithPagination(int offset,int size);
 	
