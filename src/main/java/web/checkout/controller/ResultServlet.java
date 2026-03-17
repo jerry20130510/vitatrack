@@ -14,6 +14,8 @@ import web.checkout.vo.ResultDTO;
 
 @WebServlet("/api/checkout/result")
 public class ResultServlet extends HttpServlet {
+	
+	private static final long serialVersionUID = 1L;
 
 	private final ResultService resultService = new ResultServiceImpl();
 
