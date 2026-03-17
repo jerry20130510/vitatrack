@@ -22,7 +22,6 @@ public class MemberDaoImpl implements MemberDao {
 
 	@Override
 	public int insert(Member member) {
-
 		session.persist(member);
 		return 1;
 	}

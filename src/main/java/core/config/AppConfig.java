@@ -14,6 +14,8 @@ import org.springframework.jndi.JndiObjectFactoryBean;
 import org.springframework.orm.hibernate5.HibernateTransactionManager;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBuilder;
 import org.springframework.orm.hibernate5.SpringSessionContext;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.TransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
@@ -57,5 +59,10 @@ public class AppConfig {
 	public TransactionManager transactionManager() throws IllegalArgumentException, 
 	NamingException {
 	return new HibernateTransactionManager(sessionFactory());
+	}
+	
+	@Bean
+	 public PasswordEncoder passwordEncoder() {
+		 return new BCryptPasswordEncoder(12); //長度12常見安全值
 	}
 }
