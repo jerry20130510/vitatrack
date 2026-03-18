@@ -96,19 +96,21 @@ public class PasswordResetTokensServiceImpl implements PasswordResetTokensServic
 			PasswordResetTokens resetToken = validateToken(token);
 			// 驗證密碼格式
 			if (newPassword == null || !newPassword.matches("^(?=.*[A-Za-z])(?=.*\\d).{8,}$")) {
-				throw new BusinessException("密碼格式錯誤或未填寫!");
+				throw new BusinessException("密碼格式錯誤或未填寫(需至少8字元，含英文字母與數字)");
 			}
 			// 撈出會員資料;session.get() 從資料庫抓出對應的Member實體
 			Member member = memberDao.selectByMemberId(resetToken.getMemberId());
 			if (member == null) {
-				throw new BusinessException("找不到對應會員");
+				throw new BusinessException("找不到對應會員帳號");
 			}
-			// 更新會員密碼
+			// 加密並更新會員密碼
 			member.setPassword(passwordEncoder.encode(newPassword));
 			memberDao.update(member);
-			// 標記token已使用
+			// 標記token已使用(token失效)
 			resetToken.setUsed(true);
 			passwordResetTokenDao.update(resetToken);		
+			//安全機制
+			emailUtil.sendPasswordChangedNotification(member.getEmail());
 	}
 
 }

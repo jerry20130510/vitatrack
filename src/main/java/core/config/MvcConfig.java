@@ -20,7 +20,8 @@ public class MvcConfig implements WebMvcConfigurer {
 	public void addResourceHandlers(ResourceHandlerRegistry registry) {
 	registry.addResourceHandler("/**").addResourceLocations("/");
 	}
-	//html 本身為靜態資源，不需要
+	//前後端分離架構下，不需要託管viewResolver
+	
 
 	@Override
 	public void extendMessageConverters(List<HttpMessageConverter<?>> converters) {
