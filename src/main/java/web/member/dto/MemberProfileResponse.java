@@ -13,8 +13,9 @@ public class MemberProfileResponse {
 	private Integer memberId;
 	private String name;
 	private String email;
-	private String phone;
 	private String address;
+	private String phone;
+	
 	
 	public MemberProfileResponse(Member member) {
         this.memberId = member.getMemberId();
