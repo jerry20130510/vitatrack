@@ -73,6 +73,8 @@
   async function load() {
     var skuParam = getParam('sku');
 
+    console.log('目前網址 sku =', skuParam);
+
     var elName = qs('pName');
     var elPrice = qs('pPrice');
     var elSku = qs('pSku');
@@ -80,39 +82,41 @@
     var elShort = qs('pShortDesc');
     var elDesc = qs('pDesc');
 
+    // 沒有 SKU → 直接中止
+    if (!skuParam) {
+      setText(elName, '查無商品');
+      setText(elStock, '缺少 sku');
+      setHtml(elDesc, '<p>請使用 ?sku=商品編號</p>');
+      return;
+    }
+
     try {
-      var resp = await fetch('product-list', {
+      var url = 'product-detail?sku=' + encodeURIComponent(skuParam);
+      console.log('呼叫 API =', url);
+
+      var resp = await fetch(url, {
         method: 'GET',
         headers: { 'Accept': 'application/json' }
       });
 
+      console.log('HTTP 狀態 =', resp.status);
+
       if (!resp.ok) throw new Error('HTTP ' + resp.status);
 
-      var list = await resp.json();
+      var raw = await resp.json();
+      console.log('原始資料 raw =', raw);
 
-      if (!Array.isArray(list) || list.length === 0) {
-        setText(elName, '查無商品資料');
-        setText(elStock, '無資料');
-        setHtml(elDesc, '<p>後端未回傳商品清單。</p>');
-        return;
+      // 支援兩種後端格式
+      var data = raw.data ? raw.data : raw;
+
+      var p = mapProduct(data);
+      console.log('轉換後 product =', p);
+
+      if (!p || !p.sku) {
+        throw new Error('資料格式錯誤或查無商品');
       }
 
-      var raw = null;
-
-      if (skuParam) {
-        for (var i = 0; i < list.length; i++) {
-          var itemSku = pick(list[i], ['sku', 'SKU']);
-          if (String(itemSku) === String(skuParam)) {
-            raw = list[i];
-            break;
-          }
-        }
-      }
-
-      if (!raw) raw = list[0];
-
-      var p = mapProduct(raw);
-
+      // === 填入畫面 ===
       setText(elName, p.name || '未命名商品');
       setText(elSku, p.sku || '');
       setText(elPrice, formatPrice(p.price));
@@ -120,14 +124,15 @@
       setText(elShort, p.shortDesc || '');
 
       var safe = escapeHtml(p.desc || '').replaceAll('\n', '<br>');
-      setHtml(elDesc, '<p>' + (safe || '') + '</p>');
+      setHtml(elDesc, '<p>' + safe + '</p>');
 
       document.title = (p.name ? p.name + ' | VitaTrack' : 'VitaTrack');
+
     } catch (e) {
-      console.error(e);
+      console.error('載入失敗 =', e);
       setText(elName, '載入失敗');
-      setText(elStock, '請確認 /product-list 是否可用');
-      setHtml(elDesc, '<p>無法取得商品資料。</p>');
+      setText(elStock, '請確認 API /product-detail');
+      setHtml(elDesc, '<p>無法取得商品資料</p>');
     }
   }
 
