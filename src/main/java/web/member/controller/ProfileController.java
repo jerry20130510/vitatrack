@@ -1,82 +1,51 @@
 package web.member.controller;
 
-import java.io.IOException;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
-import org.springframework.context.ApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import web.member.service.MemberService;
 import web.member.vo.Member;
 import web.member.dto.MemberProfileResponse;
 import web.member.dto.UpdateMemberRequest;
+import web.member.exception.BusinessException;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+@Controller
+public class ProfileController {
 
-@WebServlet("/profile")
-public class ProfileController extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+	@Autowired
 	private MemberService memberService;
 
-	//取得memberService物件
-		@Override
-		public void init() {
-		ApplicationContext applicationContext =
-		WebApplicationContextUtils
-		.getWebApplicationContext(getServletContext());
-		memberService = applicationContext.getBean(MemberService.class);
-		}
-	// 查看會員資料
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+	// 查看會員
+	@GetMapping("/getProfile")
+	@ResponseBody
+	public MemberProfileResponse profile(HttpSession session) {
 
-		HttpSession session = req.getSession();
 		Member member = (Member) session.getAttribute("member");
-		// 除錯點 1：檢查 Service 查完後是不是空的
-		System.out.println("Session member: " + session.getAttribute("member"));
+		if (member == null) {
+			throw new BusinessException("尚未登入");
+		}
 		Member profileMember = memberService.profile(member);
-		// 除錯點 2：檢查 Service 查完後是不是空的
-		System.out.println("Profile Member: " + profileMember);
-		resp.setContentType("application/json");
-		Gson gson = new Gson();
-		
 		MemberProfileResponse result = new MemberProfileResponse(profileMember);
-		resp.getWriter().write(gson.toJson(result));
+		return result;
 	}
 
-	// 修改會員資料
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		resp.setContentType("application/json");
-		Gson gson = new Gson();
-		UpdateMemberRequest memberDTO = gson.fromJson(req.getReader(), UpdateMemberRequest.class);
-		HttpSession session = req.getSession(false);
+	// 修改會員
+	@PostMapping("/updateProfile")
+	@ResponseBody
+	public MemberProfileResponse updateProfile(@RequestBody UpdateMemberRequest memberDTO, HttpSession session) {
+
 		Member loginMember = (Member) session.getAttribute("member");
 		if (loginMember == null) {
-			throw new RuntimeException("尚未登入");
+			throw new BusinessException("尚未登入");
 		}
-		System.out.println("session 內 memberId = " + loginMember.getMemberId());
-		JsonObject result = new JsonObject();
-		try {
-			memberService.updateProfile(loginMember.getEmail(), memberDTO);
-			result.addProperty("success", true);
-			result.addProperty("message", "資料更新成功");
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-			result.addProperty("success", false);
-			result.addProperty("message", e.getMessage());
-		} catch (RuntimeException e) {
-			e.printStackTrace();
-			result.addProperty("success", false);
-			result.addProperty("message", "系統錯誤");
-		}
-
-		resp.getWriter().write(result.toString());
+		Member updatedMember = memberService.updateProfile(loginMember.getEmail(), memberDTO);
+		return new MemberProfileResponse(updatedMember);
 	}
+
 }
