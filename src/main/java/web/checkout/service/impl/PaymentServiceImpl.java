@@ -8,24 +8,32 @@ import java.util.Map;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import core.util.HibernateUtil;
 import web.checkout.dao.OrderDao;
 import web.checkout.dao.OrderItemDao;
-import web.checkout.dao.impl.OrderDaoImpl;
-import web.checkout.dao.impl.OrderItemDaoImpl;
 import web.checkout.service.PaymentService;
 import web.checkout.vo.EcpayCheckoutPayload;
 import web.checkout.vo.OrderPaymentInfo;
 
+@Service
 public class PaymentServiceImpl implements PaymentService {
 
-	private final OrderDao orderDao = new OrderDaoImpl();
-	private final OrderItemDao orderItemDao = new OrderItemDaoImpl();
+	private final OrderDao orderDao;
+	private final OrderItemDao orderItemDao;
+	
+	@Autowired
+	public PaymentServiceImpl(OrderDao orderDao, OrderItemDao orderItemDao) {
+		this.orderDao = orderDao;
+		this.orderItemDao = orderItemDao;
+	}
+
 
 	// === 綠界測試環境網址 ===
 	private static final String ECPAY_ACTION_URL_STAGE = "https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5";
-
+	
 	// === 固定參數 ===
 	private static final String MERCHANT_ID = "3002607";
 	private static final String RETURN_URL = "https://leaseless-eventfully-sharyn.ngrok-free.dev/vitatrack/checkout/ecpay/callback";
