@@ -13,7 +13,7 @@ import web.member.service.MemberService;
 import web.member.vo.Member;
 import web.member.dto.MemberProfileResponse;
 import web.member.dto.UpdateMemberRequest;
-import web.member.exception.BusinessException;
+
 
 @Controller
 public class ProfileController {
@@ -27,9 +27,6 @@ public class ProfileController {
 	public MemberProfileResponse profile(HttpSession session) {
 
 		Member member = (Member) session.getAttribute("member");
-		if (member == null) {
-			throw new BusinessException("尚未登入");
-		}
 		Member profileMember = memberService.profile(member);
 		MemberProfileResponse result = new MemberProfileResponse(profileMember);
 		return result;
@@ -41,10 +38,7 @@ public class ProfileController {
 	public MemberProfileResponse updateProfile(@RequestBody UpdateMemberRequest memberDTO, HttpSession session) {
 
 		Member loginMember = (Member) session.getAttribute("member");
-		if (loginMember == null) {
-			throw new BusinessException("尚未登入");
-		}
-		Member updatedMember = memberService.updateProfile(loginMember.getEmail(), memberDTO);
+		Member updatedMember = memberService.updateProfile(loginMember, memberDTO);
 		return new MemberProfileResponse(updatedMember);
 	}
 

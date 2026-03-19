@@ -4,9 +4,8 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-
-
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -34,18 +33,23 @@ public class PasswordResetTokensServiceImpl implements PasswordResetTokensServic
 	@Autowired
 	private EmailUtil emailUtil;
 
-
+	private static final Logger logger = LogManager.getLogger(PasswordResetTokensServiceImpl.class);
+	
 	//建立token
 	@Transactional
 	@Override
 	public void createResetToken(String email) {
-
+		
 		String token = null;
 
 		Member member = memberDao.selectByEmail(email);
 		if (member == null) {
-			throw new BusinessException("此帳號不存在!");
+			logger.warn("有人嘗試用不存在的帳號建立token",email);
+			throw new BusinessException("此帳號不存在");
 		}
+		//將舊的未使用的Token設為已用過(防止一堆有效Token)
+		passwordResetTokenDao.invalidateOldTokens(member.getMemberId());
+		//建立新 Token
 		token = UUID.randomUUID().toString();
 		PasswordResetTokens resetToken = new PasswordResetTokens();
 		resetToken.setMemberId(member.getMemberId());
@@ -54,9 +58,9 @@ public class PasswordResetTokensServiceImpl implements PasswordResetTokensServic
 		LocalDateTime now = LocalDateTime.now();
 		resetToken.setCreateTime(Timestamp.valueOf(now));
 		resetToken.setExpiryTime(Timestamp.valueOf(LocalDateTime.now().plusMinutes(15)));
-
+		
 		passwordResetTokenDao.insert(resetToken);
-
+		//寄信
 		emailUtil.sendResetPasswordEmail(email, token);
 
 	}
