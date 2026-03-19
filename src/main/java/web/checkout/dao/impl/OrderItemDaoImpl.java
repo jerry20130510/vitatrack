@@ -3,10 +3,12 @@ package web.checkout.dao.impl;
 import java.util.List;
 
 import org.hibernate.Session;
+import org.springframework.stereotype.Repository;
 
 import web.checkout.dao.OrderItemDao;
 import web.checkout.vo.OrderItem;
 
+@Repository
 public class OrderItemDaoImpl implements OrderItemDao {
 
 	// 新增一筆訂單明細
