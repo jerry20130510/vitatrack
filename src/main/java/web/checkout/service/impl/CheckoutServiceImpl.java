@@ -5,26 +5,31 @@ import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.springframework.stereotype.Service;
 
 import core.util.HibernateUtil;
 import web.checkout.dao.CartDao;
 import web.checkout.dao.OrderDao;
 import web.checkout.dao.OrderItemDao;
-import web.checkout.dao.impl.CartDaoImpl;
-import web.checkout.dao.impl.OrderDaoImpl;
-import web.checkout.dao.impl.OrderItemDaoImpl;
 import web.checkout.service.CheckoutService;
 import web.checkout.vo.CartRow;
 import web.checkout.vo.CheckoutResult;
 import web.checkout.vo.OrderItem;
 import web.checkout.vo.Orders;
 
+@Service
 public class CheckoutServiceImpl implements CheckoutService {
 
-	private final CartDao cartDao = new CartDaoImpl();
-	private final OrderDao orderDao = new OrderDaoImpl();
-	private final OrderItemDao orderItemDao = new OrderItemDaoImpl();
+	private final CartDao cartDao;
+	private final OrderDao orderDao;
+	private final OrderItemDao orderItemDao;
 
+	public CheckoutServiceImpl(CartDao cartDao, OrderDao orderDao, OrderItemDao orderItemDao) {
+        this.cartDao = cartDao;
+        this.orderDao = orderDao;
+        this.orderItemDao = orderItemDao;
+    }
+	
 	@Override
 	public CheckoutResult checkout(int memberId) {
 

@@ -5,18 +5,25 @@ import java.util.TreeMap;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import core.util.HibernateUtil;
 import web.checkout.dao.OrderDao;
-import web.checkout.dao.impl.OrderDaoImpl;
 import web.checkout.service.CallbackService;
 import web.checkout.vo.Orders;
 
+@Service
 public class CallbackServiceImpl implements CallbackService {
 
 	private static final String HASH_KEY = "pwFHCqoQZGmho4w6";
 	private static final String HASH_IV = "EkRm7IFT261dpevs";
-	private final OrderDao orderDao = new OrderDaoImpl();
+	private final OrderDao orderDao;
+	
+	@Autowired
+	public CallbackServiceImpl(OrderDao orderDao) {
+		this.orderDao = orderDao;
+	}
 
 	@Override
 	public String handleCallback(Map<String, String> params) {

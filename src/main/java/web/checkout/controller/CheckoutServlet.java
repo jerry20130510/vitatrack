@@ -9,8 +9,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
 import web.checkout.service.CheckoutService;
-import web.checkout.service.impl.CheckoutServiceImpl;
 import web.checkout.vo.CartRow;
 import web.checkout.vo.CheckoutResult;
 
@@ -19,8 +21,16 @@ public class CheckoutServlet extends HttpServlet {
 	
 	private static final long serialVersionUID = 1L;
 
-    private final CheckoutService checkoutService = new CheckoutServiceImpl();
+    private CheckoutService checkoutService;
 
+    @Override
+    public void init() {
+        ApplicationContext applicationContext =
+            WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+        checkoutService = applicationContext.getBean(CheckoutService.class);
+    }
+
+    
  // 進入 checkout 頁面時，先查購物車資料
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)

@@ -2,15 +2,18 @@ package web.checkout.controller;
 
 import java.io.IOException;
 
+import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
 import com.google.gson.Gson;
 
 import web.checkout.service.PaymentService;
-import web.checkout.service.impl.PaymentServiceImpl;
 import web.checkout.vo.EcpayCheckoutPayload; // ✅ 新增：回傳 actionUrl + formParams 用
 
 // 接收前端 orderId -> 呼叫 Service 做判斷 -> 回傳結果給前端
@@ -20,7 +23,15 @@ public class PaymentServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	// 呼叫 paymentService
-	private final PaymentService paymentService = new PaymentServiceImpl();
+	private PaymentService paymentService;
+	
+	@Override
+	public void init() throws ServletException {
+	    WebApplicationContext context =
+	        WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+	    paymentService = context.getBean(PaymentService.class);
+	}
+	
 	// 把 Service 回傳的 payload 轉成 JSON
 	private final Gson gson = new Gson();
 
