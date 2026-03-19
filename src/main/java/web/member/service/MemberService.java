@@ -54,13 +54,13 @@ public interface MemberService {
 
 	Member profile(Member member);
 
-    Member updateProfile(String email, UpdateMemberRequest dto);
+	public Member updateProfile(Member member, UpdateMemberRequest dto);
     
     void changePassword(String email,String oldPassword, String newPassword);
     
     void remove(String email);
-    
-    PageResultResponse<Orders> viewMyOrder(Integer memberId,int page, int size);
+   
+    PageResultResponse<Orders> viewMyOrder(Member member,int page, int size);
     
     List<CartItemResponse> viewMyCartItem (Member member);
 }
