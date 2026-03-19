@@ -1,57 +1,26 @@
 package web.member.controller;
 
-import java.io.IOException;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.springframework.context.ApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
+import java.util.Map;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+
 import web.member.service.MemberService;
 import web.member.vo.Member;
 
-@WebServlet("/register")
-public class RegisterController extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+@Controller
+public class RegisterController {
+	@Autowired
 	private MemberService memberService;
 
-	//取得memberService物件
-		@Override
-		public void init() {
-		ApplicationContext applicationContext =
-		WebApplicationContextUtils
-		.getWebApplicationContext(getServletContext());
-		memberService = applicationContext.getBean(MemberService.class);
-		}
-
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		// 設定回應資料格式為JSON
-		resp.setContentType("application/json;charset=utf-8");
-		// 接收Json物件
-		Gson gson = new Gson();
-		JsonObject result = new JsonObject();
-		Member member = gson.fromJson(req.getReader(), Member.class);
-		// 調用service層的方法
-		// 最終結果：Service 最終回傳 null 給 Controller，Controller 看到是 null 就導向「註冊成功頁面」。
-
-		try {
-			memberService.register(member);
-			result.addProperty("success", true); // <--- 這裡定義了 key 名稱為 "success"
-			result.addProperty("message", "註冊成功");
-		} catch (IllegalArgumentException e) {
-			result.addProperty("success", false);
-			result.addProperty("message", e.getMessage() );
-		} catch (Exception e) {
-			result.addProperty("success", false);
-			result.addProperty("message", "系統忙碌中，請稍後再試");
-		}
-		// 輸出純文字的json格式
-		resp.getWriter().write(result.toString());
+	@PostMapping("/register")
+	@ResponseBody
+	public Map<String, Object> register(@RequestBody Member member) {
+		memberService.register(member);
+		return Map.of("success", true, "message", "註冊成功");
 	}
 
 }
