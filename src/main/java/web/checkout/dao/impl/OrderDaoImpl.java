@@ -2,12 +2,14 @@ package web.checkout.dao.impl;
 
 import org.hibernate.Session;
 import org.hibernate.query.Query;
+import org.springframework.stereotype.Repository;
 
 import web.checkout.dao.OrderDao;
 import web.checkout.vo.OrderPaymentInfo;
 import web.checkout.vo.Orders;
 import web.checkout.vo.ResultDTO;
 
+@Repository
 public class OrderDaoImpl implements OrderDao {
 
 	// 新增訂單

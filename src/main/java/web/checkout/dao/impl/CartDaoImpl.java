@@ -5,10 +5,12 @@ import java.util.List;
 
 import org.hibernate.Session;
 import org.hibernate.query.Query;
+import org.springframework.stereotype.Repository;
 
 import web.checkout.dao.CartDao;
 import web.checkout.vo.CartRow;
 
+@Repository
 public class CartDaoImpl implements CartDao {
 	
     // 查看尚未結帳的購物車

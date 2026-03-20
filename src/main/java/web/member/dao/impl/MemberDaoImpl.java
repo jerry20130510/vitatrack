@@ -22,7 +22,6 @@ public class MemberDaoImpl implements MemberDao {
 
 	@Override
 	public int insert(Member member) {
-
 		session.persist(member);
 		return 1;
 	}
@@ -30,15 +29,12 @@ public class MemberDaoImpl implements MemberDao {
 	@Override
 	public int deleteByEmail(String email) {
 		final String hql = "DELETE FROM Member m WHERE m.email = :email";
-
 		return session.createQuery(hql).setParameter("email", email).executeUpdate();
-
 	}
 
 	// 更新單筆會員
 	@Override
-	public int updateByEmail(Member member) {
-
+	public int update(Member member) {
 		session.merge(member);
 		return 1;
 	}
@@ -52,13 +48,11 @@ public class MemberDaoImpl implements MemberDao {
 	}
 
 	@Override
-	public Member selectByEmailandPassword(String email, String password) {
-		final String hql = "FROM Member m WHERE m.email = :email AND m.password= :password";
-
-		Member member = session.createQuery(hql, Member.class).setParameter("email", email)
-				.setParameter("password", password).uniqueResult();
-		return member;
-
+	public Member selectByMemberId(Integer memberId) {
+		final String hql = "FROM Member m WHERE m.memberId = :memberId ";
+		return session.createQuery(hql, Member.class)
+				.setParameter(" memberId", memberId)
+				.uniqueResult();
 	}
 
 	@Override

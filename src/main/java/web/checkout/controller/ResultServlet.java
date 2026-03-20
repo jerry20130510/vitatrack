@@ -8,14 +8,25 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
 import web.checkout.service.ResultService;
-import web.checkout.service.impl.ResultServiceImpl;
 import web.checkout.vo.ResultDTO;
 
 @WebServlet("/api/checkout/result")
 public class ResultServlet extends HttpServlet {
+	
+	private static final long serialVersionUID = 1L;
 
-	private final ResultService resultService = new ResultServiceImpl();
+	private ResultService resultService;
+	
+	@Override
+	public void init() throws ServletException {
+	    WebApplicationContext context =
+	        WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+	    resultService = context.getBean(ResultService.class);
+	}
 
 	@Override
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

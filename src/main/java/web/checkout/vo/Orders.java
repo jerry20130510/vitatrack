@@ -19,10 +19,10 @@ public class Orders {
     @Column(name = "order_id")
     private Integer orderId;
 
-    @Column(name = "member_id", nullable = false)
+    @Column(name = "member_id")
     private Integer memberId;
 
-    @Column(name = "total_amount", nullable = false)
+    @Column(name = "total_amount")
     private BigDecimal totalAmount;
 
     @Column(name = "payment_method")
@@ -31,7 +31,7 @@ public class Orders {
     @Column(name = "created_at")
     private java.sql.Timestamp createdAt;
 
-    @Column(name = "payment_status", nullable = false)
+    @Column(name = "payment_status")
     private String paymentStatus;
 
     @Column(name = "amount")

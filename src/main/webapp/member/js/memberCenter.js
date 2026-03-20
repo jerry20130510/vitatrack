@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", function () {
     function info(e) {
         e.preventDefault();
 
-        fetch('profile')
+        fetch('getProfile')
             .then(res => res.json())
             .then(member => {
                 console.log(member);
@@ -129,7 +129,7 @@ document.addEventListener("DOMContentLoaded", function () {
             }
         });
 
-        fetch('profile', {
+        fetch('updatedProfile', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(updatedData)
