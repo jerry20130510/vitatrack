@@ -9,13 +9,24 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.context.ApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
+
 import web.checkout.service.CallbackService;
-import web.checkout.service.impl.CallbackServiceImpl;
 
 @WebServlet("/checkout/ecpay/callback")
 public class CallbackServlet extends HttpServlet {
+	
+	private static final long serialVersionUID = 1L;
 
-    private final CallbackService callbackService = new CallbackServiceImpl();
+    private CallbackService callbackService;
+    
+    @Override
+    public void init() {
+        ApplicationContext applicationContext =
+            WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+        callbackService = applicationContext.getBean(CallbackService.class);
+    }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)

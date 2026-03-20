@@ -639,86 +639,23 @@
                                     <div class="mn-checkout-summary">
                                         <div>
                                             <span class="text-left">小計</span>
-                                            <span class="text-right">$295.00</span>
+                                            <span class="text-right" id="subtotal">$0.00</span>
                                         </div>
                                         <div>
                                             <span class="text-left">運費</span>
-                                            <span class="text-right">$80.00</span>
-                                        </div>
-                                        <div>
-                                            <span class="text-left">優惠券折扣</span>
-                                            <span class="text-right"><a class="mn-checkout-coupan">套用優惠券</a></span>
-                                        </div>
-                                        <div class="mn-checkout-coupan-content">
-                                            <form class="mn-checkout-coupan-form" name="mn-checkout-coupan-form"
-                                                method="post" action="#">
-                                                <input class="mn-coupan" type="text" required="" placeholder="輸入您的優惠券代碼"
-                                                    name="mn-coupan" value="">
-                                                <button class="mn-coupan-btn mn-btn-2" type="submit" name="subscribe"
-                                                    value=""><span>套用</span></button>
-                                            </form>
+                                            <span class="text-right" id="shippingFee">$0.00</span>
                                         </div>
                                         <div class="mn-checkout-summary-total">
                                             <span class="text-left">總計</span>
-                                            <span class="text-right">$375.00</span>
+                                            <span class="text-right" id="total">$0.00</span>
                                         </div>
                                     </div>
-                                    <div class="mn-checkout-pro">
-                                        <div class="col-sm-12 mb-6">
-                                            <div class="mn-product-inner">
-                                                <div class="mn-pro-image-outer">
-                                                    <div class="mn-pro-image">
-                                                        <a href="product-detail.html" class="image">
-                                                            <img class="main-image" src="assets/img/product/1.jpg"
-                                                                alt="Product">
-                                                            <img class="hover-image" src="assets/img/product/2.jpg"
-                                                                alt="Product">
-                                                        </a>
-                                                    </div>
-                                                </div>
-                                                <div class="mn-pro-content">
-                                                    <h5 class="mn-pro-title"><a href="product-detail.html">圓領棉質 T 恤</a>
-                                                    </h5>
-                                                    <div class="mn-pro-rating">
-                                                        <i class="ri-star-fill"></i>
-                                                        <i class="ri-star-fill"></i>
-                                                        <i class="ri-star-fill"></i>
-                                                        <i class="ri-star-fill"></i>
-                                                        <i class="ri-star-fill grey"></i>
-                                                    </div>
-                                                    <span class="mn-price">
-                                                        <span class="old-price">$58.00</span>
-                                                        <span class="new-price">$45.00</span>
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
+
+                                    <div class="mn-checkout-pro" id="cartList">
                                         <div class="col-sm-12 mb-0">
                                             <div class="mn-product-inner">
-                                                <div class="mn-pro-image-outer">
-                                                    <div class="mn-pro-image">
-                                                        <a href="product-detail.html" class="image">
-                                                            <img class="main-image" src="assets/img/product/11.jpg"
-                                                                alt="Product">
-                                                            <img class="hover-image" src="assets/img/product/12.jpg"
-                                                                alt="Product">
-                                                        </a>
-                                                    </div>
-                                                </div>
                                                 <div class="mn-pro-content">
-                                                    <h5 class="mn-pro-title"><a href="product-detail.html">數位智慧手錶</a>
-                                                    </h5>
-                                                    <div class="mn-pro-rating">
-                                                        <i class="ri-star-fill"></i>
-                                                        <i class="ri-star-fill"></i>
-                                                        <i class="ri-star-fill"></i>
-                                                        <i class="ri-star-fill"></i>
-                                                        <i class="ri-star-fill"></i>
-                                                    </div>
-                                                    <span class="mn-price">
-                                                        <span class="old-price">$265.00</span>
-                                                        <span class="new-price">$250.00</span>
-                                                    </span>
+                                                    <h5 class="mn-pro-title">購物車資料載入中...</h5>
                                                 </div>
                                             </div>
                                         </div>
@@ -1319,55 +1256,152 @@
     <script src="assets/js/main.js"></script>
 
     <script>
-  //取得「下訂單」按鈕，並監聽 click 事件
-document.getElementById('btnCheckout').addEventListener('click', async function (e) {
-  e.preventDefault();
+        document.addEventListener('DOMContentLoaded', async function () {
+            await loadCheckoutCart();
 
-  const btn = this;
-  const textSpan = btn.querySelector('span');
-  const oldText = textSpan ? textSpan.textContent : '';
+            document.getElementById('btnCheckout').addEventListener('click', async function (e) {
+                e.preventDefault();
 
-  // 防止使用者連續，有此情況會顯示送出中
-  btn.style.pointerEvents = 'none';
-  if (textSpan) textSpan.textContent = '送出中...';
-  
-  //// 呼叫後端，先寫死 memberId = 26
-  try {
-    const resp = await fetch('/vitatrack/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ memberId: 26 }) 
-    });
+                const btn = this;
+                const textSpan = btn.querySelector('span');
+                const oldText = textSpan ? textSpan.textContent : '';
 
-    // 先保險：不一定永遠是 JSON
-    // 如果是 JSON → 用 resp.json()
-    // 否則 → 當純文字處理
-    const contentType = resp.headers.get('content-type') || '';
-    const data = contentType.includes('application/json')
-      ? await resp.json()
-      : { message: await resp.text() };
+                btn.style.pointerEvents = 'none';
+                if (textSpan) textSpan.textContent = '送出中...';
 
-    // 顯示後端錯誤訊息  
-    if (!resp.ok) {
-      alert(data.message || '建立訂單失敗');
-      btn.style.pointerEvents = '';
-      if (textSpan) textSpan.textContent = oldText;
-      return;
-    }
+                try {
+                    const resp = await fetch('/vitatrack/checkout', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                        body: new URLSearchParams({ memberId: 26 })
+                    });
 
-    // 成功導頁
-    window.location.href =
-      'order-confirm.html?orderId=' + encodeURIComponent(data.orderId) +
-      '&totalAmount=' + encodeURIComponent(data.totalAmount) +
-      '&status=' + encodeURIComponent(data.status);
-    // 顯示後端錯誤訊息
-  } catch (err) {
-    alert('系統錯誤或網路異常，請稍後再試');
-    btn.style.pointerEvents = '';
-    if (textSpan) textSpan.textContent = oldText;
-  }
-});
-</script>
+                    const contentType = resp.headers.get('content-type') || '';
+                    const data = contentType.includes('application/json')
+                        ? await resp.json()
+                        : { message: await resp.text() };
+
+                    if (!resp.ok) {
+                        alert(data.error || data.message || '建立訂單失敗');
+                        btn.style.pointerEvents = '';
+                        if (textSpan) textSpan.textContent = oldText;
+                        return;
+                    }
+
+                    window.location.href =
+                        'order-confirm.html?orderId=' + encodeURIComponent(data.orderId) +
+                        '&totalAmount=' + encodeURIComponent(data.totalAmount) +
+                        '&status=' + encodeURIComponent(data.status);
+
+                } catch (err) {
+                    alert('系統錯誤或網路異常，請稍後再試');
+                    btn.style.pointerEvents = '';
+                    if (textSpan) textSpan.textContent = oldText;
+                }
+            });
+        });
+
+        async function loadCheckoutCart() {
+            const memberId = 26; // 先寫死
+            const shippingFeeValue = 0; // 先固定 0
+
+            try {
+                const resp = await fetch('/vitatrack/checkout?memberId=' + memberId);
+
+                const contentType = resp.headers.get('content-type') || '';
+                const data = contentType.includes('application/json')
+                    ? await resp.json()
+                    : [];
+
+                if (!resp.ok) {
+                    throw new Error('載入購物車資料失敗');
+                }
+
+                renderCartItems(data);
+
+                let subtotal = 0;
+                data.forEach(item => {
+                    subtotal += Number(item.price) * Number(item.quantity);
+                });
+
+                const total = subtotal + shippingFeeValue;
+
+                document.getElementById('subtotal').textContent = formatMoney(subtotal);
+                document.getElementById('shippingFee').textContent = formatMoney(shippingFeeValue);
+                document.getElementById('total').textContent = formatMoney(total);
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('cartList').innerHTML = `
+            <div class="col-sm-12 mb-0">
+                <div class="mn-product-inner">
+                    <div class="mn-pro-content">
+                        <h5 class="mn-pro-title">購物車資料載入失敗</h5>
+                        <div>請稍後再試</div>
+                    </div>
+                </div>
+            </div>
+        `;
+            }
+        }
+
+        function renderCartItems(cartItems) {
+            const cartList = document.getElementById('cartList');
+
+            if (!cartItems || cartItems.length === 0) {
+                cartList.innerHTML = `
+            <div class="col-sm-12 mb-0">
+                <div class="mn-product-inner">
+                    <div class="mn-pro-content">
+                        <h5 class="mn-pro-title">購物車目前沒有商品</h5>
+                    </div>
+                </div>
+            </div>
+        `;
+                return;
+            }
+
+            let html = '';
+
+            cartItems.forEach((item, index) => {
+                const price = Number(item.price);
+                const quantity = Number(item.quantity);
+                const subtotal = price * quantity;
+
+                html += `
+            <div class="col-sm-12 ${index === cartItems.length - 1 ? 'mb-0' : 'mb-6'}">
+                <div class="mn-product-inner">
+                    <div class="mn-pro-image-outer">
+                        <div class="mn-pro-image">
+                            <a href="product-detail.html" class="image">
+                                <img class="main-image"
+                                     src="${item.imageUrl ? item.imageUrl : 'assets/img/product/1.jpg'}"
+                                     alt="Product">
+                            </a>
+                        </div>
+                    </div>
+                    <div class="mn-pro-content">
+                        <h5 class="mn-pro-title">
+                            <a href="product-detail.html">${item.productName}</a>
+                        </h5>
+                        <span class="mn-price">
+                            <span class="new-price">${formatMoney(price)}</span>
+                        </span>
+                        <div>數量：${quantity}</div>
+                        <div>小計：${formatMoney(subtotal)}</div>
+                    </div>
+                </div>
+            </div>
+        `;
+            });
+
+            cartList.innerHTML = html;
+        }
+
+        function formatMoney(value) {
+            return '$' + Number(value).toFixed(2);
+        }
+    </script>
 
 
 </body>

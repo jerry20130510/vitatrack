@@ -1,30 +1,26 @@
 package web.member.controller;
 
+import java.util.Map;
 
-import java.io.IOException;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
-import com.google.gson.JsonObject;
 
-@WebServlet("/logout")
-public class LogoutController extends HttpServlet {
-	private static final long serialVersionUID = 1L;
-	
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		resp.setContentType("application/json");
-		HttpSession session = req.getSession(false);
-		if (session!= null) {
+import org.springframework.web.bind.annotation.ResponseBody;
+
+@Controller
+public class LogoutController {
+
+	@PostMapping("/logout")
+	@ResponseBody
+	public Map<String, Object> logout(HttpServletRequest request) {
+		HttpSession session = request.getSession(false);
+		if (session != null) {
 			session.invalidate();
 		}
-		JsonObject result = new JsonObject();
-		result.addProperty("success", true);
-		result.addProperty("message", "登出成功!");
-		resp.getWriter().write(result.toString());
+		return Map.of("success", true, "message", "登出成功!");
+
 	}
 }
