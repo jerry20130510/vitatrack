@@ -3394,7 +3394,8 @@ footer {
     margin-bottom: 30px;
   }
   .mn-footer .footer-top .container > .row {
-    padding: 0;
+      width: 100%;
+  max-width: none; /* 或拉大 */
   }
   .mn-footer .footer-top .mn-footer-widget .s-head {
     display: block;
@@ -7319,10 +7320,10 @@ button.btn-close.qty_close {
   /*-----  Product Info Tabs  -----*/
 }
 .mn-single-product .single-pro-img-no-sidebar {
-  width: 40%;
+  width: 50%;
 }
 .mn-single-product .single-pro-desc-no-sidebar {
-  width: 60%;
+  width: 50%;
 }
 .mn-single-product .single-pro-img {
   position: relative;

@@ -2,6 +2,7 @@ package web.product.service.impl;
 
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.HibernateException;
@@ -161,6 +162,41 @@ public class ProductServiceImpl implements ProductService {
 	        return null;
 	    }
 	    return productDao.selectBySku(sku);
+	}
+
+	public List<Product> selectRelatedBySku(String sku, int size) {
+
+	    Product currentProduct = productDao.selectBySku(sku);
+
+	    if (currentProduct == null) {
+	        return new ArrayList<>();
+	    }
+
+	    return productDao.selectRelated(
+	            currentProduct.getSku(),
+	            currentProduct.getCategoryId(),
+	            size
+	    );
+	}
+
+	@Override
+	public List<Product> selectBySkus(List<String> skus) {
+		if (skus == null || skus.isEmpty()) {
+	        return new ArrayList<>();
+	    }
+	    List<Product> dbList = productDao.selectBySkus(skus);
+	    List<Product> result = new ArrayList<>();
+
+	    for (String sku : skus) {
+	        for (Product p : dbList) {
+	            if (sku.equals(p.getSku())) {
+	                result.add(p);
+	                break;
+	            }
+	        }
+	    }
+
+	    return result;
 	}
 
 
