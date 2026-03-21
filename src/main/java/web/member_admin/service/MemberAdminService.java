@@ -3,6 +3,7 @@ package web.member_admin.service;
 
 
 import web.member.dto.EditMemberStatusRequest;
+import web.member.dto.EditMemberStatusResponse;
 import web.member.vo.Admin;
 
 import web.member_admin.dto.MemberListResponse;
@@ -17,5 +18,5 @@ public interface MemberAdminService {
 	
 	Admin login(Admin admin);
 	
-	EditMemberStatusRequest editMemberStatus(EditMemberStatusRequest member);
+	EditMemberStatusResponse editMemberStatus(Admin admin,EditMemberStatusRequest member);
 }

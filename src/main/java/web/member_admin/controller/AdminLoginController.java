@@ -28,7 +28,7 @@ public class AdminLoginController  {
 		if (loginAdmin == null) {
 			throw new BusinessException("帳號或密碼錯誤，請重新登入!");
 		}
-		session.setAttribute("member", loginAdmin);
+		session.setAttribute("admin", loginAdmin);
 		return Map.of("success", true,"message", "登入成功!");
 	}
 

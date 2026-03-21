@@ -8,9 +8,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
 import web.member.dto.EditMemberStatusRequest;
-import web.member.exception.BusinessException;
+
+import web.member.vo.Admin;
 import web.member_admin.service.MemberAdminService;
 
 
@@ -23,11 +25,11 @@ public class EditStatusController  {
 	//編輯會員狀態
 	@PostMapping("/editStatus")
 	@ResponseBody 
-	public Map<String,Object> EditStatus (@RequestBody EditMemberStatusRequest editMember ){
-		EditMemberStatusRequest memberDb = memberAdminService.editMemberStatus(editMember);
-		if (memberDb == null) {
-			throw new BusinessException("會員狀態更新失敗!");
-		}
+	public Map<String,Object> editStatus (
+			@SessionAttribute("admin") Admin admin,
+			@RequestBody EditMemberStatusRequest editMember ){
+		
+		memberAdminService.editMemberStatus(admin, editMember);		
 		return Map.of("success", true,"message", "會員狀態更新成功!");		
 	}
 	
