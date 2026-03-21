@@ -37,5 +37,7 @@ public class Admin {
 	private Timestamp updatedAt;
 	@Column(name = "admin_status",insertable = false)
 	private Integer adminStatus;
+	@Column(name = "role",insertable = false)
+	private String role;
 	
 }

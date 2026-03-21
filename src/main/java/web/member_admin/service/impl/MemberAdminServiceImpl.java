@@ -2,17 +2,18 @@ package web.member_admin.service.impl;
 
 import java.util.List;
 
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import core.util.HibernateUtil;
 import web.member.dao.AdminDao;
 import web.member.dao.MemberDao;
 import web.member.dto.EditMemberStatusRequest;
+import web.member.dto.EditMemberStatusResponse;
+import web.member.exception.BusinessException;
 import web.member.vo.Admin;
+import web.member.vo.Member;
 import web.member_admin.dto.MemberListResponse;
 import web.member_admin.dto.PageResultResponse;
 import web.member_admin.service.MemberAdminService;
@@ -23,120 +24,101 @@ public class MemberAdminServiceImpl implements MemberAdminService {
 	private MemberDao memberDao;
 	@Autowired
 	private AdminDao adminDao;
-	
-	@Transactional
+
+	@Transactional(readOnly = true)
 	@Override
 	public PageResultResponse<MemberListResponse> getMemberInfo(int page, int size) {
-		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-		Transaction tx = null;
-		try {
-			tx = session.beginTransaction();
-			//計算分頁起始位置。
-			int offset = (page - 1) * size;
-			List<MemberListResponse> members =  memberDao.selectAllWithPagination(offset, size);
-			//計算總會員數
-			long totalNumber = memberDao.countAllMembers();
-			//計算共需要幾頁
-			int totalPages = (int) Math.ceil((double) totalNumber / size);
-			tx.commit();
-			return new PageResultResponse<>(members, totalNumber, totalPages, page);
-
-		} catch (Exception e) {
-			if (tx != null) {
-				tx.rollback();
-			}
-			throw new IllegalArgumentException("取得會員分頁失敗", e);
+		if (page < 1 || size < 1) {
+			throw new BusinessException("分頁參數錯誤");
 		}
+		// 計算分頁起始位置。
+		int offset = (page - 1) * size;
+		List<MemberListResponse> members = memberDao.selectAllWithPagination(offset, size);
+
+		// 計算總會員數
+		long totalNumber = memberDao.countAllMembers();
+		// 計算共需要幾頁
+		int totalPages = (int) Math.ceil((double) totalNumber / size);
+
+		return new PageResultResponse<>(members, totalNumber, totalPages, page);
 
 	}
 
-	@Transactional
+	@Transactional(readOnly = true)
 	@Override
 	public PageResultResponse<MemberListResponse> searchMemberInfo(String keyword, int page, int size) {
-		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-		Transaction tx = null;
-		 if (keyword == null || keyword.trim().isEmpty()) {
-		        return getMemberInfo(page, size);
-		    } 
-		try {
-			tx = session.beginTransaction();
-			// 取得分頁
-			int offset = (page - 1) * size;
-			List<MemberListResponse> members = memberDao.searchMemberWithPagination(keyword, offset, size);
-			// 計算總會員數
-			long totalNumber = memberDao.countMemberByKeyword(keyword);
-			// 計算總頁數
-			int totalPages = (int) Math.ceil((double) totalNumber / size);
-			tx.commit();
-			return new PageResultResponse<>(members, totalNumber, totalPages, page);
-		} catch (Exception e) {
-			if (tx != null) {
-				tx.rollback();
-			}
-			throw new IllegalArgumentException("查詢會員分頁失敗", e);
+		keyword = keyword.trim();
+		if (keyword == null || keyword.isEmpty()) {
+			return getMemberInfo(page, size);
 		}
+		if (page < 1 || size < 1) {
+			throw new BusinessException("分頁參數錯誤");
+		}
+
+		// 取得分頁
+		int offset = (page - 1) * size;
+		List<MemberListResponse> members = memberDao.searchMemberWithPagination(keyword, offset, size);
+		// 計算總會員數
+		long totalNumber = memberDao.countMemberByKeyword(keyword);
+		// 計算總頁數
+		int totalPages = (int) Math.ceil((double) totalNumber / size);
+
+		return new PageResultResponse<>(members, totalNumber, totalPages, page);
 
 	}
 
-	@Transactional
+	@Transactional(readOnly = true)
 	@Override
 	public Admin login(Admin admin) {
-		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-		Transaction tx = null;	
-		try {
-			tx =session.beginTransaction();
-		
-			String account = admin.getAccount();
-			String password = admin.getPassword();
-			if (account == null || account.isEmpty()||password == null || password.isEmpty()) {
-				return null;
-			}
-			
-			Admin dbAdmin= adminDao.SelectByAccountandPassword(account, password);
-			
-			if (dbAdmin == null) {
-				tx.commit();
-				return null;
-			}	
-			if (!dbAdmin.getPassword().equals(password)) {
-				tx.commit();
-				return null;
-			}
-			tx.commit();
-			return dbAdmin;
-		} catch (Exception e) {
-			if (tx!= null) {
-				tx.rollback();
-			}
-			throw new IllegalArgumentException("系統錯誤，登入失敗!", e);
+
+		String account = admin.getAccount();
+		String password = admin.getPassword();
+		if (account == null || account.isEmpty() || password == null || password.isEmpty()) {
+			throw new BusinessException("帳號或密碼不可為空");
 		}
+
+		Admin dbAdmin = adminDao.SelectByAccountandPassword(account, password);
+
+		if (dbAdmin == null) {
+			throw new BusinessException("此帳號不存在!");
+		}
+		if (!dbAdmin.getPassword().equals(password)) {
+
+			throw new BusinessException("輸入的密碼或帳號不正確");
+		}
+		return dbAdmin;
 	}
 
 	@Transactional
 	@Override
-	public EditMemberStatusRequest editMemberStatus(EditMemberStatusRequest member) {
-		
-		if (member == null || member.getEmail() == null || member.getMemberStatus() == null) {
-	        throw new IllegalArgumentException("更新失敗：Email 或會員狀態不能為空！");
-	    }
-		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-		Transaction tx = null;	
-		try {
-			tx =session.beginTransaction();
-			Integer count= memberDao.updateStatusByEmail(member.getMemberStatus(),member.getEmail());
-			if (count == 0) {
-				tx.commit();
-				return null;
-			}
-			tx.commit();
-			return new EditMemberStatusRequest(member.getEmail(),member.getMemberStatus());
-		} catch (Exception e) {
-			if (tx != null) {
-				tx.rollback();
-			}
-			e.printStackTrace();
-			throw new IllegalArgumentException("系統錯誤，會員狀態更新失敗!", e);
+	public EditMemberStatusResponse editMemberStatus(Admin admin, EditMemberStatusRequest member) {
+		if (admin == null) {
+			throw new BusinessException("管理員尚未登入");
 		}
+		if (!"SUPER_ADMIN".equals(admin.getRole())) {
+		        throw new BusinessException("您沒有權限執行此操作");
+		    }
+		if (member == null || member.getEmail() == null || member.getMemberStatus() == null) {
+			throw new BusinessException("更新失敗：Email或會員狀態不能為空！");
+		}
+		
+		String email = member.getEmail().trim();
+	    Integer newStatus = member.getMemberStatus();
+	    if (newStatus != 0 && newStatus != 1) {
+	        throw new BusinessException("會員狀態值不合法");
+	    }
+
+		Member dbMember = memberDao.selectByEmail(email);
+		    if (dbMember == null) {
+		        throw new BusinessException("會員不存在");
+		    }
+		    
+		Integer count = memberDao.updateStatusByEmail(member.getMemberStatus(), member.getEmail());
+		if (count == 0) {
+			throw new BusinessException("會員狀態更新失敗");
+		}
+		
+		return new EditMemberStatusResponse(member.getEmail(), member.getMemberStatus());
 	}
 
 }
