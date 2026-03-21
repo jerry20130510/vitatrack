@@ -13,6 +13,7 @@ import web.member.service.MemberService;
 import web.member.vo.Member;
 import web.member.dto.MemberProfileResponse;
 import web.member.dto.UpdateMemberRequest;
+import web.member.exception.BusinessException;
 
 
 @Controller
@@ -27,6 +28,9 @@ public class ProfileController {
 	public MemberProfileResponse profile(HttpSession session) {
 
 		Member member = (Member) session.getAttribute("member");
+		if (member == null) {
+	        throw new BusinessException("請先登入");
+	    }
 		Member profileMember = memberService.profile(member);
 		MemberProfileResponse result = new MemberProfileResponse(profileMember);
 		return result;

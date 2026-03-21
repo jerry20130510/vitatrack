@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import web.member.exception.BusinessException;
 
@@ -25,6 +26,14 @@ public class GlobalExceptionHandler {
 	    response.put("message", b.getMessage());
 		return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 	}
+	//當客户端發送的請求參數無法被控制器方法正確解析時，就會抛出異常!
+	@ExceptionHandler(MethodArgumentTypeMismatchException.class)
+	public ResponseEntity<Map<String, Object>> handleTypeMismatch(MethodArgumentTypeMismatchException e) {
+	    Map<String, Object> response = new HashMap<>();
+	    response.put("success", false);
+	    response.put("message", "參數格式錯誤");
+	    return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+	}
 
 
 	@ExceptionHandler(Exception.class)
@@ -35,6 +44,8 @@ public class GlobalExceptionHandler {
 		response.put("message", "系統錯誤,請稍後再試");
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 	}
+	
+	
 	
 
 }
