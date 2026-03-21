@@ -2,7 +2,6 @@ package web.member_admin.service.impl;
 
 import java.util.List;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -96,28 +95,28 @@ public class MemberAdminServiceImpl implements MemberAdminService {
 			throw new BusinessException("管理員尚未登入");
 		}
 		if (!"SUPER_ADMIN".equals(admin.getRole())) {
-		        throw new BusinessException("您沒有權限執行此操作");
-		    }
+			throw new BusinessException("您沒有權限執行此操作");
+		}
 		if (member == null || member.getEmail() == null || member.getMemberStatus() == null) {
 			throw new BusinessException("更新失敗：Email或會員狀態不能為空！");
 		}
-		
+
 		String email = member.getEmail().trim();
-	    Integer newStatus = member.getMemberStatus();
-	    if (newStatus != 0 && newStatus != 1) {
-	        throw new BusinessException("會員狀態值不合法");
-	    }
+		Integer newStatus = member.getMemberStatus();
+		if (newStatus != 0 && newStatus != 1) {
+			throw new BusinessException("會員狀態值不合法");
+		}
 
 		Member dbMember = memberDao.selectByEmail(email);
-		    if (dbMember == null) {
-		        throw new BusinessException("會員不存在");
-		    }
-		    
+		if (dbMember == null) {
+			throw new BusinessException("會員不存在");
+		}
+
 		Integer count = memberDao.updateStatusByEmail(member.getMemberStatus(), member.getEmail());
 		if (count == 0) {
 			throw new BusinessException("會員狀態更新失敗");
 		}
-		
+
 		return new EditMemberStatusResponse(member.getEmail(), member.getMemberStatus());
 	}
 
