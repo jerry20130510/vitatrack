@@ -156,23 +156,6 @@
         }
     });
 
-    /*  Wishlist notify js  */
-    $('.mn-wishlist').on("click", function () {
-        $('.mn-wish-notify').remove();
-        $('.mn-compare-notify').remove();
-        $('.mn-cart-notify').remove();
-        if ($(this).hasClass("active")) {
-            $(this).removeClass("active");
-            $('footer').after('<div class="mn-wish-notify"><p class="wish-note remove">Remove product on <a href="wishlist.html"> Wishlist</a> Successfully!</p></div>');
-        } else {
-            $(this).addClass("active");
-            $('footer').after('<div class="mn-wish-notify"><p class="wish-note add">Add product in <a href="wishlist.html"> Wishlist</a> Successfully!</p></div>');
-        }
-
-        setTimeout(function () {
-            $('.mn-wish-notify').fadeOut();
-        }, 2000);
-    });
 
     $('.mn-remove-wish').on("click", function () {
         $(this).parents(".pro-gl-content").remove();
@@ -184,41 +167,20 @@
     });
 
     /*== Add to cart button notify js ==*/
-    $('.mn-add-cart').on("click", function () {
-        $('.mn-wish-notify').remove();
-        $('.mn-compare-notify').remove();
-        $('.mn-cart-notify').remove();
-        var iscartlist = $(this).hasClass("active");
-        if (iscartlist) {
-            $(this).removeClass("active");
-            $('footer').after('<div class="mn-cart-notify"><p class="compare-note remove">Remove product in <a href="cart.html"> Cart</a> Successfully!</p></div>');
-        } else {
-            $(this).addClass("active");
-            $('footer').after('<div class="mn-cart-notify"><p class="compare-note add">Add product in <a href="cart.html"> Cart</a> Successfully!</p></div>');
-        }
-        setTimeout(function () {
-            $('.mn-cart-notify').fadeOut();
-        }, 2000);
-    });
+	$('.mn-add-cart').off("click").on("click", function () {
+	    $('.mn-wish-notify').remove();
+	    $('.mn-compare-notify').remove();
+	    $('.mn-cart-notify').remove();
 
-    /*== Compare notify js ==*/
-    $('.mn-compare').on("click", function () {
-        $('.mn-wish-notify').remove();
-        $('.mn-compare-notify').remove();
-        $('.mn-cart-notify').remove();
-        var isCompare = $(this).hasClass("active");
-        if (isCompare) {
-            $(this).removeClass("active");
-            $('footer').after('<div class="mn-compare-notify"><p class="compare-note remove">Remove product on <a href="compare.html"> Compare list</a> Successfully!</p></div>');
-        } else {
-            $(this).addClass("active");
-            $('footer').after('<div class="mn-compare-notify"><p class="compare-note add">Add product in <a href="compare.html"> Compare list</a> Successfully!</p></div>');
-        }
+	    $('footer').after(
+	        '<div class="mn-cart-notify"><p class="compare-note add">已成功加入購物車</p></div>'
+	    );
 
-        setTimeout(function () {
-            $('.mn-compare-notify').fadeOut();
-        }, 2000);
-    });
+	    setTimeout(function () {
+	        $('.mn-cart-notify').fadeOut();
+	    }, 2000);
+	});
+
 
     /*== Remove Product (Compare page) ==*/
     $('.remove-compare-product').on("click", function () {

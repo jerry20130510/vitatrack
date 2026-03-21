@@ -14,5 +14,8 @@ public interface ProductDao {
 	boolean updateEditableFields(Product product);
 
 	boolean deleteBySku(String sku);
-    
+	
+	List<Product> selectRelated(String sku, Integer categoryId, Integer size);
+
+	List<Product> selectBySkus(List<String> skus);    
 }
