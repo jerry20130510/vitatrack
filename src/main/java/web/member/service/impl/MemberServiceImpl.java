@@ -3,6 +3,8 @@ package web.member.service.impl;
 import java.util.List;
 
 import java.util.stream.Collectors;
+
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -194,6 +196,9 @@ public class MemberServiceImpl implements MemberService {
 			Product product = (Product) obj[1];
 			return new CartItemResponse(cartItem, product);
 		}).collect(Collectors.toList());
+		
+//		BeanUtils.copyProperties(items, result);
+		
 		return result;
 	}
 

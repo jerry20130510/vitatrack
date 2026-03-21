@@ -5,6 +5,7 @@ import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import core.util.HibernateUtil;
@@ -16,6 +17,7 @@ import web.member_admin.dto.MemberListResponse;
 import web.member_admin.dto.PageResultResponse;
 import web.member_admin.service.MemberAdminService;
 
+@Service
 public class MemberAdminServiceImpl implements MemberAdminService {
 	@Autowired
 	private MemberDao memberDao;
