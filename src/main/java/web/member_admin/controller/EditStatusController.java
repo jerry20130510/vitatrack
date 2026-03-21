@@ -1,6 +1,5 @@
 package web.member_admin.controller;
 
-
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,23 +14,19 @@ import web.member.dto.EditMemberStatusRequest;
 import web.member.vo.Admin;
 import web.member_admin.service.MemberAdminService;
 
-
-
 @Controller
-public class EditStatusController  {
+public class EditStatusController {
 	@Autowired
 	private MemberAdminService memberAdminService;
-	
-	//編輯會員狀態
+
+	// 編輯會員狀態
 	@PostMapping("/editStatus")
-	@ResponseBody 
-	public Map<String,Object> editStatus (
-			@SessionAttribute("admin") Admin admin,
-			@RequestBody EditMemberStatusRequest editMember ){
-		
-		memberAdminService.editMemberStatus(admin, editMember);		
-		return Map.of("success", true,"message", "會員狀態更新成功!");		
+	@ResponseBody
+	public Map<String, Object> editStatus(@SessionAttribute("admin") Admin admin,
+			@RequestBody EditMemberStatusRequest editMember) {
+
+		memberAdminService.editMemberStatus(admin, editMember);
+		return Map.of("success", true, "message", "會員狀態更新成功!");
 	}
-	
-		
+
 }

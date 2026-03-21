@@ -1,7 +1,5 @@
 package web.member_admin.controller;
 
-
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,19 +12,19 @@ import web.member_admin.dto.PageResultResponse;
 import web.member_admin.service.MemberAdminService;
 
 @Controller
-public class MemberListController  {
+public class MemberListController {
 	@Autowired
 	private MemberAdminService memberAdminService;
-	//@param page 起始頁碼（預設從1開始)
-	//@param size 每頁筆數（預設10筆）
+
+	// @param page 起始頁碼（預設從1開始)
+	// @param size 每頁筆數（預設10筆）
 	// 查看會員資料(列表)
 	@GetMapping("/memberList")
 	@ResponseBody
-	public PageResultResponse<MemberListResponse> memberList(
-			@RequestParam(value = "page", defaultValue = "1") int page,
-			@RequestParam(value = "size", defaultValue = "10") int size){
-		
+	public PageResultResponse<MemberListResponse> memberList(@RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(value = "size", defaultValue = "10") int size) {
+
 		return memberAdminService.getMemberInfo(page, size);
-		
+
 	}
 }

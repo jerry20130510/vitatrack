@@ -1,6 +1,5 @@
 package web.member_admin.controller;
 
-
 import java.util.Map;
 
 import javax.servlet.http.HttpSession;
@@ -14,22 +13,20 @@ import web.member.exception.BusinessException;
 import web.member.vo.Admin;
 import web.member_admin.service.MemberAdminService;
 
-
-
 @Controller
-public class AdminLoginController  {
+public class AdminLoginController {
 	@Autowired
 	private MemberAdminService memberAdminService;
 
 	@PostMapping("/adminLogin")
 	@ResponseBody
-	public Map<String,Object> adminLogin (@RequestBody Admin admin,HttpSession session){
+	public Map<String, Object> adminLogin(@RequestBody Admin admin, HttpSession session) {
 		Admin loginAdmin = memberAdminService.login(admin);
 		if (loginAdmin == null) {
 			throw new BusinessException("帳號或密碼錯誤，請重新登入!");
 		}
 		session.setAttribute("admin", loginAdmin);
-		return Map.of("success", true,"message", "登入成功!");
+		return Map.of("success", true, "message", "登入成功!");
 	}
 
 }
