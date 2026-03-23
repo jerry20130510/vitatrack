@@ -104,4 +104,50 @@ public class ProductDaoImpl implements ProductDao {
 		
 	}
 
+	@Override
+	public List<Product> selectRelated(String sku, Integer categoryId, Integer size) {
+	    Session session = sessionFactory.getCurrentSession();
+	    try {
+	        Transaction transaction = session.beginTransaction();
+
+	        String hql = "FROM Product p " +
+	                     "WHERE p.categoryId = :categoryId " +
+	                     "AND p.sku != :sku " +
+	                     "ORDER BY p.sku DESC";
+
+	        List<Product> list = session.createQuery(hql, Product.class)
+	                .setParameter("categoryId", categoryId)
+	                .setParameter("sku", sku)
+	                .setMaxResults(size)
+	                .getResultList();
+
+	        transaction.commit();
+	        return list;
+	    } catch (Exception e) {
+	        session.getTransaction().rollback();
+	        throw e;
+	    }
+	}
+
+	@Override
+	public List<Product> selectBySkus(List<String> skus) {
+	    Session session = sessionFactory.getCurrentSession();
+	    try {
+	        Transaction transaction = session.beginTransaction();
+
+	        String hql = "FROM Product p WHERE p.sku IN (:skus)";
+
+	        List<Product> list = session.createQuery(hql, Product.class)
+	                .setParameterList("skus", skus)
+	                .getResultList();
+
+	        transaction.commit();
+	        return list;
+	    } catch (Exception e) {
+	        session.getTransaction().rollback();
+	        throw e;
+	    }
+	}
+
+
 }

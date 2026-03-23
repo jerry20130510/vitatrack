@@ -26,7 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 //--------------------------------------------------------------------------------------------------
     function loadMember() {
-        fetch('profile')
+        fetch('getProfile')
             .then(res => res.json())
             .then(member => {
                 currentMember = member;
@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             <div class="form-row" data-editable="false"><label>使用者帳號</label><p class="readonly">${member.email}</p></div>
                             <div class="form-row" data-field="name"><label>姓名</label><p class="readonly">${member.name}</p></div>
                             <div class="form-row" data-editable="false"><label>Email</label><p class="readonly">${member.email}</p></div>
-                            <div class="form-row" data-field="address"><label>地址</label><p class="readonly">${member.address}</p></div>
+                            <div class="form-row" data-field="address"><label>地址</label><p class="readonly">${member.address?? '尚未填寫'}</p></div>
                             <div class="form-row" data-field="phone"><label>手機號碼</label><p class="readonly">${member.phone}</p></div>
 
                             <div class="form-actions" style="margin-top: 20px; text-align: center;">
@@ -305,16 +305,18 @@ document.addEventListener("DOMContentLoaded", function () {
         })
             .then(result => result.json())
             .then(result => {
+                console.log("回傳資料:", result);
                 if (result.success) {
                     alert(result.message);
-                    location.reload();
+                    window.location.href = "login.html";
                 } else {
                     alert(result.message);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert("系統發生錯誤，"+error.message);
+                alert("系統發生錯誤，請稍後再試");
+                
             });
     }
 //--------------------------------------------------------------------------------------------------
@@ -450,23 +452,31 @@ document.addEventListener("DOMContentLoaded", function () {
 
     }
     //--------------------------------------------------------------------------------------------------
-    function loadCartItems() {
-        fetch('myCartItem')
-            .then(res => res.json())
-            .then(cartItems => {
-                console.log("這是後端回傳:" + cartItems);
+  function loadCartItems() {
+    // 假設 contentArea 已定義，是用來放購物車或訂單的區域
+  
 
+    fetch('myCartItem')
+        .then(res => res.json())
+        .then(cartItems => {
+            console.log("這是後端回傳:", cartItems);
+
+            // 如果購物車沒有商品
+            if (!cartItems || cartItems.length === 0) {
+                contentArea.innerHTML = ` <div class="member-card">
+                        <header class="member-card-header">我的購物車</header>
+                        <div class="member-card-body">
+                            <p>購物車沒有商品</p>
+                        </div>
+                    </div>`;
+                return;
+            }
               
 
-                if (cartItems.length === 0) {
-                    cartDropdown.innerHTML = "<p style='padding:10px'>購物車沒有商品</p>";
-                    return;
-                }
-
-                let rows = ` `;
-
-                cartItems.forEach(item => {
-                    rows += `
+            // 生成 table rows
+            let rows = '';
+            cartItems.forEach(item => {
+                rows += `
                     <tr>
                         <td>${item.productName}</td>
                         <td>${item.sku}</td>
@@ -477,19 +487,16 @@ document.addEventListener("DOMContentLoaded", function () {
                         <td>${item.stockQuantity}</td>
                     </tr>
                 `;
-                });
+            });
 
-                let tablehtml = `
+            // 生成完整 table
+            const tableHtml = `
                 <div class="member-card">
-
-                    <header class="member-card-header" >
-                        我的購物車
+                    <header class="member-card-header">
+                        我的購物車                                                                        
                     </header>
-
                     <div class="member-card-body">
-
-                        <table id="orderTable" class="table table-hover align-middle">
-
+                        <table id="cartTable" class="table table-hover align-middle">
                             <thead>
                                 <tr>
                                     <th>商品名稱</th>
@@ -501,27 +508,24 @@ document.addEventListener("DOMContentLoaded", function () {
                                     <th>庫存量</th>
                                 </tr>
                             </thead>
-
                             <tbody>
                                 ${rows}
                             </tbody>
-
                         </table>
-
                     </div>
-
                 </div>
             `;
-                // 渲染購物車清單
-                contentArea.innerHTML = tablehtml;
+       
 
+            // 渲染到 contentArea
+            contentArea.innerHTML = tableHtml;
 
-            })
-            .catch(err => {
-                console.error("載入購物車失敗", err);
-                alert("載入購物車失敗，請稍後再試");
-            });
-    }
+        })
+        .catch(err => {
+            console.error("載入購物車失敗", err);
+            alert("載入購物車失敗，請稍後再試");
+        });
+}
 
 //--------------------------------------------------------------------------------------------------
     logoutBtn.addEventListener('click', function (e) {

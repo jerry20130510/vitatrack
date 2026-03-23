@@ -1,48 +1,32 @@
 package web.member_admin.controller;
 
-import java.io.IOException;
-
-
-import javax.naming.NamingException;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import web.member_admin.dto.MemberListResponse;
 import web.member_admin.dto.PageResultResponse;
 import web.member_admin.service.MemberAdminService;
-import web.member_admin.service.impl.MemberAdminServiceImpl;
-import com.google.gson.Gson;
 
+//@param page 起始頁碼（預設從1開始)
+//@param size 每頁筆數（預設10筆）
 
-@WebServlet("/memberSearch")
-public class MemberSearchController extends HttpServlet {                                                      
-	private static final long serialVersionUID = 1L;
+@Controller
+public class MemberSearchController {
+	@Autowired
 	private MemberAdminService memberAdminService;
 
-	public  MemberSearchController() throws NamingException {
-                      
-		memberAdminService = new MemberAdminServiceImpl();
-	}
+	// 關鍵字查詢會員
+	@GetMapping("/memberSearch")
+	@ResponseBody
+	public PageResultResponse<MemberListResponse> memberList(
+			@RequestParam(value = "keyword", required = false, defaultValue = "") String keyword,
+			@RequestParam(value = "page", defaultValue = "1") int page,
+			@RequestParam(value = "size", defaultValue = "10") int size) {
 
-	// 查看會員資料
-	@Override
-	protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		resp.setContentType("application/json");
-		Gson gson = new Gson();
-		String keyword = req.getParameter("keyword");
-		String pageParam = req.getParameter("page");
-		int page = (pageParam == null) ? 1 : Integer.parseInt(pageParam);
-	    int size = 10;
-	    try {
-	        PageResultResponse<MemberListResponse> result = memberAdminService.searchMemberInfo(keyword, page, size);
-	        resp.getWriter().write(gson.toJson(result));
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	        resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-	    }
-	}
+		return memberAdminService.searchMemberInfo(keyword, page, size);
 
+	}
 }

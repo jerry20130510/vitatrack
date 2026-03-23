@@ -15,5 +15,7 @@ public interface ProductService {
 
 	List<Product> findAll();
 	
+	List<Product> selectBySkus(List<String> skus);
+
 	Product selectBySku(String sku);
 }

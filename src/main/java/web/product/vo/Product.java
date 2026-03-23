@@ -11,8 +11,6 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "product")
 public class Product {
-	 public Product() {
-	    }
 	@Id
 	private String sku;
 	@Column (name = "category_id")
@@ -35,6 +33,7 @@ public class Product {
 	private Long createdByAdminId;
 	@Column (name = "updated_by_admin_id")
 	private Long updatedByAdminId;
+
 	public String getSku() {
 		return sku;
 	}
@@ -99,22 +98,6 @@ public class Product {
 		return updatedByAdminId;
 	}
 	public void setUpdatedByAdminId(Long updatedByAdminId) {
-		this.updatedByAdminId = updatedByAdminId;
-	}
-	public Product(String sku, Integer categoryId, String productName, String size, BigDecimal price,
-			Integer stockQuantity, String status, String shortDescription, String description, Long createdByAdminId,
-			Long updatedByAdminId) {
-		super();
-		this.sku = sku;
-		this.categoryId = categoryId;
-		this.productName = productName;
-		this.size = size;
-		this.price = price;
-		this.stockQuantity = stockQuantity;
-		this.status = status;
-		this.shortDescription = shortDescription;
-		this.description = description;
-		this.createdByAdminId = createdByAdminId;
 		this.updatedByAdminId = updatedByAdminId;
 	}
 
