@@ -4,7 +4,6 @@ import java.util.List;
 
 import java.util.stream.Collectors;
 
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -43,6 +42,10 @@ public class MemberServiceImpl implements MemberService {
 		if (memberDao.selectByEmail(member.getEmail()) != null) {
 			throw new BusinessException("此帳號已經被註冊了");
 		}
+		//電話唯一性檢查
+		if (memberDao.selectByPhone(member.getPhone()) != null) {
+	        throw new BusinessException("此手機號碼已經被註冊了");
+	    }
 		member.setAddress(validateAddress(member.getAddress()));
 		// 密碼加密
 		String encoded = passwordEncoder.encode(member.getPassword());
@@ -60,20 +63,23 @@ public class MemberServiceImpl implements MemberService {
 		// 驗證帳號和密碼
 		String email = member.getEmail();
 		String password = member.getPassword();
-		if (email == null || email.isEmpty() || password == null || password.isEmpty()) {
+		if (email == null || email.isBlank() || password == null || password.isBlank()) {
 			throw new BusinessException("請輸入帳號或密碼");
 		}
 		Member dbMember = memberDao.selectByEmail(email);
 		if (dbMember == null) {
-			throw new BusinessException("會員帳號不存在!");
+			throw new BusinessException("帳號或密碼錯誤");
+		}
+		
+		if (dbMember.getMemberStatus() != null && dbMember.getMemberStatus() == 0) {
+			throw new BusinessException("此帳號已被註銷或停用");
 		}
 		String dbPassword = dbMember.getPassword();
 		// 資料庫儲存的雜湊值」不匹配時，判定登入失敗。
 		// (使用者輸入的密碼,資料庫中儲存的BCrypt hash)
 		if (!passwordEncoder.matches(password, dbPassword)) {
-			throw new BusinessException("密碼錯誤!");
+			throw new BusinessException("帳號或密碼錯誤");
 		}
-		memberDao.update(dbMember);
 		return dbMember;
 	}
 
@@ -99,7 +105,7 @@ public class MemberServiceImpl implements MemberService {
 		if (member == null) {
 			throw new BusinessException("尚未登入");
 		}
-		// 1:撈出舊資料
+		// 1:撈出資料庫舊資料
 		String email = member.getEmail();
 		Member dbmember = memberDao.selectByEmail(email);
 		if (dbmember == null) {
@@ -112,52 +118,71 @@ public class MemberServiceImpl implements MemberService {
 		if (dto.getAddress() != null) {
 			dbmember.setAddress(validateAddress(dto.getAddress()));
 		}
-		if (dto.getPhone() != null && !dto.getPhone().isEmpty()) {
-			if (dto.getPhone().matches("^09[0-9]{8}$")) {
-				dbmember.setPhone(dto.getPhone());
-			} else {
-				throw new BusinessException("手機號碼格式錯誤或未填寫!");
+		
+		String newPhone = dto.getPhone();
+		//判斷：「使用者這次有沒有要改電話？」
+		if (newPhone != null && !newPhone.isBlank()) {
+			//只有跟舊手機不同時，驗證格式與重複
+			if (!newPhone.equals(dbmember.getPhone())) {
+				validatePhone(newPhone);
+			}
+			//檢查電話唯一性
+			Member phoneMember = memberDao.selectByPhone(dto.getPhone());
+			if (phoneMember != null) {
+				throw new BusinessException("手機號碼已被其他用戶使用!");
 			}
 		}
+		dbmember.setPhone(newPhone);
 
 		return dbmember;
 	}
 
-	//修改密碼
+	// 修改密碼
 	@Transactional
 	@Override
-	public void changePassword(String email, String oldPassword, String newPassword) {
+	public void changePassword(String email, String oldPassword, String newPassword,String confirmPassword) {
 
 		Member memberDb = memberDao.selectByEmail(email);
 		if (memberDb == null) {
 			throw new BusinessException("會員帳號不存在");
 		}
-
-		//舊密碼驗證
+		
+		// 舊密碼驗證
 		String dbPassword = memberDb.getPassword();
 		if (!passwordEncoder.matches(oldPassword, dbPassword)) {
 			throw new BusinessException("舊密碼錯誤");
 		}
-		//驗證新密碼格式
-		if (newPassword == null || !newPassword.matches("^(?=.*[A-Za-z])(?=.*\\d).{8,}$")) {
-			throw new BusinessException("密碼格式錯誤或未填寫(需至少8字元，含英文字母與數字)");
-		}
+		if (passwordEncoder.matches(newPassword, memberDb.getPassword())) {
+	        throw new BusinessException("新密碼不得與舊密碼相同");
+	    }
+		// 驗證新密碼格式與
+		validatePassword(newPassword, confirmPassword);
+		
 		String newPasswordHash = passwordEncoder.encode(newPassword);
 		memberDb.setPassword(newPasswordHash);
 		memberDao.update(memberDb);
-		
+
 	}
 
-	// 刪除會員
+	// 刪除會員(停用)
 	@Transactional
 	@Override
-	public void remove(String email) {
-		if (email == null || email.trim().isEmpty()) {
-			throw new BusinessException("此帳號為無效帳號!");
-		}
-		int count = memberDao.deleteByEmail(email);
-		if (count == 0) {
-			throw new BusinessException("找不到對應的會員帳號");
+	public void remove(String email,String password ) {
+		//1. 撈出會員
+	    Member dbMember = memberDao.selectByEmail(email);
+	    if (dbMember == null) {
+	        throw new BusinessException("帳號不存在");
+	    }
+		
+	    //2. 驗證密碼：確保是本人操作
+	    if (!passwordEncoder.matches(password, dbMember.getPassword())) {
+	        throw new BusinessException("密碼錯誤，無法刪除帳號");
+	    }
+		//3.改成停用狀態
+	    int result = memberDao.updateStatusByEmail(0, email);
+	    
+	    if (result == 0) {
+	    	throw new BusinessException("帳號註銷失敗，請稍後再試");
 		}
 	}
 
@@ -196,9 +221,9 @@ public class MemberServiceImpl implements MemberService {
 			Product product = (Product) obj[1];
 			return new CartItemResponse(cartItem, product);
 		}).collect(Collectors.toList());
-		
+
 //		BeanUtils.copyProperties(items, result);
-		
+
 		return result;
 	}
 

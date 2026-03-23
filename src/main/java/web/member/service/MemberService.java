@@ -13,26 +13,36 @@ import web.member.exception.BusinessException;
 public interface MemberService {
 
 	default void validateName(String name) {
-		if (name == null || name.trim().isEmpty()) {
+		if (name == null || name.isBlank()) {
 			throw new BusinessException("會員名為必填欄位!");
 		}
 	}
 
 	default void validateEmail(String email) {
-		if (email == null || !email.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
-			throw new BusinessException("email格式錯誤或未填寫!");
+		if (email == null || email.isBlank()) {
+			throw new BusinessException("Email為必填欄位!");
+		}
+		if (!email.matches("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+			throw new BusinessException("Email格式錯誤!(請輸入有效的 Email，例如：example@mail.com)");
 		}
 	}
 
 	default void validatePhone(String phone) {
-		if (phone == null || !phone.matches("^09[0-9]{8}$")) {
-			throw new BusinessException("手機號碼格式錯誤或未填寫!");
+		if (phone == null || phone.isBlank()) {
+			throw new BusinessException("手機號碼未填寫!");
+		}
+		if (!phone.matches("^09[0-9]{8}$")) {
+			throw new BusinessException("手機號碼格式錯誤!(必須是09開頭且共10位數字)");
 		}
 	}
 
 	default void validatePassword(String password, String confirmPassword) {
-		if (password == null || !password.matches("^(?=.*[A-Za-z])(?=.*\\d).{8,}$")) {
-			throw new BusinessException("密碼格式錯誤或未填寫!");
+		if (password == null || password.isBlank()) {
+			throw new BusinessException("密碼未填寫!");
+		}
+		if (!password.matches("^(?=.*[A-Za-z])(?=.*\\d).{8,}$")) {
+
+			throw new BusinessException("密碼格式錯誤(需至少8字元，含英文字母與數字)");
 		}
 		if (!password.equals(confirmPassword)) {
 			throw new BusinessException("與設定密碼不一致，請重新輸入!");
@@ -40,13 +50,16 @@ public interface MemberService {
 	}
 
 	default String validateAddress(String address) {
-	        if (address == null) return null;
-	        address = address.trim();
-	        if (address.isEmpty()) return null;
-	        if (address.length() > 200) throw new BusinessException("地址長度過長");
-	        // 簡單防XSS
-	        return address.replaceAll("<[^>]*>", "");
-	    }
+		if (address == null || address.isBlank()) {
+			return null;
+		}
+		address = address.trim();
+		if (address.length() > 200) {
+			throw new BusinessException("地址長度過長");
+		}
+		//簡易防XSS
+		return address.replaceAll("<[^>]*>", "");
+	}
 
 	String register(Member member);
 
@@ -55,12 +68,12 @@ public interface MemberService {
 	Member profile(Member member);
 
 	public Member updateProfile(Member member, UpdateMemberRequest dto);
-    
-    void changePassword(String email,String oldPassword, String newPassword);
-    
-    void remove(String email);
-   
-    PageResultResponse<Orders> viewMyOrder(Member member,int page, int size);
-    
-    List<CartItemResponse> viewMyCartItem (Member member);
+
+	void changePassword(String email, String oldPassword, String newPassword,String confirmPassword);
+
+	void remove(String email, String password);
+
+	PageResultResponse<Orders> viewMyOrder(Member member, int page, int size);
+
+	List<CartItemResponse> viewMyCartItem(Member member);
 }
