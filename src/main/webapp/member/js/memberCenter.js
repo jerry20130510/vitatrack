@@ -53,7 +53,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             <div class="form-row" data-editable="false"><label>使用者帳號</label><p class="readonly">${member.email}</p></div>
                             <div class="form-row" data-field="name"><label>姓名</label><p class="readonly">${member.name}</p></div>
                             <div class="form-row" data-editable="false"><label>Email</label><p class="readonly">${member.email}</p></div>
-                            <div class="form-row" data-field="address"><label>地址</label><p class="readonly">${member.address}</p></div>
+                            <div class="form-row" data-field="address"><label>地址</label><p class="readonly">${member.address?? '尚未填寫'}</p></div>
                             <div class="form-row" data-field="phone"><label>手機號碼</label><p class="readonly">${member.phone}</p></div>
 
                             <div class="form-actions" style="margin-top: 20px; text-align: center;">
@@ -305,16 +305,18 @@ document.addEventListener("DOMContentLoaded", function () {
         })
             .then(result => result.json())
             .then(result => {
+                console.log("回傳資料:", result);
                 if (result.success) {
                     alert(result.message);
-                    location.reload();
+                    window.location.href = "login.html";
                 } else {
                     alert(result.message);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert("系統發生錯誤，"+error.message);
+                alert("系統發生錯誤，請稍後再試");
+                
             });
     }
 //--------------------------------------------------------------------------------------------------
