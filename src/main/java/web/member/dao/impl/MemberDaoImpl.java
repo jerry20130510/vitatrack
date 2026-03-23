@@ -152,4 +152,11 @@ public class MemberDaoImpl implements MemberDao {
 				.executeUpdate();
 	}
 
+	@Override
+	public Member selectByPhone(String phone) {
+		return session.createQuery("FROM Member m WHERE m.phone = :phone",Member.class)
+		.setParameter("phone", phone) 
+		.uniqueResult();
+	}
+
 }
