@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", function () {
                             <div class="form-row" data-field="address"><label>地址</label><p class="readonly">${member.address ?? '尚未填寫'}</p></div>
                             <div class="form-row" data-field="phone"><label>手機號碼</label><p class="readonly">${member.phone}</p></div>
 
-                            <div class="form-actions" style="margin-top: 20px; text-align: center;">
+                            <div class="form-actions" style="margin-top: 20px; text-align: center;justify-content: center; gap: 10px; align-items: center;">
                                 <button  class="mn-btn-1 " id="editBtn" type="button"><span>編輯</span></button>
                                 <button class="mn-btn-1" id="saveBtn" type="button">
                                      <span>儲存變更</span>
@@ -139,7 +139,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.log();
 
                 if (result.success) {
-                    alert("資料已更新");
+                    alert(result.message);
                     location.reload();
                 } else {
                     alert("更新失敗：" + result.message);

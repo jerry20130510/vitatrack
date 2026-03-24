@@ -127,8 +127,9 @@ public class MemberServiceImpl implements MemberService {
 				validatePhone(newPhone);
 			}
 			//檢查電話唯一性
-			Member phoneMember = memberDao.selectByPhone(dto.getPhone());
-			if (phoneMember != null) {
+			//如果查得到人，且那個人「不是我本人」(Email 不一樣)，才會衝突
+			Member phoneOwner = memberDao.selectByPhone(dto.getPhone());
+			if (phoneOwner != null && !phoneOwner.getEmail().equals(dbmember.getEmail())) {
 				throw new BusinessException("手機號碼已被其他用戶使用!");
 			}
 		}
