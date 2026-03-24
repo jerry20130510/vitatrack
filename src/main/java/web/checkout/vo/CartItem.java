@@ -1,5 +1,7 @@
 package web.checkout.vo;
 
+import java.sql.Timestamp;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -10,8 +12,18 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import org.hibernate.annotations.DynamicUpdate;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 @Entity
 @Table(name = "cart_item")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@DynamicUpdate
 public class CartItem {
 
     @Id
@@ -31,6 +43,11 @@ public class CartItem {
     @Column(name = "order_id")
     private Integer orderId; // 允許 null：表示還在購物車
 
+    @Column(name = "created_date", insertable = false, updatable = false)
+    private Timestamp createDate;
+
+    @Column(name = "updated_date", insertable = false, updatable = false)
+    private Timestamp updatedDate;
     /**
      * ORM 關聯：用 cart_item.sku 去對 product.sku
      * insertable/updatable=false 是重點：
@@ -41,52 +58,5 @@ public class CartItem {
     @JoinColumn(name = "sku", referencedColumnName = "sku", insertable = false, updatable = false)
     private web.product.vo.Product product;
 
-	public Integer getCartItemId() {
-		return cartItemId;
-	}
-
-	public void setCartItemId(Integer cartItemId) {
-		this.cartItemId = cartItemId;
-	}
-
-	public Integer getMemberId() {
-		return memberId;
-	}
-
-	public void setMemberId(Integer memberId) {
-		this.memberId = memberId;
-	}
-
-	public String getSku() {
-		return sku;
-	}
-
-	public void setSku(String sku) {
-		this.sku = sku;
-	}
-
-	public Integer getQuantity() {
-		return quantity;
-	}
-
-	public void setQuantity(Integer quantity) {
-		this.quantity = quantity;
-	}
-
-	public Integer getOrderId() {
-		return orderId;
-	}
-
-	public void setOrderId(Integer orderId) {
-		this.orderId = orderId;
-	}
-
-	public web.product.vo.Product getProduct() {
-		return product;
-	}
-
-	public void setProduct(web.product.vo.Product product) {
-		this.product = product;
-	}
-    
+	
 }

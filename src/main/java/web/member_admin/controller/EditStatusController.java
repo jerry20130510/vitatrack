@@ -1,49 +1,32 @@
 package web.member_admin.controller;
 
-import java.io.IOException;
-import javax.naming.NamingException;
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
 import web.member.dto.EditMemberStatusRequest;
-import web.member_admin.service.MemberAdminService;
-import web.member_admin.service.impl.MemberAdminServiceImpl;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
-@WebServlet("/editStatus")
-public class EditStatusController extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+import web.member.vo.Admin;
+import web.member_admin.service.MemberAdminService;
+
+@Controller
+public class EditStatusController {
+	@Autowired
 	private MemberAdminService memberAdminService;
 
-	public EditStatusController() throws NamingException {
-		memberAdminService = new MemberAdminServiceImpl();
+	// 編輯會員狀態
+	@PostMapping("/editStatus")
+	@ResponseBody
+	public Map<String, Object> editStatus(@SessionAttribute("admin") Admin admin,
+			@RequestBody EditMemberStatusRequest editMember) {
+
+		memberAdminService.editMemberStatus(admin, editMember);
+		return Map.of("success", true, "message", "會員狀態更新成功!");
 	}
 
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		resp.setContentType("application/json");
-		Gson gson = new Gson();
-		EditMemberStatusRequest member = gson.fromJson(req.getReader(), EditMemberStatusRequest.class);
-		JsonObject result = new JsonObject();
-		EditMemberStatusRequest memberDb = memberAdminService.editMemberStatus(member);
-		try {
-			if (memberDb == null) {
-				result.addProperty("success", false);
-				result.addProperty("message", "會員狀態更新失敗!");
-			} else {
-				result.addProperty("success", true);
-				result.addProperty("message", "會員狀態更新成功!");
-			}
-			resp.getWriter().write(result.toString());
-		} catch (Exception e) {
-			result.addProperty("message", e.getMessage());
-			resp.getWriter().write(result.toString());
-		}
-		
-		
-	}
 }

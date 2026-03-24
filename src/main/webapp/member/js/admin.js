@@ -181,13 +181,12 @@ function renderResult(members) {
                             <td>${m.phone}</td>
                             <td>${m.address}</td>
                             <td>
-                                <select class="form-select form-select-sm" id="status-${m.memberId}" onchange="saveStatus('${m.email}',  this.value )>
+                                <select class="form-select form-select-sm"  id="status-${m.memberId}" onchange="saveStatus('${m.email}',  this.value )">
                                     <option value="1" ${m.memberStatus === 1 ? "selected" : ""} class="text-success">啟用</option>
                                     <option value="0" ${m.memberStatus === 0 ? "selected" : ""} class="text-danger">停用</option>
                                 </select>
                             </td>
                             <td>${m.registrationTime}</td>
-                            
                         </tr>`;
     });
     tableHtml += `</tbody></table>`;

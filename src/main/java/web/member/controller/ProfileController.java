@@ -1,5 +1,7 @@
 package web.member.controller;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpSession;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import web.member.service.MemberService;
 import web.member.vo.Member;
 import web.member.dto.MemberProfileResponse;
 import web.member.dto.UpdateMemberRequest;
+import web.member.exception.BusinessException;
 
 
 @Controller
@@ -27,6 +30,9 @@ public class ProfileController {
 	public MemberProfileResponse profile(HttpSession session) {
 
 		Member member = (Member) session.getAttribute("member");
+		if (member == null) {
+	        throw new BusinessException("請先登入");
+	    }
 		Member profileMember = memberService.profile(member);
 		MemberProfileResponse result = new MemberProfileResponse(profileMember);
 		return result;
@@ -35,11 +41,12 @@ public class ProfileController {
 	// 修改會員
 	@PostMapping("/updateProfile")
 	@ResponseBody
-	public MemberProfileResponse updateProfile(@RequestBody UpdateMemberRequest memberDTO, HttpSession session) {
+	public Map<String, Object> updateProfile(@RequestBody UpdateMemberRequest memberDTO, HttpSession session) {
 
 		Member loginMember = (Member) session.getAttribute("member");
 		Member updatedMember = memberService.updateProfile(loginMember, memberDTO);
-		return new MemberProfileResponse(updatedMember);
+		session.setAttribute("member", updatedMember);
+		return Map.of("success", true,"message", "會員資訊更新成功");
 	}
 
 }

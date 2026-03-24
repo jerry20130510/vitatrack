@@ -35,5 +35,7 @@ public interface MemberDao {
 	
 	int updateStatusByEmail(Integer memberStatus,String email);
 	
+	Member selectByPhone(String phone);
+	
 	
 }
