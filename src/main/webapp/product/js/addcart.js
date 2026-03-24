@@ -4,7 +4,28 @@
   function getCart() {
     try {
       var raw = localStorage.getItem(CART_KEY);
-      return raw ? JSON.parse(raw) : [];
+      var cart = raw ? JSON.parse(raw) : [];
+      var changed = false;
+
+      cart = cart.map(function (item) {
+        if (item.qty != null) {
+          changed = true;
+        }
+
+        return {
+          sku: item.sku,
+          name: item.name || item.productName || '',
+          price: Number(item.price || 0),
+          quantity: Number(item.quantity != null ? item.quantity : item.qty || 1),
+          image: item.image || ''
+        };
+      });
+
+      if (changed) {
+        localStorage.setItem(CART_KEY, JSON.stringify(cart));
+      }
+
+      return cart;
     } catch (e) {
       console.error('讀取購物車失敗', e);
       return [];
@@ -16,14 +37,14 @@
   }
 
   function getCartTypeCount() {
-	var cart = getCart();
-	var total = 0;
+    var cart = getCart();
+    var total = 0;
 
-	for (var i = 0; i < cart.length; i++) {
-	  total += Number(cart[i].qty || 0);
-	}
+    for (var i = 0; i < cart.length; i++) {
+      total += Number(cart[i].quantity || 0);
+    }
 
-	return total;
+    return total;
   }
 
   function updateCartBadge() {
@@ -51,19 +72,19 @@
       }
     }
 
-    var qtyToAdd = Number(product.qty || 1);
-    if (!Number.isFinite(qtyToAdd) || qtyToAdd <= 0) {
-      qtyToAdd = 1;
+    var quantityToAdd = Number(product.quantity || 1);
+    if (!Number.isFinite(quantityToAdd) || quantityToAdd <= 0) {
+      quantityToAdd = 1;
     }
 
     if (found) {
-      found.qty += qtyToAdd;
+      found.quantity = Number(found.quantity || 0) + quantityToAdd;
     } else {
       cart.push({
         sku: product.sku,
         name: product.name || '',
         price: Number(product.price || 0),
-        qty: qtyToAdd,
+        quantity: quantityToAdd,
         image: product.image || ''
       });
     }
@@ -83,5 +104,5 @@
   document.addEventListener('DOMContentLoaded', function () {
     updateCartBadge();
   });
-  
+
 })();
