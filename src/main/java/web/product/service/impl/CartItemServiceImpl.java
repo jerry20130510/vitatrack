@@ -2,14 +2,21 @@ package web.product.service.impl;
 
 import java.util.List;
 
+import javax.transaction.Transactional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import web.product.dao.CartItemDao;
-import web.product.dao.impl.CartItemDaoImpl;
+
 import web.product.service.CartItemService;
 import web.product.vo.CartItem;
 
+@Service
+@Transactional
 public class CartItemServiceImpl implements CartItemService {
-
-    private CartItemDao dao = new CartItemDaoImpl();
+	@Autowired
+    private CartItemDao dao ;
 
     @Override
     public boolean saveCartItems(List<CartItem> cartItems) {
