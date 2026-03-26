@@ -2,82 +2,59 @@ package web.product.dao.impl;
 
 import java.util.List;
 
-import org.hibernate.HibernateException;
+import javax.persistence.PersistenceContext;
+
+
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import core.util.HibernateUtil;
+import org.springframework.stereotype.Repository;
+
 import web.product.dao.ProductDao;
 import web.product.vo.Product;
 
+@Repository
 public class ProductDaoImpl implements ProductDao {
-	
-	 private final SessionFactory sessionFactory;
 
-	 public ProductDaoImpl() {
-		 this.sessionFactory = HibernateUtil.getSessionFactory();
-		 }
+	@PersistenceContext
+	Session session;
 
 	@Override
 	public List<Product> selectAll() {
-		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-		Session session = sessionFactory.getCurrentSession();
-		try {
-			Transaction transaction = session.beginTransaction();
-			
-			List<Product> list = session
-					.createQuery("FROM Product", Product.class)
-					.getResultList();
-			transaction.commit();
-			return list;
-		} catch (Exception e) {
-			session.getTransaction().rollback();
-			throw e;
-		}
+
+		return session.createQuery("FROM Product", Product.class)
+				.getResultList();
 	}
-	
+
 	@Override
 	public boolean insert(Product product) {
 
-		SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-		Session session = sessionFactory.getCurrentSession();
-		try {
-			Transaction transaction = session.beginTransaction();
-			session.persist(product);
-			transaction.commit();
-			return true;
-		} catch (HibernateException e) {
-			session.getTransaction().rollback();
-
-		}
-		return false;
+		session.persist(product);
+		return true;
 	}
 
 	@Override
 	public boolean updateEditableFields(Product product) {
-		Session session = sessionFactory.getCurrentSession();
 
-        // 先用 sku 找到「資料庫那筆」
-        Product dbProduct = session.get(Product.class, product.getSku());
-        if (dbProduct == null) {
-            return false;
-        }
-        dbProduct.setProductName(product.getProductName());
-        dbProduct.setPrice(product.getPrice());
-        dbProduct.setSize(product.getSize());
-        dbProduct.setStockQuantity(product.getStockQuantity());
-        dbProduct.setDescription(product.getDescription());
-        dbProduct.setShortDescription(product.getShortDescription());
+		// 先用 sku 找到「資料庫那筆」
+		Product dbProduct = session.get(Product.class, product.getSku());
+		if (dbProduct == null) {
+			return false;
+		}
+		dbProduct.setProductName(product.getProductName());
+		dbProduct.setPrice(product.getPrice());
+		dbProduct.setSize(product.getSize());
+		dbProduct.setStockQuantity(product.getStockQuantity());
+		dbProduct.setDescription(product.getDescription());
+		dbProduct.setShortDescription(product.getShortDescription());
 		if (product.getStatus() != null) {
 			dbProduct.setStatus(product.getStatus());
 		}
-        dbProduct.setUpdatedByAdminId(1L);
-        return true;
-    }
+		dbProduct.setUpdatedByAdminId(1L);
+		return true;
+	}
 
 	@Override
 	public boolean deleteBySku(String sku) {
-		Session session = sessionFactory.getCurrentSession();
+
 		Product target = session.get(Product.class, sku);
 		if (target == null) {
 			return false;
@@ -88,66 +65,30 @@ public class ProductDaoImpl implements ProductDao {
 
 	@Override
 	public Product selectBySku(String sku) {
-	    SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
-	    Session session = sessionFactory.getCurrentSession();
-	    try {
-	        Transaction transaction = session.beginTransaction();
 
-	        Product product = session.get(Product.class, sku);
+		return session.get(Product.class, sku);
 
-	        transaction.commit();
-	        return product;
-	    } catch (Exception e) {
-	        session.getTransaction().rollback();
-	        throw e;
-	    }
-		
 	}
 
 	@Override
 	public List<Product> selectRelated(String sku, Integer categoryId, Integer size) {
-	    Session session = sessionFactory.getCurrentSession();
-	    try {
-	        Transaction transaction = session.beginTransaction();
 
-	        String hql = "FROM Product p " +
-	                     "WHERE p.categoryId = :categoryId " +
-	                     "AND p.sku != :sku " +
-	                     "ORDER BY p.sku DESC";
+		final String hql = "FROM Product p " + "WHERE p.categoryId = :categoryId " + "AND p.sku != :sku "
+				+ "ORDER BY p.sku DESC";
 
-	        List<Product> list = session.createQuery(hql, Product.class)
-	                .setParameter("categoryId", categoryId)
-	                .setParameter("sku", sku)
-	                .setMaxResults(size)
-	                .getResultList();
-
-	        transaction.commit();
-	        return list;
-	    } catch (Exception e) {
-	        session.getTransaction().rollback();
-	        throw e;
-	    }
+		return session.createQuery(hql, Product.class).setParameter("categoryId", categoryId).setParameter("sku", sku)
+				.setMaxResults(size)
+				.getResultList();
 	}
 
 	@Override
 	public List<Product> selectBySkus(List<String> skus) {
-	    Session session = sessionFactory.getCurrentSession();
-	    try {
-	        Transaction transaction = session.beginTransaction();
 
-	        String hql = "FROM Product p WHERE p.sku IN (:skus)";
+		final String hql = "FROM Product p WHERE p.sku IN (:skus)";
 
-	        List<Product> list = session.createQuery(hql, Product.class)
-	                .setParameterList("skus", skus)
-	                .getResultList();
-
-	        transaction.commit();
-	        return list;
-	    } catch (Exception e) {
-	        session.getTransaction().rollback();
-	        throw e;
-	    }
+		return session.createQuery(hql, Product.class)
+				.setParameterList("skus", skus)
+				.getResultList();
 	}
-
 
 }

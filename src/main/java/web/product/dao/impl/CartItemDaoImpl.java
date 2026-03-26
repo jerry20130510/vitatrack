@@ -1,61 +1,41 @@
 package web.product.dao.impl;
 
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import javax.persistence.PersistenceContext;
 
-import core.util.HibernateUtil;
+import org.hibernate.Session;
+
+import org.springframework.stereotype.Repository;
 import web.product.dao.CartItemDao;
 import web.product.vo.CartItem;
 
+@Repository
 public class CartItemDaoImpl implements CartItemDao {
 
-    @Override
-    public int insert(CartItem cartItem) {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-        Transaction tx = session.beginTransaction();
-        try {
-            session.save(cartItem);
-            tx.commit();
-            return 1;
-        } catch (Exception e) {
-            tx.rollback();
-            e.printStackTrace();
-            return -1;
-        }
-    }
+	@PersistenceContext
+	private Session session;
 
-    @Override
-    public CartItem selectByMemberIdAndSku(Integer memberId, String sku) {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-        Transaction tx = session.beginTransaction();
-        try {
-            CartItem result = session.createQuery(
-                    "FROM ProductCartItem WHERE memberId = :memberId AND sku = :sku", CartItem.class)
-                    .setParameter("memberId", memberId)
-                    .setParameter("sku", sku)
-                    .uniqueResult();
+	@Override
+	public int insert(CartItem cartItem) {
 
-            tx.commit();
-            return result;
-        } catch (Exception e) {
-            tx.rollback();
-            e.printStackTrace();
-            return null;
-        }
-    }
+		session.save(cartItem);
 
-    @Override
-    public int update(CartItem cartItem) {
-        Session session = HibernateUtil.getSessionFactory().getCurrentSession();
-        Transaction tx = session.beginTransaction();
-        try {
-            session.update(cartItem);
-            tx.commit();
-            return 1;
-        } catch (Exception e) {
-            tx.rollback();
-            e.printStackTrace();
-            return -1;
-        }
-    }
+		return 1;
+	}
+
+	@Override
+	public CartItem selectByMemberIdAndSku(Integer memberId, String sku) {
+		
+			return session
+					.createQuery("FROM ProductCartItem WHERE memberId = :memberId AND sku = :sku", CartItem.class)
+					.setParameter("memberId", memberId).setParameter("sku", sku).uniqueResult();
+	}
+
+	@Override
+	public int update(CartItem cartItem) {	
+		
+			session.update(cartItem);
+			
+			return 1;
+		
+	}
 }
