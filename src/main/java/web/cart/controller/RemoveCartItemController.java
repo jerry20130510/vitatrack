@@ -10,22 +10,25 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import web.cart.dto.AddToCartItemRequest;
-import web.cart.dto.AddToCartItemResponse;
+
 import web.cart.dto.ApiResponse;
+import web.cart.dto.RemoveCartItemRequest;
+import web.cart.dto.RemoveCartItemResponse;
+
 import web.cart.service.CartService;
 import web.member.exception.BusinessException;
 import web.member.vo.Member;
 
 
 @Controller
-public class AddToCartController {
+public class RemoveCartItemController {
+	
 	@Autowired
 	private CartService cartService;
 
-	@PostMapping("/addToCart")
+	@PostMapping("/removeCartItem")
 	@ResponseBody
-	public ApiResponse<AddToCartItemResponse> addToCart(@RequestBody AddToCartItemRequest dto, HttpSession session) {
+	public ApiResponse<RemoveCartItemResponse> removeCartItem(@RequestBody RemoveCartItemRequest dto, HttpSession session) {
 
 		Member loginMember = (Member)session.getAttribute("member");
 		if (loginMember == null) {
@@ -33,9 +36,9 @@ public class AddToCartController {
 		}
 		Integer loginMemberId = loginMember.getMemberId();	
 		
-		AddToCartItemResponse result = cartService.addToCart(loginMemberId,dto.getSku(), dto.getQuantity()); 
+		RemoveCartItemResponse result = cartService.removeItem(loginMemberId, dto.getSkus());
 		
-		return new ApiResponse<AddToCartItemResponse>(true, "加入成功", result);
+		return new ApiResponse<RemoveCartItemResponse>(true, "刪除成功", result);
 
 	}
 

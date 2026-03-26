@@ -9,6 +9,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import core.util.HibernateUtil;
 import web.product.dao.ProductDao;
@@ -16,14 +18,15 @@ import web.product.dao.impl.ProductDaoImpl;
 import web.product.service.ProductService;
 import web.product.vo.Product;
 
-
+@Service
 public class ProductServiceImpl implements ProductService {
+	@Autowired
 	private ProductDao productDao;
     private final SessionFactory sessionFactory;
 	
 	public ProductServiceImpl(){
 		this.sessionFactory =  HibernateUtil.getSessionFactory();
-		productDao = new ProductDaoImpl();
+		
 	}
 	
 	@Override
