@@ -6,18 +6,20 @@ document.addEventListener("DOMContentLoaded", function () {
     const menuLinks = document.querySelectorAll('.menu-link');
     const profile = menuLinks[0];
     const password = menuLinks[1];
+    const privacy = menuLinks[2];
+    const order = menuLinks[3];
     const memberInfo = document.getElementById('memberInfo');
     const orderInfoBtn = document.getElementById('orderInfo');
     const logoutBtn = document.getElementById('logoutBtn');
     const cartIcon = document.getElementById('cartIcon');
-    const privacy = menuLinks[2];
-    const order = menuLinks[3];
+
 
     loadMember();
 
     memberInfo.addEventListener("click", info);
-    profile.addEventListener("click", info);
     orderInfoBtn.addEventListener("click", (e) => orderInfo(e));
+
+    profile.addEventListener("click", info);
     order.addEventListener("click", (e) => orderInfo(e));
     cartIcon.addEventListener("click", loadCartItems);
 
@@ -545,6 +547,7 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(result => result.json())
             .then(result => {
                 if (result.success) {
+                    localStorage.removeItem("token");
                     alert(result.message);
                     window.location.href = 'index.html';
                 }
