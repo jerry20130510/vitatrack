@@ -90,7 +90,8 @@ document.addEventListener("DOMContentLoaded", function () {
             .then(result => {
                 console.log("這是後端回傳結果：", result);
                 if (result.success) {
-
+                    
+                    localStorage.setItem("token", result.token || "login_success");
                     showAlert("會員登入成功<br>歡迎回來！"); //視窗彈出(.style.display = "flex"),會員登入成功<br>歡迎回來！ (.innerHTML)
                     alertBtn.onclick = function () {
                         window.location.href = "memberCenter.html";

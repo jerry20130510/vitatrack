@@ -38,16 +38,10 @@ public class MvcConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-		registry.addInterceptor(loginInterceptor).addPathPatterns("/**") // 攔 API
-				.excludePathPatterns("/login", 
-						"/register", 
-						"/css/**", 
-						"/js/**", 
-						"/images/**", 
-						"/favicon.ico", 
-						"/index.html" 
-				);
-
+	
+	    registry.addInterceptor(loginInterceptor)
+	            .addPathPatterns("/api/**") 
+	            .excludePathPatterns("/api/login", "/api/register"); 
 	}
 
 }
