@@ -1,81 +1,71 @@
 package web.product.service.impl;
 
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 
-import core.util.HibernateUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import web.product.dao.ProductDao;
-import web.product.dao.impl.ProductDaoImpl;
+
 import web.product.service.ProductService;
 import web.product.vo.Product;
 
-
+@Service
 public class ProductServiceImpl implements ProductService {
+	@Autowired
 	private ProductDao productDao;
-    private final SessionFactory sessionFactory;
-	
-	public ProductServiceImpl(){
-		this.sessionFactory =  HibernateUtil.getSessionFactory();
-		productDao = new ProductDaoImpl();
-	}
-	
+
 	@Override
 	public boolean add(Product product) {
-	    if (product == null) {
-	        return false;
-	    }
-	    // 商品名稱
-	    if (product.getProductName() == null){
-	        return false;
-	    }
-	    // 價格 > 0
-	    if (product.getPrice() == null || product.getPrice().compareTo(java.math.BigDecimal.ZERO) <= 0) {
-	        return false;
-	    }
-	    // 顆數 > 0
-	    if (product.getSize() == null || product.getSize().trim().isEmpty()) {
-	        return false;
-	    }
-	    // 商品數量 > 0
-	    if (product.getStockQuantity() <= 0) {
-	        return false;
-	    }
-	    // 商品描述
-	    if (product.getDescription() == null || product.getDescription().trim().isEmpty()) {
-	        return false;
-	    }
-	    // 商品簡述
-	    if (product.getShortDescription() == null || product.getShortDescription().trim().isEmpty()) {
-	        return false;
-	    }
-	    // 商品狀態是否為上架
-	    if (product.getStatus() == null || product.getShortDescription().trim().isEmpty()) {
-	        return false;
-	    }
-	    
-	    product.setSku(generateSku());
-	    product.setCreatedByAdminId(1L);
-	    product.setCategoryId(1);
+		if (product == null) {
+			return false;
+		}
+		// 商品名稱
+		if (product.getProductName() == null) {
+			return false;
+		}
+		// 價格 > 0
+		if (product.getPrice() == null || product.getPrice().compareTo(java.math.BigDecimal.ZERO) <= 0) {
+			return false;
+		}
+		// 顆數 > 0
+		if (product.getSize() == null || product.getSize().trim().isEmpty()) {
+			return false;
+		}
+		// 商品數量 > 0
+		if (product.getStockQuantity() <= 0) {
+			return false;
+		}
+		// 商品描述
+		if (product.getDescription() == null || product.getDescription().trim().isEmpty()) {
+			return false;
+		}
+		// 商品簡述
+		if (product.getShortDescription() == null || product.getShortDescription().trim().isEmpty()) {
+			return false;
+		}
+		// 商品狀態是否為上架
+		if (product.getStatus() == null || product.getShortDescription().trim().isEmpty()) {
+			return false;
+		}
 
-	    
-	    // 驗證通過才寫入資料庫
-	    return productDao.insert(product);
+		product.setSku(generateSku());
+		product.setCreatedByAdminId(1L);
+		product.setCategoryId(1);
+
+		// 驗證通過才寫入資料庫
+		return productDao.insert(product);
 	}
-	//自動取sku編號
+
+	// 自動取sku編號
 	private String generateSku() {
-	    String datePart = new java.text.SimpleDateFormat("yyyyMMdd")
-	            .format(new java.util.Date());
+		String datePart = new java.text.SimpleDateFormat("yyyyMMdd").format(new java.util.Date());
 
-	    String randomPart = String.valueOf((int)(Math.random() * 9000) + 1000);
+		String randomPart = String.valueOf((int) (Math.random() * 9000) + 1000);
 
-	    return datePart + randomPart;
+		return datePart + randomPart;
 	}
 
 	@Override
@@ -85,70 +75,46 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	public boolean update(Product product) {
-        
+
 		if (product == null) {
 			return false;
 		}
 
-        if (product.getSku() == null || product.getSku().trim().isEmpty()) {
-        	return false;
-        }
-        if (product.getProductName() == null || product.getProductName().trim().isEmpty()) {
-        	return false;
-        }
-        if (product.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
-        	return false;
-        }
-        if (product.getSize() == null || product.getSize().trim().isEmpty()) {
-        	return false;
-        }
-        if (product.getStockQuantity() <= 0) {
-        	return false;
-        }
-        if (product.getDescription() == null || product.getDescription().trim().isEmpty()) {
-        	return false;
-        }
-        if (product.getShortDescription() == null || product.getShortDescription().trim().isEmpty()) {
-        	return false;
-        }
-        if (product.getStatus() == null) {
+		if (product.getSku() == null || product.getSku().trim().isEmpty()) {
+			return false;
+		}
+		if (product.getProductName() == null || product.getProductName().trim().isEmpty()) {
+			return false;
+		}
+		if (product.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
+			return false;
+		}
+		if (product.getSize() == null || product.getSize().trim().isEmpty()) {
+			return false;
+		}
+		if (product.getStockQuantity() <= 0) {
+			return false;
+		}
+		if (product.getDescription() == null || product.getDescription().trim().isEmpty()) {
+			return false;
+		}
+		if (product.getShortDescription() == null || product.getShortDescription().trim().isEmpty()) {
+			return false;
+		}
+		if (product.getStatus() == null) {
 			return false;
 		}
 
-        Session session = sessionFactory.getCurrentSession();
-        try {
-            session.beginTransaction();
+		boolean result = productDao.updateEditableFields(product);
 
-            boolean result = productDao.updateEditableFields(product);
-
-            session.getTransaction().commit();
-            return result;
-
-        } catch (Exception e) {
-            if (session.getTransaction() != null) {
-                session.getTransaction().rollback();
-            }
-            e.printStackTrace();
-            return false;
-        }
+		return result;
 
 	}
 
 	@Override
-	public boolean deleteBySku(String sku) {
-		Session session = sessionFactory.getCurrentSession();
-		Transaction tx = null;
-		try {
-			tx = session.beginTransaction();
-			boolean ok = productDao.deleteBySku(sku);
-			tx.commit();
-			return ok;
-		} catch (HibernateException e) {
-			if (tx != null) {
-				tx.rollback();
-			}
-			e.printStackTrace();
-		}		return false;
+	public boolean deleteBySku(String sku) {				
+		return productDao.deleteBySku(sku);
+	
 	}
 
 	@Override
@@ -159,45 +125,40 @@ public class ProductServiceImpl implements ProductService {
 	@Override
 	public Product selectBySku(String sku) {
 		if (sku == null || sku.trim().isEmpty()) {
-	        return null;
-	    }
-	    return productDao.selectBySku(sku);
+			return null;
+		}
+		return productDao.selectBySku(sku);
 	}
 
 	public List<Product> selectRelatedBySku(String sku, int size) {
 
-	    Product currentProduct = productDao.selectBySku(sku);
+		Product currentProduct = productDao.selectBySku(sku);
 
-	    if (currentProduct == null) {
-	        return new ArrayList<>();
-	    }
+		if (currentProduct == null) {
+			return new ArrayList<>();
+		}
 
-	    return productDao.selectRelated(
-	            currentProduct.getSku(),
-	            currentProduct.getCategoryId(),
-	            size
-	    );
+		return productDao.selectRelated(currentProduct.getSku(), currentProduct.getCategoryId(), size);
 	}
 
 	@Override
 	public List<Product> selectBySkus(List<String> skus) {
 		if (skus == null || skus.isEmpty()) {
-	        return new ArrayList<>();
-	    }
-	    List<Product> dbList = productDao.selectBySkus(skus);
-	    List<Product> result = new ArrayList<>();
+			return new ArrayList<>();
+		}
+		List<Product> dbList = productDao.selectBySkus(skus);
+		List<Product> result = new ArrayList<>();
 
-	    for (String sku : skus) {
-	        for (Product p : dbList) {
-	            if (sku.equals(p.getSku())) {
-	                result.add(p);
-	                break;
-	            }
-	        }
-	    }
+		for (String sku : skus) {
+			for (Product p : dbList) {
+				if (sku.equals(p.getSku())) {
+					result.add(p);
+					break;
+				}
+			}
+		}
 
-	    return result;
+		return result;
 	}
-
 
 }

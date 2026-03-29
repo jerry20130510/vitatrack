@@ -12,6 +12,7 @@
 		<mapping class="web.blog.vo.Blogger" />
 		<mapping class="web.member.vo.Member" />
 		<mapping class="web.product.vo.Product" />
+		<mapping class="web.product.vo.CartItem"/>
 		<mapping class="web.member.vo.PasswordResetTokens" />
 		<mapping class="web.checkout.vo.Orders" />
 		<mapping class="web.checkout.vo.CartItem" />

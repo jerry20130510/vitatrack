@@ -1,5 +1,26 @@
 function getCart() {
-  return JSON.parse(localStorage.getItem("cart")) || [];
+  var cart = JSON.parse(localStorage.getItem("cart")) || [];
+  var changed = false;
+
+  cart = cart.map(function(item) {
+    if (item.qty != null) {
+      changed = true;
+    }
+
+    return {
+      sku: item.sku,
+      name: item.name || item.productName || '',
+      price: Number(item.price || 0),
+      quantity: Number(item.quantity != null ? item.quantity : item.qty || 1),
+      image: item.image || ''
+    };
+  });
+
+  if (changed) {
+    localStorage.setItem("cart", JSON.stringify(cart));
+  }
+
+  return cart;
 }
 
 function saveCart(cart) {
@@ -17,6 +38,10 @@ function removeItem(sku) {
 
   saveCart(cart);
   renderCartPage();
+
+  if (window.CartStore && typeof window.CartStore.updateCartBadge === "function") {
+    window.CartStore.updateCartBadge();
+  }
 }
 
 function renderCartPage() {
@@ -41,38 +66,38 @@ function renderCartPage() {
 
   for (var i = 0; i < cart.length; i++) {
     var item = cart[i];
-    var qty = Number(item.qty || 1);
+    var quantity = Number(item.quantity || 1);
     var price = Number(item.price || 0);
-    var subtotal = qty * price;
+    var subtotal = quantity * price;
     total += subtotal;
 
     html += `
-	<tr class="mn-cart-product">
-	  <td data-label="Product" class="mn-cart-pro-name">
-	    <a href="product-detail.html?sku=${item.sku || ''}">
-	      <img class="mn-cart-pro-img" src="${item.image || 'assets/img/product/default.jpg'}" alt="">
-	      ${item.name || ''}
-	    </a>
-	  </td>
-	  <td data-label="Price" class="mn-cart-pro-price">
-	    <span class="amount">${formatPrice(price)}</span>
-	  </td>
-	  <td data-label="Quantity" class="mn-cart-pro-qty" style="text-align:center;">
-	    <div class="cart-qty-box">
-	      <button type="button" onclick="changeQty('${item.sku}', -1)">-</button>
-	      <input type="text" value="${qty}" readonly style="width:40px; text-align:center;">
-	      <button type="button" onclick="changeQty('${item.sku}', 1)">+</button>
-	    </div>
-	  </td>
-	  <td data-label="Total" class="mn-cart-pro-subtotal">
-	    ${formatPrice(subtotal)}
-	  </td>
-	  <td data-label="Remove" class="mn-cart-pro-remove">
-	    <a href="javascript:void(0)" onclick="removeItem('${item.sku}')">
-	      <i class="ri-delete-bin-line"></i>
-	    </a>
-	  </td>
-	</tr>
+      <tr class="mn-cart-product">
+        <td data-label="Product" class="mn-cart-pro-name">
+          <a href="product-detail.html?sku=${item.sku || ''}">
+            <img class="mn-cart-pro-img" src="${item.image || 'assets/img/product/default.jpg'}" alt="">
+            ${item.name || item.productName || ''}
+          </a>
+        </td>
+        <td data-label="Price" class="mn-cart-pro-price">
+          <span class="amount">${formatPrice(price)}</span>
+        </td>
+        <td data-label="Quantity" class="mn-cart-pro-qty" style="text-align:center;">
+          <div class="cart-qty-box">
+            <button type="button" onclick="changeQty('${item.sku}', -1)">-</button>
+            <input type="text" value="${quantity}" readonly style="width:40px; text-align:center;">
+            <button type="button" onclick="changeQty('${item.sku}', 1)">+</button>
+          </div>
+        </td>
+        <td data-label="Total" class="mn-cart-pro-subtotal">
+          ${formatPrice(subtotal)}
+        </td>
+        <td data-label="Remove" class="mn-cart-pro-remove">
+          <a href="javascript:void(0)" onclick="removeItem('${item.sku}')">
+            <i class="ri-delete-bin-line"></i>
+          </a>
+        </td>
+      </tr>
     `;
   }
 
@@ -92,9 +117,9 @@ function changeQty(sku, delta) {
 
   for (var i = 0; i < cart.length; i++) {
     if (cart[i].sku === sku) {
-      cart[i].qty = Number(cart[i].qty || 1) + delta;
+      cart[i].quantity = Number(cart[i].quantity || 1) + delta;
 
-      if (cart[i].qty <= 0) {
+      if (cart[i].quantity <= 0) {
         cart.splice(i, 1);
       }
       break;
@@ -117,28 +142,42 @@ function checkoutNow() {
     return;
   }
 
-  fetch("/vitatrack/checkout", {
+  var payloadItems = cart.map(function(item) {
+    return {
+      sku: item.sku,
+      productName: item.productName || item.name || "",
+      price: Number(item.price || 0),
+      quantity: Number(item.quantity || item.qty || 1)
+    };
+  });
+
+  fetch("/vitatrack/cart-item/checkout", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      items: cart
+      items: payloadItems
     })
   })
-  .then(function(response) {
-    return response.json();
-  })
-  .then(function(result) {
-    if (result.success) {
-      localStorage.removeItem("vitatrack_cart");
-      window.location.href = "checkout.html?orderId=" + result.orderId;
-    } else {
-      alert(result.message || "結帳失敗");
-    }
-  })
-  .catch(function(error) {
-    console.error(error);
-    alert("結帳失敗，請稍後再試");
-  });
+    .then(function(response) {
+      return response.json();
+    })
+    .then(function(result) {
+      if (result.success) {
+        localStorage.removeItem("cart");
+
+        if (window.CartStore && typeof window.CartStore.updateCartBadge === "function") {
+          window.CartStore.updateCartBadge();
+        }
+
+        window.location.href = "/vitatrack/checkout/checkout.html";
+      } else {
+        alert(result.message || "結帳失敗");
+      }
+    })
+    .catch(function(error) {
+      console.error(error);
+      alert("系統錯誤，請稍後再試");
+    });
 }

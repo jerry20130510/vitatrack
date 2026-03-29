@@ -99,7 +99,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 } else {
 
-                    showAlert("帳號或密碼錯誤<br>請重新輸入!");
+                    showAlert(result.message);
                     loginForm.reset();
                 }
             }).catch(error => {

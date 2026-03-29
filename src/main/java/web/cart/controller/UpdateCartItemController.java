@@ -10,22 +10,23 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import web.cart.dto.AddToCartItemRequest;
-import web.cart.dto.AddToCartItemResponse;
+
 import web.cart.dto.ApiResponse;
+import web.cart.dto.UpdateCartItemRequest;
+import web.cart.dto.UpdateCartItemResponse;
 import web.cart.service.CartService;
 import web.member.exception.BusinessException;
 import web.member.vo.Member;
 
 
 @Controller
-public class AddToCartController {
+public class UpdateCartItemController {
 	@Autowired
 	private CartService cartService;
 
-	@PostMapping("/addToCart")
+	@PostMapping("/updateCartItem")
 	@ResponseBody
-	public ApiResponse<AddToCartItemResponse> addToCart(@RequestBody AddToCartItemRequest dto, HttpSession session) {
+	public ApiResponse<UpdateCartItemResponse> updateCartItem(@RequestBody UpdateCartItemRequest dto, HttpSession session) {
 
 		Member loginMember = (Member)session.getAttribute("member");
 		if (loginMember == null) {
@@ -33,9 +34,9 @@ public class AddToCartController {
 		}
 		Integer loginMemberId = loginMember.getMemberId();	
 		
-		AddToCartItemResponse result = cartService.addToCart(loginMemberId,dto.getSku(), dto.getQuantity()); 
+		UpdateCartItemResponse result = cartService.updateQuantity(loginMemberId, dto.getSku(), dto.getQuantity());
 		
-		return new ApiResponse<AddToCartItemResponse>(true, "加入成功", result);
+		return new ApiResponse<UpdateCartItemResponse>(true, "更新成功", result);
 
 	}
 

@@ -27,7 +27,8 @@ public class ChangePasswordController {
 		if (member == null) {
 			throw new BusinessException("請先登入");
 		}
-		memberService.changePassword(member.getEmail(), dto.getOldPassword(), dto.getNewPassword());
+		memberService.changePassword(member.getEmail(), dto.getOldPassword(), dto.getNewPassword(),dto.getConfirmPassword());
+		session.invalidate();
 		return Map.of("success", true, "message", "密碼更新成功，請重新登入");
 	}
 
