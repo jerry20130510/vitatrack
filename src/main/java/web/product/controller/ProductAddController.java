@@ -1,38 +1,26 @@
 package web.product.controller;
 
-import java.io.IOException;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import com.google.gson.Gson;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
 
 import web.product.service.ProductService;
-import web.product.service.impl.ProductServiceImpl;
+
 import web.product.vo.Product;
 
-
-@WebServlet("/product-add")
-public class ProductAddController extends HttpServlet {
-	private static final long serialVersionUID = 1L;
+@RestController
+public class ProductAddController {
+	@Autowired
 	private ProductService productService;
-	
-	@Override
-	public void init() throws ServletException {
-		productService = new ProductServiceImpl();
-	}
-	
-	@Override
-	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Gson gson = new Gson();
-        Product product = gson.fromJson(req.getReader(), Product.class);
 
-        boolean success = productService.add(product);
-
-        resp.getWriter().write(gson.toJson(success));
+	@PostMapping("/product-add")
+	public boolean addProduct(@RequestBody Product product) {
+		
+		return productService.add(product);
 	}
 
 }

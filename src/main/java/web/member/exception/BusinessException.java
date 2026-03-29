@@ -1,20 +1,25 @@
 package web.member.exception;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import org.springframework.http.HttpStatus;
 
 public class BusinessException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
-	private static final Logger logger = LogManager.getLogger(BusinessException.class);
+
+	private final HttpStatus status; // 新增狀態碼欄位
 
 	public BusinessException(String message) {
-		super(message);
-		logger.error("BusinessException: {}", message);
+		this(message, HttpStatus.BAD_REQUEST); // 預設 400
+		
 	}
 
-	public BusinessException(String message, Throwable e) {
-		super(message,e);
-		logger.error("BusinessException: {}", message, e);
+	public BusinessException(String message, HttpStatus status) {
+		super(message);
+		this.status = status;
+		
+	}
+
+	public HttpStatus getStatus() {
+		return status;
 	}
 }

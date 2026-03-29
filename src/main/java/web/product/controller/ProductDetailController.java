@@ -1,59 +1,37 @@
 package web.product.controller;
 
-import java.io.IOException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
-import com.google.gson.Gson;
 
+import web.member.exception.BusinessException;
 import web.product.service.ProductService;
-import web.product.service.impl.ProductServiceImpl;
+
 import web.product.vo.Product;
 
-@WebServlet("/product-detail")
-public class ProductDetailController extends HttpServlet{
-	private static final long serialVersionUID = 1L;
+@RestController
+public class ProductDetailController {
 
-    private ProductService productService;
+	@Autowired
+	private ProductService productService;
 
-    @Override
-    public void init() throws ServletException {
-        productService = new ProductServiceImpl();
-    }
+	@GetMapping("/product-detail")
+	public ResponseEntity<Product> getProductDetail(@RequestParam(value = "sku") String sku) {
+		if (sku == null || sku.isBlank()) {
+			throw new BusinessException("SKU 不能為空");
+		}
+		
+		Product p = productService.selectBySku(sku);
 
-    @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
-            throws ServletException, IOException {
-
-        resp.setContentType("application/json;charset=utf-8");
-
-        String sku = req.getParameter("sku");
-        if (sku == null || sku.trim().isEmpty()) {
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.getWriter().write("{}");
-            return;
-        }
-
-        try {
-            Product p = productService.selectBySku(sku);
-            if (p == null) {
-                resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                resp.getWriter().write("{}");
-                return;
-            }
-
-            Gson gson = new Gson();
-            resp.getWriter().write(gson.toJson(p));
-            
-        } catch (Exception e) {
-            e.printStackTrace();
-            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-            resp.getWriter().write("{}");
-        }
-    }
-    
+		if (p == null) {
+			throw new BusinessException("找不到該 SKU 的商品", HttpStatus.NOT_FOUND);
+		}
+		
+		return ResponseEntity.ok(p);
+	}
 }
