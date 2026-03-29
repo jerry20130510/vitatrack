@@ -7,11 +7,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import core.util.HibernateUtil;
 import web.checkout.dao.OrderDao;
 import web.checkout.dao.OrderItemDao;
 import web.checkout.service.PaymentService;
@@ -23,11 +23,13 @@ public class PaymentServiceImpl implements PaymentService {
 
 	private final OrderDao orderDao;
 	private final OrderItemDao orderItemDao;
+	private final SessionFactory sessionFactory;
 	
 	@Autowired
-	public PaymentServiceImpl(OrderDao orderDao, OrderItemDao orderItemDao) {
-		this.orderDao = orderDao;
-		this.orderItemDao = orderItemDao;
+	public PaymentServiceImpl(OrderDao orderDao, OrderItemDao orderItemDao, SessionFactory sessionFactory) {
+	    this.orderDao = orderDao;
+	    this.orderItemDao = orderItemDao;
+	    this.sessionFactory = sessionFactory;
 	}
 
 
@@ -49,46 +51,17 @@ public class PaymentServiceImpl implements PaymentService {
 
 	// 開關 Session + 啟動串金流
 	@Override
+	@Transactional
 	public EcpayCheckoutPayload createEcpayCheckout(int orderId) {
-
-		Session session = null;
-		Transaction tx = null;
-
-		try {
-			session = HibernateUtil.getSessionFactory().openSession();
-			tx = session.beginTransaction();
-
-			EcpayCheckoutPayload payload = createEcpayCheckout(session, orderId);
-
-			tx.commit();
-			return payload;
-
-		} catch (Exception ex) {
-
-			if (tx != null) {
-				try {
-					tx.rollback();
-				} catch (Exception ignore) {
-				}
-			}
-			throw new RuntimeException(ex);
-
-		} finally {
-
-			if (session != null) {
-				try {
-					session.close();
-				} catch (Exception ignore) {
-				}
-			}
-		}
+	    Session session = sessionFactory.getCurrentSession();
+	    return createEcpayCheckout(session, orderId);
 	}
 
 	// 驗證是否可付款 + 產生交易號 + 更新 orders.transaction_id + 組 itemName
 	private OrderPaymentInfo validateOrderCanPay(Session session, int orderId) {
 
 		// 1.查訂單
-		OrderPaymentInfo info = orderDao.selectPaymentInfoByOrderId(session, orderId);
+		OrderPaymentInfo info = orderDao.selectPaymentInfoByOrderId(orderId);
 		// 1.1 訂單不存在
 		if (info == null)
 			return null;
@@ -99,7 +72,7 @@ public class PaymentServiceImpl implements PaymentService {
 		// 3.產生 transactionId
 		String transactionId = generateUniqueTxId(session);
 		// 4.更新 orders.transaction_id
-		int updated = orderDao.updateTransactionId(session, orderId, transactionId);
+		int updated = orderDao.updateTransactionId(orderId, transactionId);
 		if (updated <= 0) {
 			throw new RuntimeException("updateTransactionId updated 0 rows.");
 		}
@@ -107,7 +80,7 @@ public class PaymentServiceImpl implements PaymentService {
 		info.setTransactionId(transactionId);
 
 		// 5.從 order_item 取 product_name
-		List<String> names = orderItemDao.selectProductNamesByOrderId(session, orderId);
+		List<String> names = orderItemDao.selectProductNamesByOrderId(orderId);
 		if (names == null || names.isEmpty()) {
 			return null;
 		}
@@ -156,7 +129,7 @@ public class PaymentServiceImpl implements PaymentService {
 		// 1.產生transactionId
 		String txid = "TXN" + System.currentTimeMillis();
 		// 2.檢查是否重複
-		boolean exists = orderDao.existsTransactionId(session, txid);
+		boolean exists = orderDao.existsTransactionId(txid);
 		if (!exists)
 			return txid;
 		return txid;
