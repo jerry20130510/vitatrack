@@ -4,11 +4,11 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import core.util.HibernateUtil;
 import web.checkout.dao.OrderDao;
 import web.checkout.service.CallbackService;
 import web.checkout.vo.Orders;
@@ -19,14 +19,19 @@ public class CallbackServiceImpl implements CallbackService {
 	private static final String HASH_KEY = "pwFHCqoQZGmho4w6";
 	private static final String HASH_IV = "EkRm7IFT261dpevs";
 	private final OrderDao orderDao;
-	
+	private final SessionFactory sessionFactory;
+
 	@Autowired
-	public CallbackServiceImpl(OrderDao orderDao) {
+	public CallbackServiceImpl(OrderDao orderDao, SessionFactory sessionFactory) {
 		this.orderDao = orderDao;
+		this.sessionFactory = sessionFactory;
 	}
 
+	@Transactional
 	@Override
 	public String handleCallback(Map<String, String> params) {
+
+		Session session = sessionFactory.getCurrentSession();
 
 		// 1.取得綠界提供的 CheckMacValue
 		String cmv = params.get("CheckMacValue");
@@ -68,84 +73,56 @@ public class CallbackServiceImpl implements CallbackService {
 			return "0|ERROR";
 		}
 
-		Session session = null;
-		Transaction tx = null;
-
-		try {
-			session = HibernateUtil.getSessionFactory().openSession();
-			tx = session.beginTransaction();
-
-			// 5.取出 DB 的 TransactionId
-			Orders order = orderDao.selectByTransactionId(session, merchantTradeNo);
-			// 5.1 DB 找不到這筆交易
-			if (order == null) {
-				tx.rollback();
-				return "0|ERROR";
-			}
-
-			// 6.比對 TransactionId
-			boolean ok1 = merchantTradeNo.equalsIgnoreCase(order.getTransactionId());
-			// 6.1 TransactionId 不一致
-			if (!ok1) {
-				tx.rollback();
-				return "0|ERROR";
-			}
-
-			// 7.查目前 payment_status
-			// 7.1 查目前 payment_status
-			String currentStatus = order.getPaymentStatus();
-
-			// 7.2 如果已 SUCCESS -> 直接 1|OK
-			if ("SUCCESS".equalsIgnoreCase(currentStatus)) {
-				tx.commit();
-				return "1|OK";
-			}
-
-			// 7.3取得ECPay的RtnCode
-			String rtnCode = params.get("RtnCode");
-			String newStatus = "1".equals(rtnCode) ? "SUCCESS" : "FAILED";
-
-			// 8.依 RtnCode 更新 SUCCESS / FAILED
-			order.setPaymentStatus(newStatus);
-
-			// 9.更新 raw_response、failureReason
-			// 9.1 組 raw_response
-			StringBuilder respSb = new StringBuilder();
-			for (Map.Entry<String, String> e : params.entrySet()) {
-				respSb.append(e.getKey()).append("=").append(e.getValue()).append("&");
-			}
-			if (respSb.length() > 0) {
-				respSb.setLength(respSb.length() - 1);
-			}
-			String rawResponse = respSb.toString();
-
-			// 9.2 產 failureReason
-			String failureReason = "1".equals(rtnCode) ? null : params.get("RtnMsg");
-
-			// 9.3 寫回 DB
-			order.setRawResponse(rawResponse);
-			order.setFailureReason(failureReason);
-
-			tx.commit();
-			return "1|OK";
-
-		} catch (Exception e) {
-			if (tx != null) {
-				try {
-					tx.rollback();
-				} catch (Exception ignore) {
-				}
-			}
-			e.printStackTrace();
+		// 5.取出 DB 的 TransactionId
+		Orders order = orderDao.selectByTransactionId(merchantTradeNo);
+		// 5.1 DB 找不到這筆交易
+		if (order == null) {
 			return "0|ERROR";
-		} finally {
-			if (session != null) {
-				try {
-					session.close();
-				} catch (Exception ignore) {
-				}
-			}
 		}
+
+		// 6.比對 TransactionId
+		boolean ok1 = merchantTradeNo.equalsIgnoreCase(order.getTransactionId());
+		// 6.1 TransactionId 不一致
+		if (!ok1) {
+			return "0|ERROR";
+		}
+
+		// 7.查目前 payment_status
+		// 7.1 查目前 payment_status
+		String currentStatus = order.getPaymentStatus();
+
+		// 7.2 如果已 SUCCESS -> 直接 1|OK
+		if ("SUCCESS".equalsIgnoreCase(currentStatus)) {
+			return "1|OK";
+		}
+
+		// 7.3取得ECPay的RtnCode
+		String rtnCode = params.get("RtnCode");
+		String newStatus = "1".equals(rtnCode) ? "SUCCESS" : "FAILED";
+
+		// 8.依 RtnCode 更新 SUCCESS / FAILED
+		order.setPaymentStatus(newStatus);
+
+		// 9.更新 raw_response、failureReason
+		// 9.1 組 raw_response
+		StringBuilder respSb = new StringBuilder();
+		for (Map.Entry<String, String> e : params.entrySet()) {
+			respSb.append(e.getKey()).append("=").append(e.getValue()).append("&");
+		}
+		if (respSb.length() > 0) {
+			respSb.setLength(respSb.length() - 1);
+		}
+		String rawResponse = respSb.toString();
+
+		// 9.2 產 failureReason
+		String failureReason = "1".equals(rtnCode) ? null : params.get("RtnMsg");
+
+		// 9.3 寫回 DB
+		order.setRawResponse(rawResponse);
+		order.setFailureReason(failureReason);
+
+		return "1|OK";
+
 	}
 
 	// UrlEncode 方法

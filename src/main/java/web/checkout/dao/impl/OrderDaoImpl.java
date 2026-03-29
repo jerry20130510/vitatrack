@@ -1,6 +1,7 @@
 package web.checkout.dao.impl;
 
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Repository;
 
@@ -11,16 +12,25 @@ import web.checkout.vo.ResultDTO;
 
 @Repository
 public class OrderDaoImpl implements OrderDao {
+	
+	private final SessionFactory sessionFactory;
+
+	public OrderDaoImpl(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
 
 	// 新增訂單
 	@Override
-	public void save(Session session, Orders order) {
+	public void save(Orders order) {
+		Session session = sessionFactory.getCurrentSession();
 		session.persist(order);
 	}
 
 	// 查訂單
 	@Override
-	public OrderPaymentInfo selectPaymentInfoByOrderId(Session session, int orderId) {
+	public OrderPaymentInfo selectPaymentInfoByOrderId(int orderId) {
+		
+		Session session = sessionFactory.getCurrentSession();
 
 		Orders o = session.get(Orders.class, orderId);
 		if (o == null)
@@ -43,7 +53,9 @@ public class OrderDaoImpl implements OrderDao {
 
 	// 產生一組唯一的 transaction_id
 	@Override
-	public int updateTransactionId(Session session, int orderId, String transactionId) {
+	public int updateTransactionId(int orderId, String transactionId) {
+		
+		Session session = sessionFactory.getCurrentSession();
 
 		String hql = "UPDATE Orders o SET o.transactionId = :txid WHERE o.orderId = :oid";
 
@@ -56,7 +68,9 @@ public class OrderDaoImpl implements OrderDao {
 
 	// 檢查 transactionId 是否重複
 	@Override
-	public boolean existsTransactionId(Session session, String transactionId) {
+	public boolean existsTransactionId(String transactionId) {
+		
+		Session session = sessionFactory.getCurrentSession();
 
 		String hql = "SELECT 1 FROM Orders o WHERE o.transactionId = :txid";
 
@@ -68,7 +82,9 @@ public class OrderDaoImpl implements OrderDao {
 
 	// 用 transaction_id 查訂單是否存在
 	@Override
-	public Orders selectByTransactionId(Session session, String transactionId) {
+	public Orders selectByTransactionId(String transactionId) {
+		
+		Session session = sessionFactory.getCurrentSession();
 
 		String hql = "FROM Orders o WHERE o.transactionId = :txid";
 
@@ -77,23 +93,11 @@ public class OrderDaoImpl implements OrderDao {
 	}
 
 	// 查詢訂單狀態(提供前端判斷付款成功或失敗)
-//	@Override
-//	public ResultDTO selectByOrderId(Session session, int orderId) {
-//
-//		String hql = "SELECT new web.checkout.vo.ResultDTO("
-//				+ "  o.orderId, o.paymentStatus, o.totalAmount, o.paymentTime, o.paymentMethod, o.failureReason" + ") "
-//				+ "FROM Orders o " + "WHERE o.orderId = :orderId";
-//
-//		Query<ResultDTO> query = session.createQuery(hql, ResultDTO.class);
-//
-//		query.setParameter("orderId", orderId);
-//
-//		ResultDTO result = query.uniqueResult();
-//
-//		return result;
 
 	@Override
-	public ResultDTO selectByOrderId(Session session, int orderId) {
+	public ResultDTO selectByOrderId(int orderId) {
+		
+		Session session = sessionFactory.getCurrentSession();
 
 		Orders o = session.get(Orders.class, orderId);
 
