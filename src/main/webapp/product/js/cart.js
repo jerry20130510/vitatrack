@@ -171,7 +171,7 @@ function checkoutNow() {
           window.CartStore.updateCartBadge();
         }
 
-        window.location.href = "/vitatrack/checkout/checkout.html";
+        window.location.href = "/vitatrack/checkout.html";
       } else {
         alert(result.message || "結帳失敗");
       }
