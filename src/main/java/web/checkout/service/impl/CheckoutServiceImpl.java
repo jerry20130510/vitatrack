@@ -27,7 +27,15 @@ public class CheckoutServiceImpl implements CheckoutService {
 		this.orderDao = orderDao;
 		this.orderItemDao = orderItemDao;
 	}
+	
+	//回傳購物車資料給checkout.html
+	@Override
+	@Transactional(readOnly = true)
+	public List<CartRow> getCheckoutCart(int memberId) {
+		return cartDao.findOpenCartByMemberId(memberId);
+	}
 
+	//更新訂單相關資料表，包含 orders。order_item、cart_item
 	@Override
 	@Transactional
 	public CheckoutResult checkout(int memberId) {
@@ -63,11 +71,10 @@ public class CheckoutServiceImpl implements CheckoutService {
 		Orders order = new Orders();
 		order.setMemberId(memberId);
 		order.setTotalAmount(totalAmount);
-		order.setPaymentStatus("PENDING");
 		order.setPaymentMethod("ECPAY");
 		order.setCreatedAt(new java.sql.Timestamp(System.currentTimeMillis()));
+		order.setPaymentStatus("PENDING");
 		order.setAmount(totalAmount);
-		order.setTransactionId("TXN" + System.currentTimeMillis());
 		order.setPaymentTime(new java.sql.Timestamp(System.currentTimeMillis()));
 
 		orderDao.save(order);
@@ -105,9 +112,4 @@ public class CheckoutServiceImpl implements CheckoutService {
 		return new CheckoutResult(orderId, totalAmountInt, "PENDING");
 	}
 
-	@Override
-	@Transactional(readOnly = true)
-	public List<CartRow> getCheckoutCart(int memberId) {
-		return cartDao.findOpenCartByMemberId(memberId);
-	}
 }

@@ -21,3 +21,8 @@ bin/
 bin/
 # 忽略 mail.properties
 mail.properties
+
+src/main/resources/app.properties
+src/main/resources/db.properties
+.env
+*.env

@@ -13,22 +13,22 @@ public class OrderItem {
     private Integer itemId;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "order_id", nullable = false)
+    @JoinColumn(name = "order_id")
     private Orders order;
 
-    @Column(name = "sku", nullable = false)
+    @Column(name = "sku")
     private String sku;
 
-    @Column(name = "product_name", nullable = false)
+    @Column(name = "product_name")
     private String productName;
 
-    @Column(name = "unit_price", nullable = false)
+    @Column(name = "unit_price")
     private BigDecimal unitPrice;
 
-    @Column(name = "quantity", nullable = false)
+    @Column(name = "quantity")
     private Integer quantity;
 
-    @Column(name = "subtotal", nullable = false)
+    @Column(name = "subtotal")
     private BigDecimal subtotal;
 
     @Column(name = "created_at", insertable = false, updatable = false)

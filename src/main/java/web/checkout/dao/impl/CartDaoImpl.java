@@ -27,8 +27,10 @@ public class CartDaoImpl implements CartDao {
 		Session session = sessionFactory.getCurrentSession();
 
 		String hql = "SELECT new web.checkout.vo.CartRow("
-				+ "  ci.cartItemId, p.sku, p.productName, p.price, ci.quantity" + ") " + "FROM CartItem ci "
-				+ "JOIN ci.product p " + "WHERE ci.memberId = :mid AND ci.orderId IS NULL";
+				+ "  ci.cartItemId, p.sku, p.productName, p.price, ci.quantity" + ") " 
+				+ "FROM CartItem ci "
+				+ "JOIN ci.product p " 
+				+ "WHERE ci.memberId = :mid AND ci.orderId IS NULL";
 
 		Query<CartRow> query = session.createQuery(hql, CartRow.class);
 
@@ -56,7 +58,10 @@ public class CartDaoImpl implements CartDao {
 		}
 
 		// 2.更新購物車的 order_id
-		String hql = "UPDATE CartItem ci SET ci.orderId = :oid WHERE ci.cartItemId IN (:ids)";
+		String hql = 
+				"UPDATE CartItem ci "
+				+ "SET ci.orderId = :oid "
+				+ "WHERE ci.cartItemId IN (:ids)";
 
 		Query query = session.createQuery(hql);
 
