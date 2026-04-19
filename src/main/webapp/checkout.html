@@ -573,45 +573,16 @@
                                                             <select name="gi_select_city" id="mn-select-city"
                                                                 class="mn-bill-select">
                                                                 <option selected disabled>縣市</option>
-                                                                <option value="1">縣市 1</option>
-                                                                <option value="2">縣市 2</option>
-                                                                <option value="3">縣市 3</option>
-                                                                <option value="4">縣市 4</option>
-                                                                <option value="5">縣市 5</option>
+                                                                <option value="1">基隆市</option>
+                                                                <option value="2">台北市</option>
+                                                                <option value="3">新北市</option>
+                                                                <option value="4">桃園市</option>
                                                             </select>
                                                         </span>
                                                     </span>
                                                     <span class="mn-bill-wrap mn-bill-half">
                                                         <label>郵遞區號</label>
                                                         <input type="text" name="postalcode" placeholder="郵遞區號">
-                                                    </span>
-                                                    <span class="mn-bill-wrap mn-bill-half">
-                                                        <label>國家*</label>
-                                                        <span class="mn-bl-select-inner">
-                                                            <select name="gi_select_country" id="mn-select-country"
-                                                                class="mn-bill-select">
-                                                                <option selected disabled>國家</option>
-                                                                <option value="1">國家 1</option>
-                                                                <option value="2">國家 2</option>
-                                                                <option value="3">國家 3</option>
-                                                                <option value="4">國家 4</option>
-                                                                <option value="5">國家 5</option>
-                                                            </select>
-                                                        </span>
-                                                    </span>
-                                                    <span class="mn-bill-wrap mn-bill-half">
-                                                        <label>地區/州</label>
-                                                        <span class="mn-bl-select-inner">
-                                                            <select name="gi_select_state" id="mn-select-state"
-                                                                class="mn-bill-select">
-                                                                <option selected disabled>地區/州</option>
-                                                                <option value="1">地區/州 1</option>
-                                                                <option value="2">地區/州 2</option>
-                                                                <option value="3">地區/州 3</option>
-                                                                <option value="4">地區/州 4</option>
-                                                                <option value="5">地區/州 5</option>
-                                                            </select>
-                                                        </span>
                                                     </span>
                                                 </form>
                                             </div>
@@ -1321,7 +1292,7 @@
 
                 let subtotal = 0;
                 data.forEach(item => {
-                    subtotal += Number(item.price) * Number(item.quantity);
+                    subtotal += Number(item.unitPrice) * Number(item.quantity);
                 });
 
                 const total = subtotal + shippingFeeValue;
@@ -1350,14 +1321,14 @@
 
             if (!cartItems || cartItems.length === 0) {
                 cartList.innerHTML = `
-            <div class="col-sm-12 mb-0">
-                <div class="mn-product-inner">
-                    <div class="mn-pro-content">
-                        <h5 class="mn-pro-title">購物車目前沒有商品</h5>
+                    <div class="col-sm-12 mb-0">
+                        <div class="mn-product-inner">
+                            <div class="mn-pro-content">
+                                <h5 class="mn-pro-title">購物車目前沒有商品</h5>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-        `;
+                `;
                 return;
             }
 
@@ -1369,30 +1340,28 @@
                 const subtotal = price * quantity;
 
                 html += `
-            <div class="col-sm-12 ${index === cartItems.length - 1 ? 'mb-0' : 'mb-6'}">
-                <div class="mn-product-inner">
-                    <div class="mn-pro-image-outer">
-                        <div class="mn-pro-image">
-                            <a href="product-detail.html" class="image">
-                                <img class="main-image"
-                                     src="${item.imageUrl ? item.imageUrl : 'assets/img/product/1.jpg'}"
-                                     alt="Product">
-                            </a>
+                    <div class="col-sm-12 ${index === cartItems.length - 1 ? 'mb-0' : 'mb-4'}">
+                        <div class="mn-product-inner">
+                            <div class="mn-pro-content">
+                                <h5 class="mn-pro-title" style="margin-bottom: 12px;">
+                                    <a href="product-detail.html">${index + 1}. ${item.productName}</a>
+                                </h5>
+
+                                <div style="font-weight: 600; margin-bottom: 8px;">
+                                    ${formatMoney(price)}
+                                </div>
+
+                                <div style="margin-bottom: 4px;">
+                                    數量：${quantity}
+                                </div>
+
+                                <div>
+                                    小計：${formatMoney(subtotal)}
+                                </div>
+                            </div>
                         </div>
                     </div>
-                    <div class="mn-pro-content">
-                        <h5 class="mn-pro-title">
-                            <a href="product-detail.html">${item.productName}</a>
-                        </h5>
-                        <span class="mn-price">
-                            <span class="new-price">${formatMoney(price)}</span>
-                        </span>
-                        <div>數量：${quantity}</div>
-                        <div>小計：${formatMoney(subtotal)}</div>
-                    </div>
-                </div>
-            </div>
-        `;
+                `;
             });
 
             cartList.innerHTML = html;
